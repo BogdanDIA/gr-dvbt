@@ -179,53 +179,45 @@ namespace gr {
 
         int in_count = 0;
         int out_count = 0;
+        int krem = d_k;
 
         while (out_count < (noutput_items * config.d_noutput))
         {
-          //Use d_k*d_m data input bits
-          //to assure that we have an integer number of symbols
-          for (int i = 0; i < (d_k * d_m); i++)
-          {
-            in_buff[i] = (in[in_count + (i / 8)] >> (7 - d_bitcount)) & 0x1;
+          int ncount = 0;
+          //keep buffer into 64bits
+          long long ll = 0;
+          int y = 0;
 
-            //data in is in bytes
-            d_bitcount = (d_bitcount + 1) % 8;
-            if (d_bitcount == 0)
-              in_count++;
+          while(ncount < (d_n * d_m))
+          {
+            int x = 0;
+            int c = 0;
+            int bitrem = 8;
+            int byte = in[in_count];
+
+            //Do this till finish the byte
+            while(bitrem >= krem)
+            {
+              x = ((byte >> (bitrem - krem)) & ((1 << d_k) - 1));
+              c = generate_punctured_code(config.d_code_rate_HP, y | x);
+              ll = (ll << d_n) | c;
+              bitrem -= krem;
+              krem = d_k;
+              ncount += d_n;
+            }
+            //Put remaining bits 
+            if (bitrem > 0)
+            {
+              krem = d_k - bitrem;
+              y = (byte & ((1 << bitrem) - 1)) << krem;
+            }
+            in_count++;
           }
 
-          //From input we take d_kXd_m bits
-          //In output we write d_nXd_m at a time
-      
-          for (int i = 0; i < d_m; i++)
-          {
-            unsigned char x = 0;
+          int count = ncount / d_m;
 
-            //Take chunks of d_k data bits
-            //and generate the codewords
-            for (int j = 0; j < d_k; j++)
-              x = (x << j) | in_buff[j + (i * d_k)];
-
-            unsigned char c = 0;
-            //Generate the codeword
-            c = generate_punctured_code(config.d_code_rate_HP, x);
-
-            //Put the bits in FIFO in reverse order
-            //so that we'll get them in the same order
-            for (int j = 0; j < d_n; j++)
-              out_buff[j + (i * d_n)] = (c >> (d_n - j - 1)) & 0x1;
-          }
-
-          //Take out d_m bits at at time and create the output
-          for (int i = 0; i < d_n; i++)
-          {
-            unsigned char r = 0;
-
-            for (int j = 0; j < d_m; j++)
-              r = r | (out_buff[j + (i * d_m)] << (d_m - j - 1));
-
-            out[out_count++] = r;
-          }
+          while(count--)
+            out[out_count++] = (ll >> (d_m * count)) & ((1 << d_m) - 1);
         }
 
         // Do <+signal processing+>

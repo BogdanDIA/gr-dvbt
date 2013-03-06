@@ -1,0 +1,7 @@
+/*!
+ * \defgroup block GNU Radio DVBT C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the DVBT GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
+

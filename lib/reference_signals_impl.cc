@@ -136,6 +136,10 @@ namespace gr {
     void
     pilot_gen::generate_bch_code()
     {
+      //TODO
+      //DO other way: if (feedback == 1) reg = reg ^ polymomial
+      //else nothing
+
       //(n, k) = (127, 113) = (60+67, 60+53)
       unsigned int reg_bch = 0;
       unsigned char data_in[113];

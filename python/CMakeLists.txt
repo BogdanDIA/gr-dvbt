@@ -48,3 +48,4 @@ GR_ADD_TEST(qa_dvbt_map ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dvbt
 GR_ADD_TEST(qa_bit_inner_interleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_bit_inner_interleaver.py)
 GR_ADD_TEST(qa_symbol_inner_interleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_symbol_inner_interleaver.py)
 GR_ADD_TEST(qa_inner_coder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_inner_coder.py)
+GR_ADD_TEST(qa_reed_solomon ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon.py)

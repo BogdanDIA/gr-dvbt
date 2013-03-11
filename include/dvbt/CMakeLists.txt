@@ -29,5 +29,6 @@ install(FILES
     dvbt_map.h
     bit_inner_interleaver.h
     symbol_inner_interleaver.h
-    inner_coder.h DESTINATION include/dvbt
+    inner_coder.h
+    reed_solomon.h DESTINATION include/dvbt
 )

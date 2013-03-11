@@ -23,5 +23,6 @@ install(FILES
     dvbt_dvbt_map.xml
     dvbt_bit_inner_interleaver.xml
     dvbt_symbol_inner_interleaver.xml
-    dvbt_inner_coder.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt_inner_coder.xml
+    dvbt_reed_solomon.xml DESTINATION share/gnuradio/grc/blocks
 )

@@ -4,7 +4,7 @@
   <key>dvbt_reed_solomon</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.reed_solomon()</make>
+  <make>dvbt.reed_solomon(2, 8, 0x11d, 255, 239, 8)</make>
   <param>
     <name>Input length</name>
     <key>ninput</key>

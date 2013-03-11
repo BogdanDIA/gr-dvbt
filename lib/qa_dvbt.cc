@@ -35,6 +35,7 @@
 #include "qa_bit_inner_interleaver.h"
 #include "qa_symbol_inner_interleaver.h"
 #include "qa_inner_coder.h"
+#include "qa_reed_solomon.h"
 
 CppUnit::TestSuite *
 qa_dvbt::suite()
@@ -49,6 +50,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_bit_inner_interleaver::suite());
   s->addTest(gr::dvbt::qa_symbol_inner_interleaver::suite());
   s->addTest(gr::dvbt::qa_inner_coder::suite());
+  s->addTest(gr::dvbt::qa_reed_solomon::suite());
 
   return s;
 }

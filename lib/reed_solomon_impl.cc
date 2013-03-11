@@ -197,21 +197,6 @@ namespace gr {
     {
       gf_init(d_p, d_m, d_gfpoly);
       rs_init(d_p, d_n, d_k, d_t);
-
-#if 0
-      unsigned char din[d_k];
-      for (int i = 0; i < d_k; i++)
-        din[i] = i;
-
-      unsigned char dout[2 * d_t];
-      for (int i = 0; i < (d_n - d_k); i++)
-        dout[i] = 0;
-      
-      rs_encode(din, dout);
-
-      for (int i = 0; i < (2 * d_t); i++)
-        printf("out[%i]=%i\n", i, dout[i]);
-#endif
     }
 
     /*

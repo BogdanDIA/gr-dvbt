@@ -181,19 +181,19 @@ namespace gr {
     }
 
     reed_solomon::sptr
-    reed_solomon::make()
+    reed_solomon::make(int p, int m, int gfpoly, int n, int k, int t)
     {
-      return gnuradio::get_initial_sptr (new reed_solomon_impl());
+      return gnuradio::get_initial_sptr (new reed_solomon_impl(p, m, gfpoly, n, k, t));
     }
 
     /*
      * The private constructor
      */
-    reed_solomon_impl::reed_solomon_impl()
+    reed_solomon_impl::reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t)
       : gr_block("reed_solomon",
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * 378),
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * 378)),
-      d_p(2), d_m(8), d_gfpoly(0x11d), d_n(255), d_k(239), d_t(8)
+      d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t)
     {
       gf_init(d_p, d_m, d_gfpoly);
       rs_init(d_p, d_n, d_k, d_t);

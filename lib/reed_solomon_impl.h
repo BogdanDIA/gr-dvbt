@@ -50,7 +50,7 @@ namespace gr {
       int rs_encode(const unsigned char *data_in, unsigned char *data_out);
 
     public:
-      reed_solomon_impl();
+      reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t);
       ~reed_solomon_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

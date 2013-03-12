@@ -46,7 +46,7 @@ namespace gr {
         * class. dvbt::reed_solomon::make is the public interface for
         * creating new instances.
         */
-       static sptr make(int p, int m, int gfpoly, int n, int k, int t);
+       static sptr make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
     };
 
   } // namespace dvbt

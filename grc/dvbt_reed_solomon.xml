@@ -4,30 +4,63 @@
   <key>dvbt_reed_solomon</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.reed_solomon(2, 8, 0x11d, 255, 239, 8)</make>
+  <make>dvbt.reed_solomon($p, $m, $gfpoly, $n, $k, $t, $s, $blocks)</make>
   <param>
-    <name>Input length</name>
-    <key>ninput</key>
-    <value>1512</value>
+    <name>p</name>
+    <key>p</key>
+    <value>2</value>
     <type>int</type>
   </param>
   <param>
-    <name>Output length</name>
-    <key>noutput</key>
-    <value>1512</value>
+    <name>m</name>
+    <key>m</key>
+    <value>8</value>
     <type>int</type>
   </param>
-  <check>$ninput &gt; 0</check>
-  <check>$noutput &gt; 0</check>
-  <check>$noutput &gt;= $ninput</check>
+  <param>
+    <name>GF polynom</name>
+    <key>gfpoly</key>
+    <value>0x11d</value>
+    <type>raw</type>
+  </param>
+  <param>
+    <name>n</name>
+    <key>n</key>
+    <value>255</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>k</name>
+    <key>k</key>
+    <value>239</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>t</name>
+    <key>t</key>
+    <value>8</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Shorten size</name>
+    <key>s</key>
+    <value>51</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Blocks</name>
+    <key>blocks</key>
+    <value>8</value>
+    <type>int</type>
+  </param>
   <sink>
     <name>in</name>
     <type>byte</type>
-    <vlen>$ninput</vlen>
+    <vlen>$blocks*($k-$s)</vlen>
   </sink>
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>$noutput</vlen>
+    <vlen>$blocks*($n-$s)</vlen>
   </source>
 </block>

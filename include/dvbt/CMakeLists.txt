@@ -30,5 +30,6 @@ install(FILES
     bit_inner_interleaver.h
     symbol_inner_interleaver.h
     inner_coder.h
-    reed_solomon.h DESTINATION include/dvbt
+    reed_solomon.h
+    energy_dispersal.h DESTINATION include/dvbt
 )

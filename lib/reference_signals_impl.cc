@@ -299,7 +299,7 @@ namespace gr {
      * s36, s37 Guard interval
      * s38, s39 Transmission mode
      * s40, s47 Cell identifier
-     * s48-s53 All set o "0"
+     * s48-s53 All set to "0"
      * s54-s67 Error protection (BCH code)
      */
     void

@@ -36,6 +36,7 @@
 #include "qa_symbol_inner_interleaver.h"
 #include "qa_inner_coder.h"
 #include "qa_reed_solomon.h"
+#include "qa_energy_dispersal.h"
 
 CppUnit::TestSuite *
 qa_dvbt::suite()
@@ -51,6 +52,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_symbol_inner_interleaver::suite());
   s->addTest(gr::dvbt::qa_inner_coder::suite());
   s->addTest(gr::dvbt::qa_reed_solomon::suite());
+  s->addTest(gr::dvbt::qa_energy_dispersal::suite());
 
   return s;
 }

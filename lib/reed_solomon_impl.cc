@@ -147,8 +147,10 @@ namespace gr {
     void
     reed_solomon_impl::rs_uninit()
     {
-      delete [] d_l;
-      delete [] d_g;
+      if (d_l)
+        delete [] d_l;
+      if (d_g)
+        delete [] d_g;
     }
 
     int
@@ -181,22 +183,31 @@ namespace gr {
     }
 
     reed_solomon::sptr
-    reed_solomon::make(int p, int m, int gfpoly, int n, int k, int t)
+    reed_solomon::make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
     {
-      return gnuradio::get_initial_sptr (new reed_solomon_impl(p, m, gfpoly, n, k, t));
+      return gnuradio::get_initial_sptr (new reed_solomon_impl(p, m, gfpoly, n, k, t, s, blocks));
     }
 
     /*
      * The private constructor
      */
-    reed_solomon_impl::reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t)
+    reed_solomon_impl::reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
       : gr_block("reed_solomon",
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * 378),
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * 378)),
-      d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t)
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (k - s)),
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (n - s))),
+      d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks)
     {
       gf_init(d_p, d_m, d_gfpoly);
       rs_init(d_p, d_n, d_k, d_t);
+
+      //Allocate buffer for RS input
+      d_in = new unsigned char[d_k];
+      if (d_in == NULL)
+      {
+        std::cout << "Cannot allocate memory" << std::endl;
+      }
+      //For shortened code, first s bytes are zero
+      memset(&d_in[0], 0, d_s);
     }
 
     /*
@@ -204,6 +215,9 @@ namespace gr {
      */
     reed_solomon_impl::~reed_solomon_impl()
     {
+      if (d_in)
+        delete [] d_in;
+
       rs_uninit();
       gf_uninit();
     }
@@ -223,20 +237,23 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        int in_bsize = 239;
-        int out_bsize = 255;
+        int in_bsize = d_k - d_s;
+        int out_bsize = d_n - d_s;
 
         unsigned char parity[2 * d_t];
 
         int in_count = 0;
         int out_count = 0;
 
-        for (int i = 0; i < noutput_items; i++)
+        for (int i = 0; i < (d_blocks * noutput_items); i++)
         {
-          rs_encode(&in[i * in_bsize], parity);
+          memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
+
           //TODO - zero copy?
-          memcpy(&out[i * out_bsize], &in[0], d_k);
-          memcpy(&out[i * out_bsize + d_k], parity, 2 * d_t);
+          rs_encode(d_in, parity);
+
+          memcpy(&out[i * out_bsize], &in[i * in_bsize], in_bsize);
+          memcpy(&out[i * out_bsize + in_bsize], parity, 2 * d_t);
         }
 
         // Do <+signal processing+>

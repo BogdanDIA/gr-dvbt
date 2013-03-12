@@ -166,6 +166,7 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
+        //TODO - allocate these dynamically 
         unsigned char in_buff[d_n * d_m];
         unsigned char out_buff[d_n * d_m];
 
@@ -175,6 +176,8 @@ namespace gr {
          * k=1, n=2, K=6
          * Generator polinomial G1=171(OCT), G2=133(OCT)
          * Punctured to obtain rates of 2/3, 3/4, 5/6, 7/8
+         *
+         * TODO - comment in and out data format
          */
 
         int in_count = 0;

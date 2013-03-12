@@ -40,6 +40,10 @@ namespace gr {
       unsigned char *d_l;
       unsigned char *d_g;
 
+      int d_s;
+      int d_blocks;
+      unsigned char *d_in;
+
       int gf_add(int a, int b);
       int gf_mul(int a, int b);
       int gf_exp(int a);
@@ -50,7 +54,7 @@ namespace gr {
       int rs_encode(const unsigned char *data_in, unsigned char *data_out);
 
     public:
-      reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t);
+      reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
       ~reed_solomon_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

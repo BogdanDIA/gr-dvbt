@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<block>
+  <name>energy_dispersal</name>
+  <key>dvbt_energy_dispersal</key>
+  <category>dvbt</category>
+  <import>import dvbt</import>
+  <make>dvbt.energy_dispersal($nsize)</make>
+  <param>
+    <name>Length</name>
+    <key>nsize</key>
+    <value>1504</value>
+    <type>int</type>
+  </param>
+  <check>$nsize &gt; 0</check>
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+    <vlen>$nsize</vlen>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>byte</type>
+    <vlen>$nsize</vlen>
+  </source>
+</block>

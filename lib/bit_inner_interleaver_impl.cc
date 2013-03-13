@@ -79,7 +79,10 @@ namespace gr {
 
       d_perm = (unsigned char *)new unsigned char[d_v * d_bsize];
       if (d_perm == NULL)
+      {
         std::cout << "Error allocating d_perm" << std::endl;
+        return;
+      }
 
       //Init permutation table
       for (int i = 0; i <  d_bsize * d_v; i++)
@@ -138,23 +141,24 @@ namespace gr {
         /*
          * Clause 4.3.4.1
          *
-         * Data input format:
+         * Data Input format Non-Hierarchical:
          * 000000X0X1 - QPSK
          * 0000X0X1X2X3 - QAM16
          * 00X0X1X2X3X4X5 - QAM64
-         * ibit interleaver block size is 126
          *
-         * Data output format Non-Hierarchical:
-         * 000000I0I1 - QPSK
-         * 0000I0I1I2I3 - QAM16
-         * 00I0I1I2I3I4I5 - QAM64
-         * Data output format Hierarchical:
-         * 0000000I0 - H-QPSK
-         * 0000000I1 - L-QPSK
-         * 000000I0I1 - H-QAM16
-         * 000000I0I1 - L-QAM16
-         * 000000I0I1 - H-QAM64
-         * 0000I0I1I2I3 - L-QAM64
+         * Data Input format Hierarchical:
+         * 0000000X0 - H-QPSK
+         * 0000000X1 - L-QPSK
+         * 000000X0X1 - H-QAM16
+         * 000000X0X1 - L-QAM16
+         * 000000X0X1 - H-QAM64
+         * 0000X0X1X2X3 - L-QAM64
+         *
+         * Data Output format:
+         * 000000B0B1 - QPSK
+         * 0000B0B1B2B3 - QAM16
+         * 00B0B1B2B3B4B5 - QAM64
+         * bit interleaver block size is 126
          */
 
          for (int bcount = 0; bcount < bmax; bcount++)

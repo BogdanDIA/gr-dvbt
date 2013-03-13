@@ -31,5 +31,6 @@ install(FILES
     symbol_inner_interleaver.h
     inner_coder.h
     reed_solomon.h
-    energy_dispersal.h DESTINATION include/dvbt
+    energy_dispersal.h
+    convolutional_interleaver.h DESTINATION include/dvbt
 )

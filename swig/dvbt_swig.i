@@ -18,6 +18,7 @@
 #include "dvbt/inner_coder.h"
 #include "dvbt/reed_solomon.h"
 #include "dvbt/energy_dispersal.h"
+#include "dvbt/convolutional_interleaver.h"
 %}
 
 %include "dvbt/test.h"
@@ -30,6 +31,7 @@
 %include "dvbt/inner_coder.h"
 %include "dvbt/reed_solomon.h"
 %include "dvbt/energy_dispersal.h"
+%include "dvbt/convolutional_interleaver.h"
 GR_SWIG_BLOCK_MAGIC2(dvbt, test);
 GR_SWIG_BLOCK_MAGIC2(dvbt, vector_pad);
 GR_SWIG_BLOCK_MAGIC2(dvbt, reference_signals);
@@ -39,3 +41,4 @@ GR_SWIG_BLOCK_MAGIC2(dvbt, symbol_inner_interleaver);
 GR_SWIG_BLOCK_MAGIC2(dvbt, inner_coder);
 GR_SWIG_BLOCK_MAGIC2(dvbt, reed_solomon);
 GR_SWIG_BLOCK_MAGIC2(dvbt, energy_dispersal);
+GR_SWIG_BLOCK_MAGIC2(dvbt, convolutional_interleaver);

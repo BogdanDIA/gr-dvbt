@@ -31,7 +31,7 @@ namespace gr {
     class convolutional_interleaver_impl : public convolutional_interleaver
     {
     private:
-      int d_nsize;
+      int d_blocks;
       int d_I;
       int d_M;
       std::vector< std::deque<unsigned char> * > d_shift;

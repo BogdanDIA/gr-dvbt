@@ -38,11 +38,11 @@ namespace gr {
     /*
      * The private constructor
      */
-    convolutional_interleaver_impl::convolutional_interleaver_impl(int nsize, int I, int M)
+    convolutional_interleaver_impl::convolutional_interleaver_impl(int blocks, int I, int M)
       : gr_block("convolutional_interleaver",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize)),
-      d_nsize(nsize), d_I(I), d_M(M)
+		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks)),
+      d_blocks(blocks), d_I(I), d_M(M)
     {
       //Zero elements in the first position
       d_shift.push_back(new std::deque<unsigned char>(0, 0));
@@ -88,8 +88,9 @@ namespace gr {
          * Data input: Blocks of 204 bytes
          * Data output: Blocks of 204 bytes
          */
-        for (int i = 0; i < (d_nsize * noutput_items / d_I); i++)
+        for (int i = 0; i < (d_blocks * noutput_items); i++)
         {
+          //Process one block
           for (int j = 0; j < d_shift.size(); j++)
           {
             d_shift[j]->push_front(in[(d_I * i) + j]);

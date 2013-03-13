@@ -63,8 +63,8 @@ namespace gr {
      */
     energy_dispersal_impl::energy_dispersal_impl(int nsize)
       : gr_block("energy_dispersal",
-		      gr_make_io_signature(1, 1, nsize * sizeof(unsigned char)),
-		      gr_make_io_signature(1, 1, nsize * sizeof(unsigned char)))
+		      gr_make_io_signature(1, 1, nsize * 188 * sizeof(unsigned char)),
+		      gr_make_io_signature(1, 1, nsize * 188 * sizeof(unsigned char)))
     {}
 
     /*
@@ -97,6 +97,7 @@ namespace gr {
          * Output - Randomized MPEG-2 transport packets.
          * We assume the first byte is a sync
          * First sync in a row of 8 packets is reversed - 0xB8
+         * Block size is 188bytes
          */
         for (int i = 0; i < noutput_items; i++)
         {

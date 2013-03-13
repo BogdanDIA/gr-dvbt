@@ -286,6 +286,7 @@ namespace gr {
     }
 
     /*
+     * Clause 4.6
      * Format data that will be sent with TPS signals
      * en 300 744 - section 4.6.2
      * s0 Initialization

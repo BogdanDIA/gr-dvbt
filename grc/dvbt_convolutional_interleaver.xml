@@ -4,11 +4,11 @@
   <key>dvbt_convolutional_interleaver</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.convolutional_interleaver($nsize, $I, $M)</make>
+  <make>dvbt.convolutional_interleaver($blocks, $I, $M)</make>
   <param>
-    <name>Length</name>
-    <key>nsize</key>
-    <value>1504</value>
+    <name>Blocks (12 Bytes)</name>
+    <key>blocks</key>
+    <value>136</value>
     <type>int</type>
   </param>
   <param>
@@ -23,15 +23,17 @@
     <value>17</value>
     <type>int</type>
   </param>
-  <check>$nsize &gt; 0</check>
+  <check>$blocks &gt; 0</check>
+  <check>$I &gt; 0</check>
+  <check>$M &gt; 0</check>
   <sink>
     <name>in</name>
     <type>byte</type>
-    <vlen>$nsize</vlen>
+    <vlen>$blocks*$I</vlen>
   </sink>
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>$nsize</vlen>
+    <vlen>$blocks*$I</vlen>
   </source>
 </block>

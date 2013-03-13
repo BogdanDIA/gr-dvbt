@@ -38,7 +38,7 @@
 		</option>
   </param>
   <param>
-    <name>Hieracrchy Type</name>
+    <name>Hierarchy Type</name>
 		<key>hierarchy</key>
 		<type>enum</type>
 		<option>

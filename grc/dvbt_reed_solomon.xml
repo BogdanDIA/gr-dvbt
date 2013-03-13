@@ -24,13 +24,13 @@
     <type>raw</type>
   </param>
   <param>
-    <name>n</name>
+    <name>N</name>
     <key>n</key>
     <value>255</value>
     <type>int</type>
   </param>
   <param>
-    <name>k</name>
+    <name>K</name>
     <key>k</key>
     <value>239</value>
     <type>int</type>

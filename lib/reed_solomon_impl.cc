@@ -237,6 +237,11 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
+        /*
+         * Clause 4.3.2
+         * RS(N=204,K=239,T=8)
+         */
+
         int in_bsize = d_k - d_s;
         int out_bsize = d_n - d_s;
 

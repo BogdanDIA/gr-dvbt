@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<block>
+  <name>convolutional_interleaver</name>
+  <key>dvbt_convolutional_interleaver</key>
+  <category>dvbt</category>
+  <import>import dvbt</import>
+  <make>dvbt.convolutional_interleaver($nsize, $I, $M)</make>
+  <param>
+    <name>Length</name>
+    <key>nsize</key>
+    <value>1504</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Number of Shift registers</name>
+    <key>I</key>
+    <value>12</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Depth of shift registers</name>
+    <key>M</key>
+    <value>17</value>
+    <type>int</type>
+  </param>
+  <check>$nsize &gt; 0</check>
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+    <vlen>$nsize</vlen>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>byte</type>
+    <vlen>$nsize</vlen>
+  </source>
+</block>

@@ -38,48 +38,56 @@
 		</option>
   </param>
   <param>
-    <name>Hieracrchy Type</name>
+    <name>Hierarchy Type</name>
 		<key>hierarchy</key>
 		<type>enum</type>
 		<option>
 			<name>Non Hierarchical</name>
 			<key>nh</key>
 			<opt>val:dvbt.NH</opt>
+      <opt>num_streams:1</opt>
 		</option>
     <option>
 			<name>Alpha 1</name>
 			<key>alpha1</key>
 			<opt>val:dvbt.ALPHA1</opt>
+      <opt>num_streams:2</opt>
 		</option>
     <option>
       <name>Alpha 2</name>
 			<key>alpha2</key>
 			<opt>val:dvbt.ALPHA2</opt>
+      <opt>num_streams:2</opt>
 		</option>
     <option>
       <name>Alpha 4</name>
 			<key>alpha4</key>
 			<opt>val:dvbt.ALPHA4</opt>
+      <opt>num_streams:2</opt>
 		</option>
     <option>
       <name>HRES1</name>
       <key>HRES1</key>
 			<opt>val:dvbt.HRES1</opt>
+      <opt>num_streams:2</opt>
 		</option>
     <option>
       <name>HRES2</name>
       <key>HRES2</key>
 			<opt>val:dvbt.HRES2</opt>
+      <opt>num_streams:2</opt>
 		</option>
     <option>
       <name>HRES3</name>
       <key>HRES3</key>
 			<opt>val:dvbt.HRES3</opt>
+      <opt>num_streams:2</opt>
 		</option>
     <option>
       <name>HRES4</name>
       <key>HRES4</key>
 			<opt>val:dvbt.HRES4</opt>
+      <opt>num_streams:2</opt>
 		</option>
   </param>
   <check>$ninput &gt; 0</check>
@@ -89,6 +97,7 @@
     <name>in</name>
     <type>byte</type>
     <vlen>$ninput</vlen>
+    <nports>$hierarchy.num_streams</nports>
   </sink>
   <source>
     <name>out</name>

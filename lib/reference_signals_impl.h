@@ -28,9 +28,14 @@
 // This should eventually go into a const file
     const int SYMBOLS_PER_FRAME = 68;
     const int FRAMES_PER_SUPERFRAME = 4;
+
     const int SCATTERED_PILOT_SIZE_2k = 142;
     const int CONTINUAL_PILOT_SIZE_2k = 45;
     const int TPS_PILOT_SIZE_2k = 17;
+
+    const int SCATTERED_PILOT_SIZE_8k = 142; //TODO
+    const int CONTINUAL_PILOT_SIZE_8k = 177;
+    const int TPS_PILOT_SIZE_8k = 68;
 
 namespace gr {
   namespace dvbt {
@@ -43,6 +48,7 @@ class pilot_gen {
     static const int d_symbols_per_frame;
     static const int d_frames_per_superframe;
 
+    // 2k mode
     // scattered pilot carriers info
     static const int d_spilot_carriers_size_2k;
 
@@ -53,7 +59,26 @@ class pilot_gen {
     // TPS carriers info
     static const int d_tps_carriers_size_2k;
     static const int d_tps_carriers_2k[];
-    gr_complex * d_tps_carriers_val_2k;
+
+    //8k mode
+    // scattered pilot carriers info
+    static const int d_spilot_carriers_size_8k;
+
+    // continual pilot carriers info
+    static const int d_cpilot_carriers_size_8k;
+    static const int d_cpilot_carriers_8k[];
+
+    // TPS carriers info
+    static const int d_tps_carriers_size_8k;
+    static const int d_tps_carriers_8k[];
+
+    // Variables to keep data for 2k, 8k, 4k
+    int d_spilot_carriers_size;
+    int d_cpilot_carriers_size;
+    const int * d_cpilot_carriers;
+    int d_tps_carriers_size;
+    const int * d_tps_carriers;
+    gr_complex * d_tps_carriers_val;
 
     // Keeps TPS data
     unsigned char * d_tps_data;

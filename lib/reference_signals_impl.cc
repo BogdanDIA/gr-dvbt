@@ -35,6 +35,7 @@ namespace gr {
     //Number of frames in a superframe
     const int pilot_gen::d_frames_per_superframe = FRAMES_PER_SUPERFRAME;
 
+    // 2k mode
     // Scattered pilots # of carriers
     const int pilot_gen::d_spilot_carriers_size_2k = SCATTERED_PILOT_SIZE_2k;
     // Continual pilots # of carriers and positions
@@ -57,6 +58,52 @@ namespace gr {
     1594, 1687
     };
 
+    // 8k mode
+    // Scattered pilots # of carriers
+    const int pilot_gen::d_spilot_carriers_size_8k = SCATTERED_PILOT_SIZE_8k;
+    // Continual pilots # of carriers and positions
+    const int pilot_gen::d_cpilot_carriers_size_8k = CONTINUAL_PILOT_SIZE_8k;
+    const int pilot_gen::d_cpilot_carriers_8k[pilot_gen::d_cpilot_carriers_size_8k] = {
+       0,   48,   54,   87,  141,  156,  192,
+     201,  255,  279,  282,  333,  432,  450,
+     483,  525,  531,  618,  636,  714,  759,
+     765,  780,  804,  873,  888,  918,  939,
+     942,  969,  984, 1050, 1101, 1107, 1110,
+    1137, 1140, 1146, 1206, 1269, 1323, 1377,
+    1491, 1683, 1704, 1752, 1758, 1791, 1845,
+    1860, 1896, 1905, 1959, 1983, 1986, 2037,
+    2136, 2154, 2187, 2229, 2235, 2322, 2340,
+    2418, 2463, 2469, 2484, 2508, 2577, 2592,
+    2622, 2643, 2646, 2673, 2688, 2754, 2805,
+    2811, 2814, 2841, 2844, 2850, 2910, 2973,
+    3027, 3081, 3195, 3387, 3408, 3456, 3462,
+    3495, 3549, 3564, 3600, 3609, 3663, 3687,
+    3690, 3741, 3840, 3858, 3891, 3933, 3939,
+    4026, 4044, 4122, 4167, 4173, 4188, 4212,
+    4281, 4296, 4326, 4347, 4350, 4377, 4392,
+    4458, 4509, 4515, 4518, 4545, 4548, 4554,
+    4614, 4677, 4731, 4785, 4899, 5091, 5112,
+    5160, 5166, 5199, 5253, 5268, 5304, 5313,
+    5367, 5391, 5394, 5445, 5544, 5562, 5595,
+    5637, 5643, 5730, 5748, 5826, 5871, 5877,
+    5892, 5916, 5985, 6000, 6030, 6051, 6054,
+    6081, 6096, 6162, 6213, 6219, 6222, 6249,
+    6252, 6258, 6318, 6381, 6435, 6489, 6603,
+    6795, 6816
+    };
+    // TPS pilots # of carriers and positions
+    const int pilot_gen::d_tps_carriers_size_8k = TPS_PILOT_SIZE_8k;
+    const int pilot_gen::d_tps_carriers_8k[pilot_gen::d_tps_carriers_size_8k] = {
+      34,   50,  209,  346,  413,  569,  595,  688, \
+     790,  901, 1073, 1219, 1262, 1286, 1469, 1594, \
+    1687, 1738, 1754, 1913, 2050, 2117, 2273, 2299, \
+    2392, 2494, 2605, 2777, 2923, 2966, 2990, 3173, \
+    3298, 3391, 3442, 3458, 3617, 3754, 3821, 3977, \
+    4003, 4096, 4198, 4309, 4481, 4627, 4670, 4694, \
+    4877, 5002, 5095, 5146, 5162, 5321, 5458, 5525, \
+    5681, 5707, 5800, 5902, 6013, 6185, 6331, 6374
+    };
+
     /*
      * Constructor of class
      */
@@ -68,6 +115,32 @@ namespace gr {
                                         d_frame_index(0),
                                         d_superframe_index(0)
     {
+      //Set-up pilot data depending for transmission mode
+      if (config.d_transmission_mode == gr::dvbt::T2k)
+      {
+        d_spilot_carriers_size = d_spilot_carriers_size_2k;
+        d_cpilot_carriers_size = d_cpilot_carriers_size_2k;
+        d_cpilot_carriers = d_cpilot_carriers_2k;
+        d_tps_carriers_size = d_tps_carriers_size_2k;
+        d_tps_carriers = d_tps_carriers_2k;
+      }
+      else if (config.d_transmission_mode == gr::dvbt::T8k)
+      {
+        d_spilot_carriers_size = d_spilot_carriers_size_8k;
+        d_cpilot_carriers_size = d_cpilot_carriers_size_8k;
+        d_cpilot_carriers = d_cpilot_carriers_8k;
+        d_tps_carriers_size = d_tps_carriers_size_8k;
+        d_tps_carriers = d_tps_carriers_8k;
+      }
+      else
+      {
+        d_spilot_carriers_size = d_spilot_carriers_size_2k;
+        d_cpilot_carriers_size = d_cpilot_carriers_size_2k;
+        d_cpilot_carriers = d_cpilot_carriers_2k;
+        d_tps_carriers_size = d_tps_carriers_size_2k;
+        d_tps_carriers = d_tps_carriers_2k;
+      }
+
       //allocate PRBS buffer
       d_wk = new char[config.d_Kmax - config.d_Kmin + 1];
       if (d_wk == NULL)
@@ -77,10 +150,10 @@ namespace gr {
       }
 
       // allocate buffer for first tps symbol constellation
-      d_tps_carriers_val_2k = new gr_complex[d_tps_carriers_size_2k];
-      if (d_tps_carriers_val_2k == NULL)
+      d_tps_carriers_val = new gr_complex[d_tps_carriers_size];
+      if (d_tps_carriers_val == NULL)
       {
-        std::cout << "error allocating d_tps_carriers_val_2k" << std::endl;
+        std::cout << "error allocating d_tps_carriers_val" << std::endl;
         return;
       }
 
@@ -105,9 +178,9 @@ namespace gr {
      */
     pilot_gen::~pilot_gen()
     {
-      delete d_wk;
-      delete d_tps_carriers_val_2k;
-      delete d_tps_data;
+      delete [] d_wk;
+      delete [] d_tps_carriers_val;
+      delete [] d_tps_data;
     }
 
     /*
@@ -218,7 +291,7 @@ namespace gr {
     void
     pilot_gen::advance_spilot()
     {
-      d_spilot_index = (++d_spilot_index) % d_spilot_carriers_size_2k;
+      d_spilot_index = (++d_spilot_index) % d_spilot_carriers_size;
     }
 
     /*
@@ -227,7 +300,7 @@ namespace gr {
     int 
     pilot_gen::get_current_cpilot() const
     {
-      return d_cpilot_carriers_2k[d_cpilot_index];
+      return d_cpilot_carriers[d_cpilot_index];
     }
 
     gr_complex
@@ -240,7 +313,7 @@ namespace gr {
     void
     pilot_gen::advance_cpilot()
     {
-      d_cpilot_index = (++d_cpilot_index) % d_cpilot_carriers_size_2k;
+      d_cpilot_index = (++d_cpilot_index) % d_cpilot_carriers_size;
     }
 
     /*
@@ -250,7 +323,7 @@ namespace gr {
     int
     pilot_gen::get_current_tpilot() const
     {
-        return d_tps_carriers_2k[d_tpilot_index];
+        return d_tps_carriers[d_tpilot_index];
     }
 
     gr_complex
@@ -258,18 +331,18 @@ namespace gr {
     {
       //TODO - it can be calculated at the beginnning
       if (d_symbol_index == 0)
-        d_tps_carriers_val_2k[d_tpilot_index] = gr_complex(2 * (0.5 - d_wk[tpilot]), 0);
+        d_tps_carriers_val[d_tpilot_index] = gr_complex(2 * (0.5 - d_wk[tpilot]), 0);
       else
         if (d_tps_data[d_symbol_index] == 1)
-            d_tps_carriers_val_2k[d_tpilot_index] = gr_complex(-d_tps_carriers_val_2k[d_tpilot_index].real(), 0);
+            d_tps_carriers_val[d_tpilot_index] = gr_complex(-d_tps_carriers_val[d_tpilot_index].real(), 0);
 
-      return d_tps_carriers_val_2k[d_tpilot_index];
+      return d_tps_carriers_val[d_tpilot_index];
     }
 
     void
     pilot_gen::advance_tpilot()
     {
-      d_tpilot_index = (++d_tpilot_index) % (d_tps_carriers_size_2k);
+      d_tpilot_index = (++d_tpilot_index) % (d_tps_carriers_size);
     }
 
     /*
@@ -337,7 +410,7 @@ namespace gr {
       set_tps_bits(53, 48, 0);
       //Clause 4.6.2.11
       generate_bch_code();
-}
+    }
 
     void
     pilot_gen::update_output(const gr_complex *in, gr_complex *out)

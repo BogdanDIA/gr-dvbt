@@ -39,9 +39,10 @@ namespace gr {
      * The private constructor
      */
     convolutional_interleaver_impl::convolutional_interleaver_impl(int blocks, int I, int M)
-      : gr_block("convolutional_interleaver",
+      : gr_sync_interpolator("convolutional_interleaver",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks)),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
+          I * blocks),
       d_blocks(blocks), d_I(I), d_M(M)
     {
       //Zero elements in the first position
@@ -67,15 +68,8 @@ namespace gr {
       }
     }
 
-    void
-    convolutional_interleaver_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
-    {
-        ninput_items_required[0] = noutput_items;
-    }
-
     int
-    convolutional_interleaver_impl::general_work (int noutput_items,
-                       gr_vector_int &ninput_items,
+    convolutional_interleaver_impl::work (int noutput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
@@ -86,11 +80,11 @@ namespace gr {
          * Clause 4.3.1
          * Forney (Ramsey type III) convolutional interleaver
          * Data input: Blocks of 204 bytes
-         * Data output: Blocks of 204 bytes
+         * Data output: Stream of 1 byte
          */
-        for (int i = 0; i < (d_blocks * noutput_items); i++)
+        for (int i = 0; i < (noutput_items / d_I); i++)
         {
-          //Process one block
+          //Process one block of I symbols
           for (int j = 0; j < d_shift.size(); j++)
           {
             d_shift[j]->push_front(in[(d_I * i) + j]);
@@ -98,11 +92,6 @@ namespace gr {
             d_shift[j]->pop_back();
           }
         }
-
-        // Do <+signal processing+>
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (noutput_items);
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

@@ -19,12 +19,11 @@
  */
 
 
-#ifndef INCLUDED_DVBT_INNER_CODER_H
-#define INCLUDED_DVBT_INNER_CODER_H
+#ifndef INCLUDED_DVBT_TEST2_H
+#define INCLUDED_DVBT_TEST2_H
 
 #include <dvbt/api.h>
-#include <gr_sync_decimator.h>
-#include <dvbt/dvbt_config.h>
+#include <gr_sync_interpolator.h>
 
 namespace gr {
   namespace dvbt {
@@ -34,25 +33,24 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API inner_coder : virtual public gr_sync_decimator
+    class DVBT_API test2 : virtual public gr_sync_interpolator
     {
     public:
-       typedef boost::shared_ptr<inner_coder> sptr;
+       typedef boost::shared_ptr<test2> sptr;
 
        /*!
-        * \brief Return a shared_ptr to a new instance of dvbt::inner_coder.
+        * \brief Return a shared_ptr to a new instance of dvbt::test2.
         *
-        * To avoid accidental use of raw pointers, dvbt::inner_coder's
+        * To avoid accidental use of raw pointers, dvbt::test2's
         * constructor is in a private implementation
-        * class. dvbt::inner_coder::make is the public interface for
+        * class. dvbt::test2::make is the public interface for
         * creating new instances.
         */
-       static sptr make(int ninput, int noutput, dvbt_constellation_t constellation, \
-        dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate);
+       static sptr make(int itemsize, int ninput, int noutput);
     };
 
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_INNER_CODER_H */
+#endif /* INCLUDED_DVBT_TEST2_H */
 

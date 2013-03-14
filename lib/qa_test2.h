@@ -18,34 +18,29 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DVBT_TEST_IMPL_H
-#define INCLUDED_DVBT_TEST_IMPL_H
 
-#include <dvbt/test.h>
+#ifndef _QA_TEST2_H_
+#define _QA_TEST2_H_
+
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/TestCase.h>
 
 namespace gr {
   namespace dvbt {
 
-    class test_impl : public test
+    class qa_test2 : public CppUnit::TestCase
     {
-    private:
-      int d_ninput;
-
     public:
-      test_impl(int, int, int);
-      ~test_impl();
+      CPPUNIT_TEST_SUITE(qa_test2);
+      CPPUNIT_TEST(t1);
+      CPPUNIT_TEST_SUITE_END();
 
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
-
-      // Where all the action really happens
-      int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+    private:
+      void t1();
     };
 
-  } // namespace dvbt
-} // namespace gr
+  } /* namespace dvbt */
+} /* namespace gr */
 
-#endif /* INCLUDED_DVBT_TEST_IMPL_H */
+#endif /* _QA_TEST2_H_ */
 

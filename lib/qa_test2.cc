@@ -18,34 +18,21 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DVBT_TEST_IMPL_H
-#define INCLUDED_DVBT_TEST_IMPL_H
 
-#include <dvbt/test.h>
+#include "qa_test2.h"
+#include <cppunit/TestAssert.h>
+
+#include <dvbt/test2.h>
 
 namespace gr {
   namespace dvbt {
 
-    class test_impl : public test
+    void
+    qa_test2::t1()
     {
-    private:
-      int d_ninput;
+        // Put test here
+    }
 
-    public:
-      test_impl(int, int, int);
-      ~test_impl();
-
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
-
-      // Where all the action really happens
-      int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
-    };
-
-  } // namespace dvbt
-} // namespace gr
-
-#endif /* INCLUDED_DVBT_TEST_IMPL_H */
+  } /* namespace dvbt */
+} /* namespace gr */
 

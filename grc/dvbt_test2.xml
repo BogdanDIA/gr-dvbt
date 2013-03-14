@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <block>
-  <name>test</name>
-  <key>dvbt_test</key>
+  <name>test2</name>
+  <key>dvbt_test2</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.test($type.size, $ninput, $noutput)</make>
+  <make>dvbt.test2($type.size, $ninput, $noutput)</make>
   <param>
 		<name>IO Type</name>
 		<key>type</key>

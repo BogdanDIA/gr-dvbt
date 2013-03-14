@@ -26,5 +26,6 @@ install(FILES
     dvbt_inner_coder.xml
     dvbt_reed_solomon.xml
     dvbt_energy_dispersal.xml
-    dvbt_convolutional_interleaver.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt_convolutional_interleaver.xml
+    dvbt_test2.xml DESTINATION share/gnuradio/grc/blocks
 )

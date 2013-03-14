@@ -26,6 +26,7 @@
 #include "test_impl.h"
 
 #include <iostream>
+#include <stdio.h>
 
 namespace gr {
   namespace dvbt {
@@ -42,14 +43,11 @@ namespace gr {
     test_impl::test_impl(int itemsize, int ninput, int noutput)
       : gr_block("test",
 		      gr_make_io_signature(1, 1, itemsize * ninput),
-		      gr_make_io_signature(1, 1, itemsize * noutput))
+		      gr_make_io_signature(1, 1, itemsize)),
+      d_ninput(ninput)
     {
-      d_itemsize = itemsize;
-      d_ninput_len = itemsize * ninput;
-      d_noutput_len = itemsize * noutput;
-
-      d_prefix_len = itemsize * (1 + (int)((noutput - ninput) / 2));
-      d_suffix_len = d_noutput_len - d_ninput_len - d_prefix_len;
+      printf("in_bsize: %i\n", input_signature()->sizeof_stream_item (0));
+      printf("out_bsize: %i\n", output_signature()->sizeof_stream_item (0));
     }
 
     /*
@@ -62,7 +60,6 @@ namespace gr {
     void
     test_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
       ninput_items_required[0] = noutput_items;
     }
 
@@ -72,39 +69,25 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-        const char *in = (const char *) input_items[0];
-        char *out = (char *) output_items[0];
+      const char *in = (const char *) input_items[0];
+      char *out = (char *) output_items[0];
 
-        int icnt = 0;
-        int ocnt = 0;
-        int blocks = 0;
-        
-        
-        while (blocks < noutput_items)
-        {
-          // add prefix
-          memset(&out[ocnt], 0, d_prefix_len);
-          ocnt += d_prefix_len;
+      int ibsize = input_signature()->sizeof_stream_item (0);
+      int obsize = output_signature()->sizeof_stream_item (0);
 
-          // add useful data
-          memcpy(&out[ocnt], &in[icnt], d_ninput_len);
-          icnt += d_ninput_len;
-          ocnt += d_ninput_len;
-          
-          // add suffix
-          memset(&out[ocnt], 0, d_suffix_len);
-          ocnt += d_suffix_len;
+      int size = std::min (ninput_items[0] * ibsize, noutput_items * obsize);
 
-          blocks++;
-        }
+      memcpy(out, in, size); 
 
-        // Do <+signal processing+>
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (noutput_items);
+      // Do <+signal processing+>
+      // Tell runtime system how many input items we consumed on
+      // each input stream.
+      consume_each (size / ibsize);
+      printf("ninput_items: %i\n", ninput_items[0]);
+      printf("noutput_items: %i\n", noutput_items);
 
-        // Tell runtime system how many output items we produced.
-        return (noutput_items);
+      // Tell runtime system how many output items we produced.
+      return (noutput_items);
     }
 
   } /* namespace dvbt */

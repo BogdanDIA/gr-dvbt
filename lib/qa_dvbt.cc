@@ -38,6 +38,7 @@
 #include "qa_reed_solomon.h"
 #include "qa_energy_dispersal.h"
 #include "qa_convolutional_interleaver.h"
+#include "qa_test2.h"
 
 CppUnit::TestSuite *
 qa_dvbt::suite()
@@ -55,6 +56,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_reed_solomon::suite());
   s->addTest(gr::dvbt::qa_energy_dispersal::suite());
   s->addTest(gr::dvbt::qa_convolutional_interleaver::suite());
+  s->addTest(gr::dvbt::qa_test2::suite());
 
   return s;
 }

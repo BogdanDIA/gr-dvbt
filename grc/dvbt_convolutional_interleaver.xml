@@ -34,6 +34,6 @@
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>$blocks*$I</vlen>
+    <vlen>1</vlen>
   </source>
 </block>

@@ -132,9 +132,10 @@ namespace gr {
      */
     inner_coder_impl::inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, \
         dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate)
-      : gr_block("inner_coder",
+      : gr_sync_decimator("inner_coder",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * ninput),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput)),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput),
+          noutput),
       config(ninput, noutput, constellation, hierarchy, coderate, coderate),
       d_reg(0),
       d_bitcount(0)
@@ -142,6 +143,9 @@ namespace gr {
       d_k = config.d_k;
       d_n = config.d_n;
       d_m = config.d_m;
+
+      //TODO - make decimation dependent on constellation and code rate
+      set_decimation(noutput / 4);
     }
 
     /*
@@ -151,15 +155,8 @@ namespace gr {
     {
     }
 
-    void
-    inner_coder_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
-    {
-        ninput_items_required[0] = noutput_items;
-    }
-
     int
-    inner_coder_impl::general_work (int noutput_items,
-                       gr_vector_int &ninput_items,
+    inner_coder_impl::work (int noutput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
@@ -177,7 +174,21 @@ namespace gr {
          * Generator polinomial G1=171(OCT), G2=133(OCT)
          * Punctured to obtain rates of 2/3, 3/4, 5/6, 7/8
          *
-         * TODO - comment in and out data format
+         * Data Input: Packed bytes (each bit is data)
+         * MSB - first, LSB last
+         * Data Output format - Nonhierarchical:
+         * 000000X0X1 - QPSK
+         * 0000X0X1X2X3 - QAM16
+         * 00X0X1X2X3X4X5 - QAM64
+         * Data Output format Hierarchical:
+         * 0000000X0 - H-QPSK
+         * 0000000X1 - L-QPSK
+         * 000000X0X1 - H-QAM16
+         * 000000X0X1 - L-QAM16
+         * 000000X0X1 - H-QAM64
+         * 0000X0X1X2X3 - L-QAM64
+         *
+         * TODO - Format output for hierarchical
          */
 
         int in_count = 0;
@@ -222,11 +233,6 @@ namespace gr {
           while(count--)
             out[out_count++] = (ll >> (d_m * count)) & ((1 << d_m) - 1);
         }
-
-        // Do <+signal processing+>
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (noutput_items);
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

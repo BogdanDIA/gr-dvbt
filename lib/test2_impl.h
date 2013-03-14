@@ -18,34 +18,31 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DVBT_TEST_IMPL_H
-#define INCLUDED_DVBT_TEST_IMPL_H
+#ifndef INCLUDED_DVBT_TEST2_IMPL_H
+#define INCLUDED_DVBT_TEST2_IMPL_H
 
-#include <dvbt/test.h>
+#include <dvbt/test2.h>
 
 namespace gr {
   namespace dvbt {
 
-    class test_impl : public test
+    class test2_impl : public test2
     {
     private:
-      int d_ninput;
+      // Nothing to declare in this block.
 
     public:
-      test_impl(int, int, int);
-      ~test_impl();
-
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      test2_impl(int itemsize, int ninput, int noutput);
+      ~test2_impl();
 
       // Where all the action really happens
-      int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+      int work(int noutput_items,
+	       gr_vector_const_void_star &input_items,
+	       gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_TEST_IMPL_H */
+#endif /* INCLUDED_DVBT_TEST2_IMPL_H */
 

@@ -115,7 +115,7 @@ namespace gr {
                                         d_frame_index(0),
                                         d_superframe_index(0)
     {
-      //Set-up pilot data depending for transmission mode
+      //Set-up pilot data depending on transmission mode
       if (config.d_transmission_mode == gr::dvbt::T2k)
       {
         d_spilot_carriers_size = d_spilot_carriers_size_2k;

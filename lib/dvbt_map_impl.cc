@@ -53,28 +53,38 @@ namespace gr {
       d_gain(gain)
     {
       //TODO - clean up here
-        unsigned char c_gain[4] = {0x9b, 0xe8, 0xa1, 0xbe};
-        float * pf = (float *)&c_gain;
-        d_gain = (float)(-1) / float(*pf);
+      unsigned char c_gain[4] = {0x9b, 0xe8, 0xa1, 0xbe};
+      float * pf = (float *)&c_gain;
+      d_gain = (float)(-1) / float(*pf);
 
-        if (config.d_hierarchy == gr::dvbt::NH)
-          d_alpha = 1;
-        else if (config.d_hierarchy == gr::dvbt::ALPHA1)
-          d_alpha = 1;
-        else if (config.d_hierarchy == gr::dvbt::ALPHA2)
-          d_alpha = 2;
-        else if (config.d_hierarchy == gr::dvbt::ALPHA4)
-          d_alpha = 4;
+      switch (config.d_hierarchy)
+      {
+        case (gr::dvbt::NH):
+          d_alpha = 1; break;
+        case (gr::dvbt::ALPHA1):
+          d_alpha = 1; break;
+        case (gr::dvbt::ALPHA2):
+          d_alpha = 2; break;
+        case (gr::dvbt::ALPHA4):
+          d_alpha = 4;break;
+        default:
+          d_alpha = 1; break;
+      }
 
-        if (config.d_constellation == gr::dvbt::QAM16)
-          d_bits_per_symbol = 4;
-        else if (config.d_constellation == gr::dvbt::QAM64)
-          d_bits_per_symbol = 6;
-        else
-          d_bits_per_symbol = 4;
+      switch (config.d_constellation)
+      {
+        case (gr::dvbt::QPSK):
+          d_bits_per_symbol = 2; break;
+        case (gr::dvbt::QAM16):
+          d_bits_per_symbol = 4; break;
+        case (gr::dvbt::QAM64):
+          d_bits_per_symbol = 6; break;
+        default:
+          d_bits_per_symbol = 4; break;
+      }
 
-        d_qaxis_points = d_bits_per_symbol - 2;
-        d_qaxis_steps = d_qaxis_points - 1;
+      d_qaxis_points = d_bits_per_symbol - 2;
+      d_qaxis_steps = d_qaxis_points - 1;
     }
 
     /*
@@ -117,19 +127,20 @@ namespace gr {
           for (int k = 0; k < config.d_noutput; k++)
           {
             unsigned char bits = in[k + i * config.d_noutput];
-            int q0, q1;
 
+            //TODO - use VOLK for multiplication
             switch (config.d_constellation)
             {
               case (gr::dvbt::QPSK):
-                //TODO
-                break;
-              case ( gr::dvbt::QAM16):
+              {
+                q0 = (bits >> 1) & 0x1; q1 = bits & 0x1;
+                v_x = (float)(d_alpha) / d_gain; v_y = (float)(d_alpha) / d_gain;
+              }; break;
+              case (gr::dvbt::QAM16):
               {
                 q0 = (bits >> 3) & 0x1; q1 = (bits >> 2) & 0x1;
                 x = (bits >> 1) & 0x1; y = bits & 0x1;
 
-                //TODO - use VOLK for multiplication
                 v_x = (float)(d_alpha + 2 * (d_qaxis_steps - x)) / d_gain;
                 v_y = (float)(d_alpha + 2 * (d_qaxis_steps - y)) / d_gain;
               }; break;
@@ -143,14 +154,16 @@ namespace gr {
                 v_y = (float)(d_alpha + 2 * (d_qaxis_steps - gray_to_bin(y))) / d_gain;
               } break;
               default:
-                //TODO - Error
-                break;
+              {
+                //Defaults to QPSK
+                q0 = (bits >> 1) & 0x1; q1 = bits & 0x1;
+                v_x = (float)(d_alpha) / d_gain; v_y = (float)(d_alpha) / d_gain;
+              }; break;
             }
 
             int sign0 = 1 - 2 * q0; 
             int sign1 = 1 - 2 * q1; 
             out[k + config.d_noutput * i] = gr_complex(sign0 * v_x, sign1 * v_y);
-
           }
         }
 

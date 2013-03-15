@@ -58,31 +58,9 @@ namespace gr {
       float * pf = (float *)&c_gain;
       d_gain = (float)(-1) / float(*pf);
 
-      switch (config.d_hierarchy)
-      {
-        case (gr::dvbt::NH):
-          d_alpha = 1; break;
-        case (gr::dvbt::ALPHA1):
-          d_alpha = 1; break;
-        case (gr::dvbt::ALPHA2):
-          d_alpha = 2; break;
-        case (gr::dvbt::ALPHA4):
-          d_alpha = 4;break;
-        default:
-          d_alpha = 1; break;
-      }
-
-      switch (config.d_constellation)
-      {
-        case (gr::dvbt::QPSK):
-          d_bits_per_symbol = 2; break;
-        case (gr::dvbt::QAM16):
-          d_bits_per_symbol = 4; break;
-        case (gr::dvbt::QAM64):
-          d_bits_per_symbol = 6; break;
-        default:
-          d_bits_per_symbol = 4; break;
-      }
+      //Get parameters from config object
+      d_alpha = config.d_alpha;
+      d_bits_per_symbol = config.d_m;
 
       d_qaxis_points = d_bits_per_symbol - 2;
       d_qaxis_steps = d_qaxis_points - 1;

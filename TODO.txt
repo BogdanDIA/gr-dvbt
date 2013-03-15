@@ -1,0 +1,2 @@
+Use set_output_multiple() when necessary
+Enable Doxygen: cmake ../ -DENABLE_DOXYGEN=ON

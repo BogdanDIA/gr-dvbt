@@ -79,30 +79,32 @@ namespace gr {
 
       public:
 
-      unsigned char d_symbol_index;
-      unsigned char d_frame_index;
-      unsigned char d_superframe_index;
+      int d_symbol_index;
+      int d_frame_index;
+      int d_superframe_index;
 
       //Transmission type parameters
       dvbt_transmission_mode_t d_transmission_mode;
-      unsigned int d_Kmin;
-      unsigned int d_Kmax;
+      int d_Kmin;
+      int d_Kmax;
 
       //Constelaltion parameters
       dvbt_constellation_t d_constellation;
-      unsigned char d_m;
+      int d_m;
 
       //Inner Coding + puncturer parameters
       dvbt_code_rate_t d_code_rate_HP;
       dvbt_code_rate_t d_code_rate_LP;
-      unsigned char d_cr_k;
-      unsigned char d_cr_n;
+      int d_cr_k;
+      int d_cr_n;
 
-      unsigned char d_include_cell_id;
+      //Hierarchy information
       dvbt_hierarchy_t d_hierarchy;
-      dvbt_guard_interval_t d_guard_interval;
-      unsigned int d_cell_id;
+      int d_alpha;
 
+      dvbt_guard_interval_t d_guard_interval;
+      int d_include_cell_id;
+      int d_cell_id;
 
       void set_frame_number(int fn);
       int get_frame_mumber();

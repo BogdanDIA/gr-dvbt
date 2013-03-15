@@ -171,6 +171,20 @@ namespace gr {
           d_cr_k = 1; d_cr_n = 2;
           break;
       }
+
+      switch (d_hierarchy)
+      {
+        case (gr::dvbt::NH):
+          d_alpha = 1; break;
+        case (gr::dvbt::ALPHA1):
+          d_alpha = 1; break;
+        case (gr::dvbt::ALPHA2):
+          d_alpha = 2; break;
+        case (gr::dvbt::ALPHA4):
+          d_alpha = 4;break;
+        default:
+          d_alpha = 1; break;
+      }
     }
 
     dvbt_config::~dvbt_config()

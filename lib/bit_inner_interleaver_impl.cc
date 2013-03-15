@@ -29,10 +29,10 @@
 namespace gr {
   namespace dvbt {
 
-    const unsigned char bit_inner_interleaver_impl::d_bsize = 126;
+    const int bit_inner_interleaver_impl::d_bsize = 126;
 
-    unsigned char
-    bit_inner_interleaver_impl::H(unsigned char e, unsigned char w)
+    int
+    bit_inner_interleaver_impl::H(int e, int w)
     {
       int rez = 0;
 
@@ -168,15 +168,15 @@ namespace gr {
           {
             if (config.d_hierarchy == gr::dvbt::NH)
             {
-              char c = inh[bcount * d_bsize + i];
+              int c = inh[bcount * d_bsize + i];
 
               for (int k = 0; k < d_v; k++)
                 d_b[d_perm[(d_v * i) + k]][((d_v * i) + k) / d_v] = (c >> (d_v - k - 1)) & 0x1;
             }
             else
             {
-              char ch = inh[(bcount * d_bsize * (d_v - 2)) + i];
-              char cl = inl[(bcount * d_bsize * (d_v - 2)) + i];
+              int ch = inh[(bcount * d_bsize * (d_v - 2)) + i];
+              int cl = inl[(bcount * d_bsize * (d_v - 2)) + i];
               for (int k = 0; k < (d_v / 2); k++)
               {
                 //TODO - error - fix this!
@@ -193,7 +193,7 @@ namespace gr {
 
           for (int w = 0; w < d_bsize; w++)
           {
-            unsigned char val = 0;
+            int val = 0;
 
             for (int e = 0; e < d_v; e++)
               val = (val << 1) | d_b[e][H(e, w)];

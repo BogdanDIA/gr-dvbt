@@ -36,15 +36,15 @@ namespace gr {
       int d_noutput;
 
       // constellation
-      unsigned char d_v;
+      int d_v;
       // Bit interleaver block size
-      static const unsigned char d_bsize;
+      static const int d_bsize;
 
       //Table to keep interleaved indices
       unsigned char * d_perm;
 
       // permutation function
-      unsigned char H(unsigned char e, unsigned char w);
+      int H(int e, int w);
 
     public:
       bit_inner_interleaver_impl(int ninput, int noutput, \

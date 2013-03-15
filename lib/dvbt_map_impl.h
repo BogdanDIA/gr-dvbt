@@ -32,6 +32,9 @@ namespace gr {
     private:
       const dvbt_config config;
 
+      int d_ninput;
+      int d_noutput;
+
       //Keep Alpha internally
       unsigned char d_alpha;
       //Quadrant of the current symbol

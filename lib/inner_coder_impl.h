@@ -32,6 +32,9 @@ namespace gr {
     private:
       const dvbt_config config;
 
+      int d_ninput;
+      int d_noutput;
+
       unsigned char d_reg;
 
       //counts the bits in the bytes

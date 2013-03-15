@@ -79,25 +79,28 @@ namespace gr {
 
       public:
 
-      unsigned int d_ninput;
-      unsigned int d_noutput;
-      unsigned int d_Kmin;
-      unsigned int d_Kmax;
       unsigned char d_symbol_index;
       unsigned char d_frame_index;
       unsigned char d_superframe_index;
+
+      //Transmission type parameters
+      dvbt_transmission_mode_t d_transmission_mode;
+      unsigned int d_Kmin;
+      unsigned int d_Kmax;
+
+      //Constelaltion parameters
       dvbt_constellation_t d_constellation;
-      //Rate k/n convolutional encoder
-      unsigned char d_k;
-      unsigned char d_n;
-      //Constelaltion m
       unsigned char d_m;
-      unsigned char d_include_cell_id;
-      dvbt_hierarchy_t d_hierarchy;
+
+      //Inner Coding + puncturer parameters
       dvbt_code_rate_t d_code_rate_HP;
       dvbt_code_rate_t d_code_rate_LP;
+      unsigned char d_cr_k;
+      unsigned char d_cr_n;
+
+      unsigned char d_include_cell_id;
+      dvbt_hierarchy_t d_hierarchy;
       dvbt_guard_interval_t d_guard_interval;
-      dvbt_transmission_mode_t d_transmission_mode;
       unsigned int d_cell_id;
 
 
@@ -114,7 +117,7 @@ namespace gr {
       void set_transmission_mode(dvbt_transmission_mode_t transmission_mode);
       dvbt_transmission_mode_t get_transmission_mode();
 
-      dvbt_config(int ninput, int noutput, dvbt_constellation_t constellation = gr::dvbt::QAM16, \
+      dvbt_config(dvbt_constellation_t constellation = gr::dvbt::QAM16, \
           dvbt_hierarchy_t hierarchy = gr::dvbt::NH, dvbt_code_rate_t code_rate_HP = gr::dvbt::C1_2, \
           dvbt_code_rate_t code_rate_LP = gr::dvbt::C1_2, dvbt_guard_interval_t guard_interval = gr::dvbt::G1_32, \
           dvbt_transmission_mode_t transmission_mode = gr::dvbt::T2k, int include_cell_id = 0, int cell_id = 0);

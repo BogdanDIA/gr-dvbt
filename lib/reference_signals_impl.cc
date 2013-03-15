@@ -115,6 +115,10 @@ namespace gr {
                                         d_frame_index(0),
                                         d_superframe_index(0)
     {
+      //Determine parameters from config file
+      d_Kmin = config.d_Kmin;
+      d_Kmax = config.d_Kmax;
+
       //Set-up pilot data depending on transmission mode
       if (config.d_transmission_mode == gr::dvbt::T2k)
       {
@@ -142,7 +146,7 @@ namespace gr {
       }
 
       //allocate PRBS buffer
-      d_wk = new char[config.d_Kmax - config.d_Kmin + 1];
+      d_wk = new char[d_Kmax - d_Kmin + 1];
       if (d_wk == NULL)
       {
         std::cout << "error allocating d_wk" << std::endl;
@@ -194,7 +198,7 @@ namespace gr {
       // init PRBS register with 1s
       unsigned int reg_prbs = (1 << 11) - 1;
 
-      for (int k = 0; k < (config.d_Kmax - config.d_Kmin + 1); k++)
+      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
         d_wk[k] = (char)(reg_prbs & 0x01);
         int new_bit = ((reg_prbs >> 2) ^ (reg_prbs >> 0)) & 0x01;
@@ -278,7 +282,7 @@ namespace gr {
     pilot_gen::get_current_spilot() const
     {
       //TODO - can be optimised for same symbol_index
-      return (config.d_Kmin + 3 * (d_symbol_index % 4) + 12 * d_spilot_index);
+      return (d_Kmin + 3 * (d_symbol_index % 4) + 12 * d_spilot_index);
     }
 
     gr_complex
@@ -427,7 +431,7 @@ namespace gr {
       d_spilot_index = 0; d_cpilot_index = 0; d_tpilot_index = 0;
 
       //process one block - one symbol
-      for (int k = 0; k < (config.d_Kmax - config.d_Kmin + 1); k++)
+      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
           is_payload = 1;
           if (k == get_current_spilot())
@@ -488,11 +492,11 @@ namespace gr {
       : gr_block("reference_signals",
 		      gr_make_io_signature(1, 1, itemsize * ninput),
 		      gr_make_io_signature(1, 1, itemsize * noutput)),
-		      config(ninput, noutput, constellation, hierarchy, code_rate_HP, code_rate_LP, \
+		      config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
               guard_interval, transmission_mode, include_cell_id, cell_id),
+          d_ninput(ninput), d_noutput(noutput),
 		      d_pg(config)
     {
-      //
       //
     }
 
@@ -522,7 +526,7 @@ namespace gr {
 
         {
           for (int i = 0; i < noutput_items; i++)
-            d_pg.update_output(&in[i * config.d_ninput], &out[i * config.d_noutput]);
+            d_pg.update_output(&in[i * d_ninput], &out[i * d_noutput]);
         }
 
         // Do <+signal processing+>

@@ -136,16 +136,23 @@ namespace gr {
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * ninput),
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput),
           noutput),
-      config(ninput, noutput, constellation, hierarchy, coderate, coderate),
+      config(constellation, hierarchy, coderate, coderate),
+      d_ninput(ninput), d_noutput(noutput),
       d_reg(0),
       d_bitcount(0)
     {
-      d_k = config.d_k;
-      d_n = config.d_n;
+      //Determine k - input of encoder
+      d_k = config.d_cr_k;
+      //Determine n - output of encoder
+      d_n = config.d_cr_n;
+      //Determine m - constellation symbol size
       d_m = config.d_m;
 
-      //TODO - make decimation dependent on constellation and code rate
-      set_decimation(noutput / 4);
+      //We input kxm bits (kxm/8 Bytes)
+      //We output blocks of nxm bits
+      //We output one byte for a symbol of m bits
+      //The rate in bytes is: 8n/km
+      set_decimation(noutput / (8 * d_n) / (d_k * d_m));
     }
 
     /*
@@ -195,7 +202,7 @@ namespace gr {
         int out_count = 0;
         int krem = d_k;
 
-        while (out_count < (noutput_items * config.d_noutput))
+        while (out_count < (noutput_items * d_noutput))
         {
           int ncount = 0;
           //keep buffer into 64bits

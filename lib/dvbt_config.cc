@@ -91,86 +91,85 @@ namespace gr {
       return d_transmission_mode;
     }
 
-    dvbt_config::dvbt_config(int ninput, int noutput, dvbt_constellation_t constellation, \
+    dvbt_config::dvbt_config(dvbt_constellation_t constellation, \
 	dvbt_hierarchy_t hierarchy, dvbt_code_rate_t code_rate_HP, \
 	dvbt_code_rate_t code_rate_LP, dvbt_guard_interval_t guard_interval, \
 	dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id) :
-	    d_ninput(ninput), d_noutput(noutput),
 	    d_constellation(constellation), d_hierarchy(hierarchy), d_code_rate_HP(code_rate_HP),
 	    d_code_rate_LP(code_rate_LP), d_guard_interval(guard_interval), d_transmission_mode(transmission_mode),
 	    d_include_cell_id(include_cell_id), d_cell_id(cell_id)
     {
       switch (d_transmission_mode)
       {
-	      case gr::dvbt::T2k:
-		      d_Kmin = 0; d_Kmax = 1704;
-		      break;
-	      case gr::dvbt::T8k:
-		      d_Kmin = 0; d_Kmax = 6816;
-		      break;
-	      default:
-		      d_Kmin = 0; d_Kmax = 1704;
-		      break;
+	case gr::dvbt::T2k:
+	  d_Kmin = 0; d_Kmax = 1704;
+	  break;
+	case gr::dvbt::T8k:
+	  d_Kmin = 0; d_Kmax = 6816;
+	  break;
+	default:
+	  d_Kmin = 0; d_Kmax = 1704;
+	  break;
       }
 
       switch (d_constellation)
       {
-	      case gr::dvbt::QPSK:
-		      d_m = 2;
-		      break;
-	      case gr::dvbt::QAM16:
-		      d_m = 4;
-		      break;
-	      case gr::dvbt::QAM64:
-		      d_m = 6;
-		      break;
-	      default:
-		      d_m = 4;
-		      break;
+	case gr::dvbt::QPSK:
+	  d_m = 2;
+	  break;
+	case gr::dvbt::QAM16:
+	  d_m = 4;
+	  break;
+	case gr::dvbt::QAM64:
+	  d_m = 6;
+	  break;
+	default:
+	  d_m = 4;
+	  break;
       }
 
       switch (d_code_rate_HP)
       {
-	      case gr::dvbt::C1_2:
-		d_k = 1; d_n = 2;
-		break;
-	      case gr::dvbt::C2_3:
-      		d_k = 2; d_n = 3;
-      		break;
-	      case gr::dvbt::C3_4:
-	        d_k = 3; d_n = 4;
-		break;
-	      case gr::dvbt::C5_6:
-		d_k = 5; d_k = 6;
-		break;
-	      case gr::dvbt::C7_8:
-		d_k = 7; d_n = 8;
-		break;
-	      default:
-		d_k = 1; d_n = 2;
-		break;
+        case gr::dvbt::C1_2:
+          d_cr_k = 1; d_cr_n = 2;
+          break;
+        case gr::dvbt::C2_3:
+          d_cr_k = 2; d_cr_n = 3;
+          break;
+        case gr::dvbt::C3_4:
+          d_cr_k = 3; d_cr_n = 4;
+          break;
+        case gr::dvbt::C5_6:
+          d_cr_k = 5; d_cr_k = 6;
+        break;
+        case gr::dvbt::C7_8:
+          d_cr_k = 7; d_cr_n = 8;
+          break;
+        default:
+          d_cr_k = 1; d_cr_n = 2;
+          break;
       }
 
       switch (d_code_rate_LP)
       {
-	      case gr::dvbt::C1_2:
-		d_k = 1; d_n = 2;
-		break;
-	      case gr::dvbt::C2_3:
-      		d_k = 2; d_n = 3;
-      		break;
-	      case gr::dvbt::C3_4:
-	        d_k = 3; d_n = 4;
-		break;
-	      case gr::dvbt::C5_6:
-		d_k = 5; d_k = 6;
-		break;
-	      case gr::dvbt::C7_8:
-		d_k = 7; d_n = 8;
-		break;
-	      default:
-		d_k = 1; d_n = 2;
-		break;
+        case gr::dvbt::C1_2:
+          d_cr_k = 1; d_cr_n = 2;
+          break;
+        case gr::dvbt::C2_3:
+          d_cr_k = 2; d_cr_n = 3;
+          break;
+        case gr::dvbt::C3_4:
+          d_cr_k = 3; d_cr_n = 4;
+          break;
+        case gr::dvbt::C5_6:
+          d_cr_k = 5; d_cr_k = 6;
+        break;
+        case gr::dvbt::C7_8:
+          d_cr_k = 7; d_cr_n = 8;
+          break;
+        default:
+          d_cr_k = 1; d_cr_n = 2;
+          break;
       }
     }
 

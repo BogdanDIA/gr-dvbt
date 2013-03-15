@@ -102,7 +102,7 @@ namespace gr {
       : gr_block("symbol_inner_interleaver",
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * ninput),
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * noutput)),
-      config(ninput, noutput, constellation, hierarchy),
+      config(constellation, hierarchy),
       d_symbol_index(0)
     {
       generate_H();
@@ -145,9 +145,9 @@ namespace gr {
 
         for (int k = 0; k < noutput_items; k++)
         {
-          for (int q = 0; q < config.d_ninput; q++)
+          for (int q = 0; q < d_ninput; q++)
           {
-            int blocks = k * config.d_ninput;
+            int blocks = k * d_ninput;
 
             if (d_symbol_index % 2)
               out[blocks + q] = in[blocks + H(q)];

@@ -45,6 +45,9 @@ class pilot_gen {
     // this should be first in order to be initialized first
     const dvbt_config &config;
 
+    int d_Kmin;
+    int d_Kmax;
+
     static const int d_symbols_per_frame;
     static const int d_frames_per_superframe;
 
@@ -130,7 +133,7 @@ class pilot_gen {
 
     // Update out
     void update_output(const gr_complex *in, gr_complex *out);
-};
+    };
 
 
     class reference_signals_impl : public reference_signals
@@ -141,6 +144,10 @@ class pilot_gen {
     private:
 	// Pilot Generator object
     	pilot_gen d_pg;
+
+	//In and Out data length
+	int d_ninput;
+	int d_noutput;
 
     public:
 

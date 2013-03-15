@@ -73,7 +73,8 @@ namespace gr {
       : gr_block("bit_inner_interleaver",
 		      gr_make_io_signature(1, 2, sizeof(unsigned char) * ninput),
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput)),
-      config(ninput, noutput, constellation, hierarchy)
+      config(constellation, hierarchy),
+      d_ninput(ninput), d_noutput(noutput)
     {
       d_v = config.d_m;
 
@@ -136,7 +137,7 @@ namespace gr {
 
 
         unsigned char d_b[d_v][d_bsize];
-        int bmax = noutput_items * config.d_ninput / d_bsize;
+        int bmax = noutput_items * d_ninput / d_bsize;
 
         /*
          * Clause 4.3.4.1

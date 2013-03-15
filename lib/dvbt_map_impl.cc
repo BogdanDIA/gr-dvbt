@@ -49,7 +49,8 @@ namespace gr {
       : gr_block("dvbt_map",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
 		      gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize)),
-      config(nsize, nsize, constellation, hierarchy),
+      config(constellation, hierarchy),
+      d_ninput(nsize), d_noutput(nsize),
       d_gain(gain)
     {
       //TODO - clean up here
@@ -124,9 +125,9 @@ namespace gr {
 
         for (int i = 0; i < noutput_items; i++)
         {
-          for (int k = 0; k < config.d_noutput; k++)
+          for (int k = 0; k < d_noutput; k++)
           {
-            unsigned char bits = in[k + i * config.d_noutput];
+            unsigned char bits = in[k + i * d_noutput];
 
             //TODO - use VOLK for multiplication
             switch (config.d_constellation)
@@ -163,7 +164,7 @@ namespace gr {
 
             int sign0 = 1 - 2 * q0; 
             int sign1 = 1 - 2 * q1; 
-            out[k + config.d_noutput * i] = gr_complex(sign0 * v_x, sign1 * v_y);
+            out[k + d_noutput * i] = gr_complex(sign0 * v_x, sign1 * v_y);
           }
         }
 

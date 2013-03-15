@@ -32,6 +32,9 @@ namespace gr {
     private:
       const dvbt_config config;
 
+      int d_ninput;
+      int d_noutput;
+
       // constellation
       unsigned char d_v;
       // Bit interleaver block size

@@ -30,6 +30,10 @@ namespace gr {
     {
     private:
       const dvbt_config config;
+
+      int d_ninput;
+      int d_noutput;
+
       unsigned int d_h[2048];
 
       //Keeps the stmbol index

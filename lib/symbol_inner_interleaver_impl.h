@@ -36,12 +36,12 @@ namespace gr {
 
       unsigned int d_h[2048];
 
-      //Keeps the stmbol index
+      //Keeps the symbol index
       unsigned int d_symbol_index;
 
       void generate_H();
-      unsigned int H(unsigned int q);
-      unsigned int calculate_R(unsigned int i);
+      int H(int q);
+      int calculate_R(int i);
 
     public:
       symbol_inner_interleaver_impl(int ninput, int noutput, \

@@ -45,17 +45,17 @@ namespace gr {
       }
     }
 
-    unsigned int
-    symbol_inner_interleaver_impl::H(unsigned int q)
+    int
+    symbol_inner_interleaver_impl::H(int q)
     {
       return d_h[q];
     }
 
-    unsigned int
-    symbol_inner_interleaver_impl::calculate_R(unsigned int i)
+    int
+    symbol_inner_interleaver_impl::calculate_R(int i)
     {
       const int Nr = 11;
-      unsigned int reg = 0;
+      int reg = 0;
 
       unsigned char bit_perm[Nr - 1] = {4, 3, 9, 6, 2, 8, 1, 5, 7, 0};
 
@@ -75,7 +75,7 @@ namespace gr {
         }
       }
 
-      unsigned int newreg = 0;
+      int newreg = 0;
 
       for (int k = 0; k < (Nr - 1); k++)
       {
@@ -103,6 +103,7 @@ namespace gr {
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * ninput),
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * noutput)),
       config(constellation, hierarchy),
+      d_ninput(ninput), d_noutput(noutput),
       d_symbol_index(0)
     {
       generate_H();

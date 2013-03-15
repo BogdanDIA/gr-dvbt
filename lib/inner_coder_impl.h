@@ -35,22 +35,20 @@ namespace gr {
       int d_ninput;
       int d_noutput;
 
-      unsigned char d_reg;
+      int d_reg;
 
       //counts the bits in the bytes
       //in input stream
-      unsigned char d_bitcount;
+      int d_bitcount;
 
       // Code rate k/n
-      unsigned char d_k;
-      unsigned char d_n;
+      int d_k;
+      int d_n;
       // Cosntellation with m
-      unsigned char d_m;
+      int d_m;
 
-
-
-      void generate_codeword(unsigned char in, unsigned char &x, unsigned char &y);
-      unsigned char generate_punctured_code(dvbt_code_rate_t coderate, unsigned char c);
+      void generate_codeword(int in, int &x, int &y);
+      int generate_punctured_code(dvbt_code_rate_t coderate, int c);
 
     public:
       inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate);

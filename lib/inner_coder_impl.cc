@@ -25,12 +25,13 @@
 #include <gr_io_signature.h>
 #include "inner_coder_impl.h"
 #include <stdio.h>
+#include <assert.h>
 
 namespace gr {
   namespace dvbt {
 
     void
-    inner_coder_impl::generate_codeword(unsigned char in, unsigned char &x, unsigned char &y)
+    inner_coder_impl::generate_codeword(int in, int &x, int &y)
     {
       //insert input bit
       d_reg |= ((in & 0x1) << 7);
@@ -51,11 +52,11 @@ namespace gr {
      * Output e.g. rate 2/3
      * 00000c0c1c2
      */
-    unsigned char
-    inner_coder_impl::generate_punctured_code(dvbt_code_rate_t coderate, unsigned char in)
+    int
+    inner_coder_impl::generate_punctured_code(dvbt_code_rate_t coderate, int in)
     {
-      unsigned char x, y;
-      unsigned char c = 0;
+      int x, y;
+      int c = 0;
 
       switch(coderate)
       {
@@ -148,11 +149,13 @@ namespace gr {
       //Determine m - constellation symbol size
       d_m = config.d_m;
 
-      //We input kxm bits (kxm/8 Bytes)
-      //We output blocks of nxm bits
+      //We process nm bits blocks
+      //Corespondingly we process km input bits(km/8 Bytes)
       //We output one byte for a symbol of m bits
-      //The rate in bytes is: 8n/km
-      set_decimation(noutput / (8 * d_n) / (d_k * d_m));
+      //The out/in rate in bytes is: 8n/km (Bytes)
+      assert((d_noutput * d_k * d_m) % (8 * d_n));
+
+      set_decimation((d_noutput * d_k * d_m) / (8 * d_n));
     }
 
     /*

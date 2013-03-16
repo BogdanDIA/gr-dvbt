@@ -29,9 +29,8 @@ namespace gr {
   namespace dvbt {
 
     /*!
-     * \brief <+description of block+>
+     * \brief Reed Solomon encoder
      * \ingroup dvbt
-     *
      */
     class DVBT_API reed_solomon : virtual public gr_block
     {

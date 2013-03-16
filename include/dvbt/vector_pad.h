@@ -29,7 +29,7 @@ namespace gr {
   namespace dvbt {
 
     /*!
-     * \brief <+description of block+>
+     * \brief Pad a vector for IFFT.
      * \ingroup dvbt
      *
      */

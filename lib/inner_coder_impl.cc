@@ -177,30 +177,6 @@ namespace gr {
         unsigned char in_buff[d_n * d_m];
         unsigned char out_buff[d_n * d_m];
 
-        /*
-         * Clause 4.3.3
-         * Mother convolutional code with rate 1/2
-         * k=1, n=2, K=6
-         * Generator polinomial G1=171(OCT), G2=133(OCT)
-         * Punctured to obtain rates of 2/3, 3/4, 5/6, 7/8
-         *
-         * Data Input: Packed bytes (each bit is data)
-         * MSB - first, LSB last
-         * Data Output format - Nonhierarchical:
-         * 000000X0X1 - QPSK
-         * 0000X0X1X2X3 - QAM16
-         * 00X0X1X2X3X4X5 - QAM64
-         * Data Output format Hierarchical:
-         * 0000000X0 - H-QPSK
-         * 0000000X1 - L-QPSK
-         * 000000X0X1 - H-QAM16
-         * 000000X0X1 - L-QAM16
-         * 000000X0X1 - H-QAM64
-         * 0000X0X1X2X3 - L-QAM64
-         *
-         * TODO - Format output for hierarchical
-         */
-
         int in_count = 0;
         int out_count = 0;
         int krem = d_k;

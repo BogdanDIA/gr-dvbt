@@ -30,7 +30,7 @@ namespace gr {
   namespace dvbt {
 
     /*!
-     * \brief <+description of block+>
+     * \brief Bit Inner interleaver.
      * \ingroup dvbt
      *
      */

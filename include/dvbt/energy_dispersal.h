@@ -29,7 +29,7 @@ namespace gr {
   namespace dvbt {
 
     /*!
-     * \brief <+description of block+>
+     * \brief Energy dispersal
      * \ingroup dvbt
      *
      */

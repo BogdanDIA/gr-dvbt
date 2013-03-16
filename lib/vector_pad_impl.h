@@ -25,7 +25,13 @@
 
 namespace gr {
   namespace dvbt {
-
+    /*!
+     * \brief Pad a vector for IFFT. \n
+     * \ingroup dvbt
+     * \param itemsize size of in/out item. \n
+     * \param ninput length of input stream. \n
+     * \param noutput length of output stream. \n
+     */
     class vector_pad_impl : public vector_pad
     {
     private:
@@ -36,7 +42,6 @@ namespace gr {
       int d_prefix_len;
       int d_ninput_len;
       int d_suffix_len;
-      // Nothing to declare in this block.
 
     public:
       vector_pad_impl(int itemsize, int ninput, int noutput);
@@ -44,7 +49,10 @@ namespace gr {
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-      // Where all the action really happens
+      /*!
+       * This version adds a prefix and a suffix to the input data. \n
+       * Padding is with zero value.
+       */
       int general_work(int noutput_items,
 		       gr_vector_int &ninput_items,
 		       gr_vector_const_void_star &input_items,

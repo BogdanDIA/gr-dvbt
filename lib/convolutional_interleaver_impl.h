@@ -27,6 +27,13 @@
 
 namespace gr {
   namespace dvbt {
+    /*!
+     * \brief Convolutional interleaver
+     * \ingroup dvbt
+     * \param blocks number of blocks to process \n
+     * \param I size of a block \n
+     * \param M depth length for each element in shift registers \n
+     */
 
     class convolutional_interleaver_impl : public convolutional_interleaver
     {
@@ -40,7 +47,12 @@ namespace gr {
       convolutional_interleaver_impl(int nsize, int I, int M);
       ~convolutional_interleaver_impl();
 
-      // Where all the action really happens
+      /*!
+       * ETSI EN 300 744 Clause 4.3.1. \n
+       * Forney (Ramsey type III) convolutional interleaver. \n
+       * Data input: Blocks of I bytes size. \n
+       * Data output: Stream of 1 byte elements. \n
+       */
       int work(int noutput_items,
 		       gr_vector_const_void_star &input_items,
 		       gr_vector_void_star &output_items);

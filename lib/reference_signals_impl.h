@@ -39,9 +39,14 @@
 
 namespace gr {
   namespace dvbt {
+    /*!
+     * \brief Pilot generator class.
+     * Adds DVBT pilots to a signal.
+     * \param c config object to keep all config data
+     */
 
 class pilot_gen {
-  public:
+  private:
     // this should be first in order to be initialized first
     const dvbt_config &config;
 
@@ -101,12 +106,7 @@ class pilot_gen {
 
     // TPS private methods
     void set_tps_bits(int start, int stop, unsigned int data);
-    
-  public:
-
-    pilot_gen(const dvbt_config &config);
-    ~pilot_gen();
-
+     
     void set_symbol_index(int);
     int get_symbol_index();
     void set_tps_data();
@@ -131,11 +131,34 @@ class pilot_gen {
     // Encode TPS data
     void generate_bch_code();
 
-    // Update out
+  public:
+
+    pilot_gen(const dvbt_config &config);
+    ~pilot_gen();
+
+    /*!
+     * ETSI EN 300 744 Clause 4.5. \n
+     * Update a set of carriers with the pilot signals. \n
+     */
     void update_output(const gr_complex *in, gr_complex *out);
     };
 
 
+    /*!
+     * \brief Reference signals class. \n
+     * \ingroup dvbt
+     * \param itemsize size of an in/out item
+     * \param ninput input stream length
+     * \param noutput output stream length
+     * \param constellation constelaltion used
+     * \param hierarchy hierarchy used
+     * \param code_rate_HP high priority stream code rate
+     * \param code_rate_LP low priority stream code rate
+     * \param guard_interval gurad interval used
+     * \param transmission_mode transmission mode used
+     * \param include_cell_id include or not Cell ID
+     * \param cell_id value of the Cell ID
+     */
     class reference_signals_impl : public reference_signals
     {
       // configuration object for this class

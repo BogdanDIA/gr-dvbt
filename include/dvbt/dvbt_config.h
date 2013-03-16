@@ -24,9 +24,13 @@
 
 #include <dvbt/api.h>
 
+/*! 
+ * \file dvbt_config.h 
+ * \brief DVBT config header.
+ */
+
 namespace gr {
   namespace dvbt {
-
     enum dvbt_constellation_t {
       QPSK = 0,
       QAM16,
@@ -71,8 +75,17 @@ namespace gr {
     };
 
     /*!
-     * \brief <+description+>
-     *
+     * \brief DVBT Configuration class.
+     * \ingroup dvbt
+     * Keeps all data related to configuration. \n
+     * \param constellation constelaltion used
+     * \param hierarchy hierarchy used
+     * \param code_rate_HP high priority stream code rate
+     * \param code_rate_LP low priority stream code rate
+     * \param guard_interval gurad interval used
+     * \param transmission_mode transmission mode used
+     * \param include_cell_id include or not Cell ID
+     * \param cell_id value of the Cell ID
      */
     class DVBT_API dvbt_config
     {

@@ -1,2 +1,5 @@
 Use set_output_multiple() when necessary
 Enable Doxygen: cmake ../ -DENABLE_DOXYGEN=ON
+Write comments for Doxygen.
+Add copyright
+Document enum types.

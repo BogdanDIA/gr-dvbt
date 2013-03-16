@@ -139,29 +139,6 @@ namespace gr {
         unsigned char d_b[d_v][d_bsize];
         int bmax = noutput_items * d_ninput / d_bsize;
 
-        /*
-         * Clause 4.3.4.1
-         *
-         * Data Input format Non-Hierarchical:
-         * 000000X0X1 - QPSK
-         * 0000X0X1X2X3 - QAM16
-         * 00X0X1X2X3X4X5 - QAM64
-         *
-         * Data Input format Hierarchical:
-         * 0000000X0 - H-QPSK
-         * 0000000X1 - L-QPSK
-         * 000000X0X1 - H-QAM16
-         * 000000X0X1 - L-QAM16
-         * 000000X0X1 - H-QAM64
-         * 0000X0X1X2X3 - L-QAM64
-         *
-         * Data Output format:
-         * 000000B0B1 - QPSK
-         * 0000B0B1B2B3 - QAM16
-         * 00B0B1B2B3B4B5 - QAM64
-         * bit interleaver block size is 126
-         */
-
          for (int bcount = 0; bcount < bmax; bcount++)
          {
           for (int i = 0; i < d_bsize; i++)

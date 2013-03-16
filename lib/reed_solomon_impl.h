@@ -25,7 +25,18 @@
 
 namespace gr {
   namespace dvbt {
-
+    /*!
+     * \brief Reed Solomon encoder.
+     * \ingroup dvbt
+     * \param p characteristic of GF(p^m) \n
+     * \param m we use GF(p^m) \n
+     * \param gfpoly Generator Polynomial \n
+     * \param n length of codeword of RS coder \n
+     * \param k length of information sequence of RS encoder \n
+     * \param t number of corrected errors \n
+     * \param s shortened length \n
+     * \param blocks number of blocks to process at once\n
+     */
     class reed_solomon_impl : public reed_solomon
     {
     private:
@@ -59,7 +70,10 @@ namespace gr {
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-      // Where all the action really happens
+	/*!
+         * ETSI EN 300 744 Clause 4.3.2 \n
+         * RS(N=204,K=239,T=8)
+         */
       int general_work(int noutput_items,
 		       gr_vector_int &ninput_items,
 		       gr_vector_const_void_star &input_items,

@@ -131,19 +131,6 @@ namespace gr {
         const unsigned char *in = (unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        /*
-         * Clause 4.3.4.2
-         * One block is 12groupsx126datawords=1512datawords
-         * Input format: 
-         * 000000I0I1 - QPSK
-         * 0000I0I1I2I3 - 16QAM
-         * 00I0I1I2I3I4I5 - 64QAM
-         * Output format:
-         * 000000Y0Y1 - QPSK
-         * 0000Y0Y1Y2Y3 - 16QAM
-         * 00Y0Y1Y2Y3Y4Y5 - 64QAM
-         */
-
         for (int k = 0; k < noutput_items; k++)
         {
           for (int q = 0; q < d_ninput; q++)

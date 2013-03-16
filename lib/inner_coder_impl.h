@@ -26,7 +26,15 @@
 
 namespace gr {
   namespace dvbt {
-
+    /*!
+     * \brief Inner coder with Puncturing.
+     * \ingroup dvbt
+     * \param ninput length of input. \n
+     * \param noutput lenght of output. \n
+     * \param constellation type of constelaltion. \n
+     * \param hierarchy type of hierarchy used. \n
+     * \param coderate coderate used. \n
+     */
     class inner_coder_impl : public inner_coder
     {
     private:
@@ -53,8 +61,28 @@ namespace gr {
     public:
       inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate);
       ~inner_coder_impl();
-
-      // Where all the action really happens
+      /*!
+       * ETSI EN 300 744 Clause 4.3.3. \n
+       * Mother convolutional code with rate 1/2. \n
+       * k=1, n=2, K=6 \n
+       * Generator polinomial G1=171(OCT), G2=133(OCT) \n
+       * Punctured to obtain rates of 2/3, 3/4, 5/6, 7/8 \n
+       * Data Input: Packed bytes (each bit is data) \n
+       * MSB - first, LSB last \n
+       * Data Output format - Nonhierarchical: \n
+       * 000000X0X1 - QPSK \n
+       * 0000X0X1X2X3 - QAM16 \n
+       * 00X0X1X2X3X4X5 - QAM64 \n
+       * Data Output format Hierarchical: \n
+       * 0000000X0 - H-QPSK \n
+       * 0000000X1 - L-QPSK \n
+       * 000000X0X1 - H-QAM16 \n
+       * 000000X0X1 - L-QAM16 \n
+       * 000000X0X1 - H-QAM64 \n
+       * 0000X0X1X2X3 - L-QAM64 \n
+       *
+       * TODO - Format output for hierarchical \n
+       */
       int work(int noutput_items,
 		       gr_vector_const_void_star &input_items,
 		       gr_vector_void_star &output_items);

@@ -25,11 +25,18 @@
 
 namespace gr {
   namespace dvbt {
-
+    /*! 
+     * \brief DVBT Energy dispersal class. \n 
+     * \ingroup dvbt
+     * Randomizes MPEG-2 packets using a PRBS generator. \n
+     * Each block has 188 bytes. \n
+     * \param nsize	number of blocks \n
+     */
     class energy_dispersal_impl : public energy_dispersal
     {
     private:
       int d_reg;
+
       void init_prbs();	
       int clock_prbs(int clocks);
 
@@ -39,7 +46,14 @@ namespace gr {
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-      // Where all the action really happens
+      /*!
+       * ETSI EN 300 744 - Clause 4.3.1. \n
+       * Input - MPEG-2 transport packets (including sync - 0x47). \n
+       * Output - Randomized MPEG-2 transport packets. \n
+       * We assume the first byte is a sync.\n
+       * First sync in a row of 8 packets is reversed - 0xB8. \n
+       * Block size is 188bytes. \n
+       */
       int general_work(int noutput_items,
 		       gr_vector_int &ninput_items,
 		       gr_vector_const_void_star &input_items,

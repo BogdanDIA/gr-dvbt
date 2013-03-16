@@ -76,7 +76,6 @@ namespace gr {
     void
     dvbt_map_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
       ninput_items_required[0] = noutput_items;
     }
 
@@ -91,16 +90,6 @@ namespace gr {
         char q0, q1, x, y;
         float v_x, v_y;
         
-        /*
-         * Data input format:
-         * 000000Y0Y1 - QAM4
-         * 0000Y0Y1Y2Y3 - QAM16
-         * 00Y0Y1Y2Y3Y4Y5 - QAM64
-         *
-         * Data output format:
-         * complex(real(float), imag(float))
-         */
-
         for (int i = 0; i < noutput_items; i++)
         {
           for (int k = 0; k < d_noutput; k++)

@@ -91,15 +91,7 @@ namespace gr {
 
         int count = 0;
 
-        /*
-         * Clause 4.3.1
-         * Input - MPEG-2 transport packets (including sync - 0x47)
-         * Output - Randomized MPEG-2 transport packets.
-         * We assume the first byte is a sync
-         * First sync in a row of 8 packets is reversed - 0xB8
-         * Block size is 188bytes
-         */
-        for (int i = 0; i < noutput_items; i++)
+                for (int i = 0; i < noutput_items; i++)
         {
           init_prbs();
 

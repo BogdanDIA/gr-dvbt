@@ -76,12 +76,6 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        /*
-         * Clause 4.3.1
-         * Forney (Ramsey type III) convolutional interleaver
-         * Data input: Blocks of 204 bytes
-         * Data output: Stream of 1 byte
-         */
         for (int i = 0; i < (noutput_items / d_I); i++)
         {
           //Process one block of I symbols

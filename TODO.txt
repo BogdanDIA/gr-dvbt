@@ -3,3 +3,5 @@ Enable Doxygen: cmake ../ -DENABLE_DOXYGEN=ON
 Write comments for Doxygen.
 Add copyright
 Document enum types.
+Move pilot_generator class in it's own file
+Write docs for demod_reference_signals

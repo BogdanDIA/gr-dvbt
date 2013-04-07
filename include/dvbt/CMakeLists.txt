@@ -33,5 +33,6 @@ install(FILES
     reed_solomon.h
     energy_dispersal.h
     convolutional_interleaver.h
-    test2.h DESTINATION include/dvbt
+    test2.h
+    demod_reference_signals.h DESTINATION include/dvbt
 )

@@ -31,7 +31,14 @@ endif()
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
+    ofdm_receiver.py
+    #ofdm.py
+    ofdm_sync_pn.py
+    ofdm_sync_pnac.py
+    ofdm_sync_ml.py
+    ofdm_sync_fixed.py
     DESTINATION ${GR_PYTHON_DIR}/dvbt
+    COMPONENT "dvbt_python"
 )
 
 ########################################################################
@@ -52,3 +59,4 @@ GR_ADD_TEST(qa_reed_solomon ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_
 GR_ADD_TEST(qa_energy_dispersal ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_energy_dispersal.py)
 GR_ADD_TEST(qa_convolutional_interleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_convolutional_interleaver.py)
 GR_ADD_TEST(qa_test2 ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_test2.py)
+GR_ADD_TEST(qa_demod_reference_signals ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_demod_reference_signals.py)

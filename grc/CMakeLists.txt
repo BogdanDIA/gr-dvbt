@@ -27,5 +27,7 @@ install(FILES
     dvbt_reed_solomon.xml
     dvbt_energy_dispersal.xml
     dvbt_convolutional_interleaver.xml
-    dvbt_test2.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt_ofdm_demod.xml
+    dvbt_test2.xml
+    dvbt_demod_reference_signals.xml DESTINATION share/gnuradio/grc/blocks
 )

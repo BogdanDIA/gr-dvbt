@@ -526,7 +526,7 @@ namespace gr {
             
       // Scattered pilots positions depends on symbol index
       if (!d_symbol_index_known)
-	      return;
+	return;
 
       // Use frequency correction
       gr_complex c = frequency_correction();
@@ -540,13 +540,12 @@ namespace gr {
         // Keep data for channel estimation
         if (k == get_current_spilot())
         {
-          set_chanestim_carrier(k);
-          advance_spilot(); 
-          advance_chanestim();
+	  set_chanestim_carrier(k);
+	  advance_spilot(); 
+	  advance_chanestim();
         }
 
-        // Keep data for frequency correction
-        // and channel estimation
+        // Keep data for channel estimation
         if (k == get_current_cpilot())
         {
           set_chanestim_carrier(k);
@@ -587,6 +586,10 @@ namespace gr {
 
         startk = k;
       }
+
+      // Signal that equalizer is ready
+      d_equalizer_ready = 1;
+
 #else
       // This methigs waits for 4 symbols to have a valid spilot measurement
       // in each fourth carrier (uses history)
@@ -617,10 +620,11 @@ namespace gr {
 	d_channel_gain[i + 2] = 
 	  (d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
       }
-#endif
 
       // Signal that equalizer is ready
       d_equalizer_ready = 1;
+#endif
+
     }
 
     /*
@@ -841,7 +845,8 @@ namespace gr {
         // Verify parity for TPS data
         if (!verify_bch_code(d_rcv_tps_data))
         {
-          printf("TPS data parity OK for frame 0 or 2\n");
+          printf("Aquired sync - TPS OK for frame 0 or 2\n");
+	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
 
           d_symbol_index_known = 1;
           d_symbol_index = d_symbols_per_frame - 1;
@@ -849,7 +854,9 @@ namespace gr {
         }
         else
         {
-          printf("TPS data parity Not OK for frame 0 or 2\n");
+          printf("Lost sync - TPS Not OK for frame 0 or 2\n");
+	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
+
           d_symbol_index_known = 0;
           d_symbol_index = 0;
           next_symbol_index = 0;
@@ -868,7 +875,8 @@ namespace gr {
         // Verify parity for TPS data
         if (!verify_bch_code(d_rcv_tps_data))
         {
-          printf("TPS data parity OK for frame 1 or 3\n");
+          printf("Aquired sync - TPS OK for frame 1 or 3\n");
+	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
 
           d_symbol_index_known = 1;
           d_symbol_index = d_symbols_per_frame - 1;
@@ -876,7 +884,8 @@ namespace gr {
         }
         else
         {
-          printf("TPS data parity Not OK for frame 1 or 3\n");
+          printf("Lost synck - TPS Not OK for frame 1 or 3\n");
+	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
 
           d_symbol_index_known = 0;
           d_symbol_index = 0;
@@ -1013,7 +1022,7 @@ namespace gr {
       // If this block does not have a trigger then we just exit
       if (trigger_in[0] != 1)
       {
-        printf("Not trigger: d_trigger_index: %i\n", d_trigger_index);
+        printf("Not Trigger sync: d_trigger_index: %i\n", d_trigger_index);
 	trigger_out[0] = 0;
         return;
       }
@@ -1024,8 +1033,8 @@ namespace gr {
       }
 
       //reset indexes
-      d_spilot_index = 0; d_cpilot_index = 0; d_tpilot_index = 0; d_payload_index = 0;
-      d_chanestim_index = 0;
+      d_spilot_index = 0; d_cpilot_index = 0; d_tpilot_index = 0;
+      d_payload_index = 0;d_chanestim_index = 0;
       int is_payload = 1;
 
       //process one block - one symbol
@@ -1034,6 +1043,7 @@ namespace gr {
         is_payload = 1;
 
         // Keep data for channel estimation
+	// This depends on the symbol index
         if (k == get_current_spilot())
         {
           advance_spilot(); 
@@ -1055,6 +1065,7 @@ namespace gr {
         } 
 
         // Keep payload carrier number
+	// This depends on the symbol index
         if (is_payload)
         {
           set_payload_carrier(k);

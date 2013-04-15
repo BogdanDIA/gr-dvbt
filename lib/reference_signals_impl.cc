@@ -531,10 +531,10 @@ namespace gr {
       // Use frequency correction
       gr_complex c = frequency_correction();
 
+#if 1
       d_spilot_index = 0; d_cpilot_index = 0;
       d_chanestim_index = 0;
 
-#if 1
       for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
         // Keep data for channel estimation
@@ -575,7 +575,7 @@ namespace gr {
         //printf("tg_alpha: re: %f, img: %f\n", tg_alpha.real(), tg_alpha.imag());
 
         // Calculate interpolation for all intermediate values
-        for (int j = 0; j < (k - startk); j++)
+        for (int j = 1; j < (k - startk); j++)
         {
           gr_complex current = d_channel_gain[startk] + tg_alpha * gr_complex(j, 0.0);
           d_channel_gain[startk + j] = current;
@@ -612,10 +612,10 @@ namespace gr {
       // Suppose we have a pilot each third carrier.
       for (int i = 0; i < (d_Kmax - d_Kmin + 1 - 3); i += 3)
       {
-	      d_channel_gain[i + 1] = 
-		      (gr_complex(2.0, 0.0) * d_channel_gain[i] + d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
-	      d_channel_gain[i + 2] = 
-		      (d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
+	d_channel_gain[i + 1] = 
+	  (gr_complex(2.0, 0.0) * d_channel_gain[i] + d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
+	d_channel_gain[i + 2] = 
+	  (d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
       }
 #endif
 
@@ -931,13 +931,10 @@ namespace gr {
     void
     pilot_gen::process_payload_data(const gr_complex *in, gr_complex *out)
     {
-      if (!d_symbol_index_known)
-	      return;
-
       // Use frequency correction
       gr_complex c = frequency_correction();
       
-      if (d_equalizer_ready)
+      if (d_symbol_index_known && d_equalizer_ready)
       {
 	// Equalize payload data according to channel estimator
 	for (int i = 0; i < d_payload_index; i++)
@@ -948,7 +945,7 @@ namespace gr {
       else
       {
 	// If equ not ready, copy payload from input to output as is
-	for (int i = 0; i < d_payload_index; i++)
+	for (int i = 0; i < d_payload_length; i++)
         {
 	  out[0] = 0; // TODO - remove trigger in this case
 	  //out[i] = c * in[d_payload_carriers[i] + d_zeros_on_left + d_freq_offset];

@@ -113,52 +113,53 @@ class ofdm_sync_ml(gr.hier_block2):
         # This gives us the same timing signal as the PN sync block only on the preamble
         # we don't use the signal generated from the CP correlation because we don't want
         # to readjust the timing in the middle of the packet or we ruin the equalizer settings.
-        kstime = [k.conjugate() for k in kstime]
-        kstime.reverse()
-        self.kscorr = gr.fir_filter_ccc(1, kstime)
-        self.corrmag = gr.complex_to_mag_squared()
-        self.div = gr.divide_ff()
+        #kstime = [k.conjugate() for k in kstime]
+        #kstime.reverse()
+        #self.kscorr = gr.fir_filter_ccc(1, kstime)
+        #self.corrmag = gr.complex_to_mag_squared()
+        #self.div = gr.divide_ff()
 
         # The output signature of the correlation has a few spikes because the rest of the
         # system uses the repeated preamble symbol. It needs to work that generically if 
         # anyone wants to use this against a WiMAX-like signal since it, too, repeats.
         # The output theta of the correlator above is multiplied with this correlation to
         # identify the proper peak and remove other products in this cross-correlation
-        self.threshold_factor = 0.1
-        self.slice = gr.threshold_ff(self.threshold_factor, self.threshold_factor, 0)
-        self.f2b = gr.float_to_char()
-        self.b2f = gr.char_to_float()
-        self.mul = gr.multiply_ff()
+        #self.threshold_factor = 0.1
+        #self.slice = gr.threshold_ff(self.threshold_factor, self.threshold_factor, 0)
+        #self.f2b = gr.float_to_char()
+        #self.b2f = gr.char_to_float()
+        #self.mul = gr.multiply_ff()
         
         # Normalize the power of the corr output by the energy. This is not really needed
         # and could be removed for performance, but it makes for a cleaner signal.
         # if this is removed, the threshold value needs adjustment.
-        self.connect(self.input, self.kscorr, self.corrmag, (self.div,0))
-        self.connect(self.moving_sum_filter, (self.div,1))
+        #self.connect(self.input, self.kscorr, self.corrmag, (self.div,0))
+        #self.connect(self.moving_sum_filter, (self.div,1))
         
-        self.connect(self.div, (self.mul,0))
-        self.connect(self.pk_detect, self.b2f, (self.mul,1))
-        self.connect(self.mul, self.slice)
+        #self.connect(self.div, (self.mul,0))
+        #self.connect(self.pk_detect, self.b2f, (self.mul,1))
+        #self.connect(self.mul, self.slice)
         
         # Set output signals
         #    Output 0: fine frequency correction value
         #    Output 1: timing signal
         self.connect(self.sample_and_hold, (self,0))
         #self.connect(self.slice, self.f2b, (self,1)) 
-        self.connect(self.slice, gr.null_sink(4))
+        #self.connect(self.slice, gr.null_sink(4))
         self.connect(self.pk_detect, (self,1))
 
+        logging = 0
 
         if logging:
             self.connect(self.moving_sum_filter, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-energy_f.dat"))
             self.connect(self.diff, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-diff_f.dat"))
             self.connect(self.diff, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-theta_f.dat"))
             self.connect(self.angle, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-epsilon_f.dat"))
-            self.connect(self.corrmag, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-corrmag_f.dat"))
-            self.connect(self.kscorr, gr.file_sink(gr.sizeof_gr_complex, "ofdm_sync_ml-kscorr_c.dat"))
-            self.connect(self.div, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-div_f.dat"))
-            self.connect(self.mul, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-mul_f.dat"))
-            self.connect(self.slice, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-slice_f.dat"))
+            #self.connect(self.corrmag, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-corrmag_f.dat"))
+            #self.connect(self.kscorr, gr.file_sink(gr.sizeof_gr_complex, "ofdm_sync_ml-kscorr_c.dat"))
+            #self.connect(self.div, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-div_f.dat"))
+            #self.connect(self.mul, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-mul_f.dat"))
+            #self.connect(self.slice, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-slice_f.dat"))
             self.connect(self.pk_detect, gr.file_sink(gr.sizeof_char, "ofdm_sync_ml-peaks_b.dat"))
             if use_dpll:
                 self.connect(self.dpll, gr.file_sink(gr.sizeof_char, "ofdm_sync_ml-dpll_b.dat"))

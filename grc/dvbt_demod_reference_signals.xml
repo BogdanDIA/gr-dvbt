@@ -4,7 +4,7 @@
   <key>dvbt_demod_reference_signals</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.demod_reference_signals($type.size, $ninput, $noutput, $constellation.val, $hierarchy.val, $code_rate_hp.val, $code_rate_lp.val, $guard_interval.val, $transmission_mode.val, $include_cell_id.val, $cell_id)</make>
+  <make>dvbt.demod_reference_signals($type.size, $transmission_mode.fft_length, $transmission_mode.payload_length, $constellation.val, $hierarchy.val, $code_rate_hp.val, $code_rate_lp.val, $guard_interval.val, $transmission_mode.val, $include_cell_id.val, $cell_id)</make>
   <param>
 		<name>IO Type</name>
 		<key>type</key>
@@ -35,18 +35,6 @@
 			<opt>size:gr.sizeof_char</opt>
 		</option>
 	</param>
-  <param>
-    <name>Input length</name>
-    <key>ninput</key>
-    <value>1512</value>
-    <type>int</type>
-  </param>
-  <param>
-    <name>Output length</name>
-    <key>noutput</key>
-    <value>1705</value>
-    <type>int</type>
-  </param>
   <param>
     <name>Constellation Type</name>
 		<key>constellation</key>
@@ -235,21 +223,29 @@
       <name>2K</name>
 			<key>T2k</key>
 			<opt>val:dvbt.T2k</opt>
+      <opt>fft_length:2048</opt>
+      <opt>payload_length:1512</opt>
 		</option>
 		<option>
       <name>8K</name>
 			<key>T8k</key>
 			<opt>val:dvbt.T8k</opt>
+      <opt>fft_length:2048</opt>
+      <opt>payload_length:1512</opt>
 		</option>
 		<option>
       <name>TRES1</name>
 			<key>TRES1</key>
 			<opt>val:dvbt.TRES1</opt>
+      <opt>fft_length:2048</opt>
+      <opt>payload_length:1512</opt>
 		</option>
 		<option>
       <name>TRES2</name>
 			<key>TRES2</key>
 			<opt>val:dvbt.TRES2</opt>
+      <opt>fft_length:2048</opt>
+      <opt>payload_length:1512</opt>
 		</option>
   </param>
   <param>
@@ -273,23 +269,25 @@
     <value>0</value>
     <type>int</type>
   </param>
-
-  <check>$ninput &gt; 0</check>
-  <check>$noutput &gt; 0</check>
-  <check>$noutput &gt;= $ninput</check>
   <sink>
     <name>in</name>
     <type>complex</type>
-    <vlen>$ninput</vlen>
+    <vlen>$transmission_mode.fft_length</vlen>
   </sink>
   <sink>
-    <name>trigger</name>
+    <name>trigger_in</name>
     <type>byte</type>
-    <vlen>$ninput</vlen>
+    <vlen>$transmission_mode.fft_length</vlen>
   </sink>
   <source>
     <name>out</name>
     <type>complex</type>
-    <vlen>$noutput</vlen>
+    <vlen>$transmission_mode.payload_length</vlen>
   </source>
+  <source>
+    <name>trigger_out</name>
+    <type>byte</type>
+    <vlen>$transmission_mode.payload_length</vlen>
+  </source>
+
 </block>

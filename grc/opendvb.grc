@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Mon Apr  1 16:46:44 2013</timestamp>
+  <timestamp>Sun Apr  7 21:15:20 2013</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -1211,45 +1211,6 @@
     </param>
   </block>
   <block>
-    <key>blks2_rational_resampler_xxx</key>
-    <param>
-      <key>id</key>
-      <value>blks2_rational_resampler_xxx_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>ccc</value>
-    </param>
-    <param>
-      <key>decim</key>
-      <value>64</value>
-    </param>
-    <param>
-      <key>interp</key>
-      <value>70</value>
-    </param>
-    <param>
-      <key>taps</key>
-      <value>[]</value>
-    </param>
-    <param>
-      <key>fractional_bw</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1064, 529)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>180</value>
-    </param>
-  </block>
-  <block>
     <key>wxgui_fftsink2</key>
     <param>
       <key>id</key>
@@ -1461,6 +1422,45 @@
     </param>
   </block>
   <block>
+    <key>blks2_rational_resampler_xxx</key>
+    <param>
+      <key>id</key>
+      <value>blks2_rational_resampler_xxx_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>ccc</value>
+    </param>
+    <param>
+      <key>decim</key>
+      <value>64</value>
+    </param>
+    <param>
+      <key>interp</key>
+      <value>70</value>
+    </param>
+    <param>
+      <key>taps</key>
+      <value>[]</value>
+    </param>
+    <param>
+      <key>fractional_bw</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1064, 529)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+  </block>
+  <block>
     <key>gr_file_sink</key>
     <param>
       <key>id</key>
@@ -1472,7 +1472,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvbt/grc/test_2.bin</value>
+      <value>/home/bogdan/ettus/dvbt-baruffa/test_BB.bin</value>
     </param>
     <param>
       <key>type</key>
@@ -1488,7 +1488,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1144, 324)</value>
+      <value>(980, 818)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1586,7 +1586,7 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>gr_multiply_const_vxx_0</source_block_id>
+    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
     <sink_block_id>gr_file_sink_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>

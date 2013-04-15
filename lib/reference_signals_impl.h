@@ -30,7 +30,7 @@
     const int SYMBOLS_PER_FRAME = 68;
     const int FRAMES_PER_SUPERFRAME = 4;
 
-    const int SCATTERED_PILOT_SIZE_2k = 142;
+    const int SCATTERED_PILOT_SIZE_2k = 142; // TODO - fix this - what should be here
     const int CONTINUAL_PILOT_SIZE_2k = 45;
     const int TPS_PILOT_SIZE_2k = 17;
 
@@ -53,6 +53,10 @@ class pilot_gen {
 
     int d_Kmin;
     int d_Kmax;
+    int d_fft_length;
+    int d_payload_length;
+    int d_zeros_on_left;
+    int d_cp_length;
 
     static const int d_symbols_per_frame;
     static const int d_frames_per_superframe;
@@ -93,6 +97,10 @@ class pilot_gen {
 
     int d_cpilot_carriers_size;
     const int * d_cpilot_carriers;
+    float * d_known_phase_diff;
+    float * d_cpilot_phase_diff;
+    int d_freq_offset_max;
+    int d_freq_offset;
 
     int d_tps_carriers_size;
     const int * d_tps_carriers;
@@ -110,6 +118,10 @@ class pilot_gen {
     std::deque<char> d_tps_sync_evenv;
     std::deque<char> d_tps_sync_oddv;
 
+    // Keeps channel estimation carriers
+    // we use both continual and scattered carriers
+    int * d_chanestim_carriers;
+
     // Keeps paload carriers
     int * d_payload_carriers;
 
@@ -118,6 +130,7 @@ class pilot_gen {
     int d_cpilot_index;
     int d_tpilot_index;
     int d_payload_index;
+    int d_chanestim_index;
     int d_symbol_index;
     int d_symbol_index_known;
     int d_equalizer_ready;
@@ -132,7 +145,7 @@ class pilot_gen {
     // TPS private methods
     void set_tps_bits(int start, int stop, unsigned int data);
      
-    void set_symbol_index(int);
+    void set_symbol_index(int index);
     int get_symbol_index();
     void set_tps_data();
     void get_tps_data();
@@ -144,8 +157,12 @@ class pilot_gen {
     gr_complex get_spilot_value(int spilot);
     void set_spilot_value(int spilot, gr_complex val);
     void advance_spilot();
+    // Methods used to quick iterate through all spilots
+    int get_first_spilot();
+    int get_last_spilot() const;
+    int get_next_spilot();
     // Scattered pilot data processing method
-    void process_spilot_data();
+    void process_spilot_data(const gr_complex * in);
 
     // Channel estimation methods
     void set_channel_gain(int spilot, gr_complex val);
@@ -155,7 +172,8 @@ class pilot_gen {
     gr_complex get_cpilot_value(int cpilot);
     void advance_cpilot();
     // Continual pilot data processing methods
-    void process_cpilot_data();
+    void process_cpilot_data(const gr_complex * in);
+    gr_complex frequency_correction();
 
     // TPS generator methods
     int get_current_tpilot() const;
@@ -168,13 +186,19 @@ class pilot_gen {
     // Verify parity on TPS data
     int verify_bch_code(std::deque<char> data);
     // TPS data processing metods
-    void process_tps_data();
+    int process_tps_data(const gr_complex * in);
+
+    // Channel estimation methods
+    void set_chanestim_carrier(int k);
 
     // Payload data processing methods
     int get_current_payload();
+    void advance_chanestim();
     void set_payload_carrier(int k);
     void advance_payload();
     void process_payload_data(const gr_complex *in, gr_complex *out);
+
+    int d_trigger_index;
 
   public:
 
@@ -190,7 +214,7 @@ class pilot_gen {
     /*!
      * TODO
      */
-    void parse_input(const gr_complex *in, const unsigned char *trigger, gr_complex *out);
+    void parse_input(const gr_complex *in, const unsigned char *trigger_in, gr_complex *out, unsigned char *trigger_out);
 
     };
 

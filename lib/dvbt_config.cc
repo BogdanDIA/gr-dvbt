@@ -103,14 +103,21 @@ namespace gr {
       {
 	case gr::dvbt::T2k:
 	  d_Kmin = 0; d_Kmax = 1704;
+	  d_fft_length = 2048;
+	  d_payload_length = 1512;
 	  break;
 	case gr::dvbt::T8k:
 	  d_Kmin = 0; d_Kmax = 6816;
+	  d_fft_length = 8192;
+	  d_payload_length = 1512; //TODO
 	  break;
 	default:
 	  d_Kmin = 0; d_Kmax = 1704;
+	  d_fft_length = 2048;
+	  d_payload_length = 1512;
 	  break;
       }
+      d_zeros_on_left = int(ceil((d_fft_length - (d_Kmax - d_Kmin + 1)) / 2.0));
 
       switch (d_constellation)
       {
@@ -169,6 +176,25 @@ namespace gr {
           break;
         default:
           d_cr_k = 1; d_cr_n = 2;
+          break;
+      }
+
+      switch (guard_interval)
+      {
+        case gr::dvbt::G1_32:
+          d_cp_length = d_fft_length / 32;
+          break;
+        case gr::dvbt::G1_16:
+          d_cp_length = d_fft_length / 16;
+          break;
+        case gr::dvbt::G1_8:
+          d_cp_length = d_fft_length / 8;
+          break;
+        case gr::dvbt::G1_4:
+          d_cp_length = d_fft_length / 4;
+          break;
+        default:
+          d_cp_length = d_fft_length / 32;
           break;
       }
 

@@ -100,6 +100,10 @@ namespace gr {
       dvbt_transmission_mode_t d_transmission_mode;
       int d_Kmin;
       int d_Kmax;
+      int d_fft_length;
+      int d_payload_length;
+      int d_zeros_on_left;
+      int d_cp_length;
 
       //Constelaltion parameters
       dvbt_constellation_t d_constellation;

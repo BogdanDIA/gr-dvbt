@@ -1116,6 +1116,9 @@ namespace gr {
         d_trigger_index++;
       } 
 
+      // Obtain frequency correction based on cpilots.
+      // Obtain channel estimation based on both
+      // cpilots and spilots.
       // We use spilot correlation for finding the symbol index modulo 4
       // The diff between previous sym index and current index is used
       // to advance the symbol index inside a frame (0 to 67)

@@ -132,6 +132,8 @@ class pilot_gen {
     int d_payload_index;
     int d_chanestim_index;
     int d_symbol_index;
+    int d_prev_mod_symbol_index;
+    int d_mod_symbol_index;
     int d_symbol_index_known;
     int d_equalizer_ready;
     int d_frame_index;
@@ -153,16 +155,16 @@ class pilot_gen {
     void reset_pilot_generator();
 
     // Scattered pilot generator methods
-    int get_current_spilot() const;
+    int get_current_spilot(int spilot) const;
     gr_complex get_spilot_value(int spilot);
     void set_spilot_value(int spilot, gr_complex val);
-    void advance_spilot();
+    void advance_spilot(int sindex);
     // Methods used to quick iterate through all spilots
     int get_first_spilot();
     int get_last_spilot() const;
     int get_next_spilot();
     // Scattered pilot data processing method
-    void process_spilot_data(const gr_complex * in);
+    int process_spilot_data(const gr_complex * in);
 
     // Channel estimation methods
     void set_channel_gain(int spilot, gr_complex val);
@@ -186,7 +188,7 @@ class pilot_gen {
     // Verify parity on TPS data
     int verify_bch_code(std::deque<char> data);
     // TPS data processing metods
-    int process_tps_data(const gr_complex * in);
+    int process_tps_data(const gr_complex * in, const int diff_symbo_index);
 
     // Channel estimation methods
     void set_chanestim_carrier(int k);

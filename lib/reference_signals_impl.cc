@@ -138,7 +138,9 @@ namespace gr {
                                         d_freq_offset_max(30),
                                         d_trigger_index(0),
                                         d_payload_index(0),
-                                        d_chanestim_index(0)
+                                        d_chanestim_index(0),
+					d_prev_mod_symbol_index(0),
+					d_mod_symbol_index(0)
     {
       //Determine parameters from config file
       d_Kmin = config.d_Kmin;
@@ -449,10 +451,10 @@ namespace gr {
      * Init scattered pilot generator
      */
     int
-    pilot_gen::get_current_spilot() const
+    pilot_gen::get_current_spilot(int sindex) const
     {
       //TODO - can be optimized for same symbol_index
-      return (d_Kmin + 3 * (d_symbol_index % 4) + 12 * d_spilot_index);
+      return (d_Kmin + 3 * (sindex % 4) + 12 * d_spilot_index);
     }
 
     gr_complex
@@ -465,7 +467,7 @@ namespace gr {
     void
     pilot_gen::set_spilot_value(int spilot, gr_complex val)
     {
-      d_spilot_carriers_val[spilot] =val;
+      d_spilot_carriers_val[spilot] = val;
     }
 
     void
@@ -475,12 +477,12 @@ namespace gr {
       d_channel_gain[spilot] = gr_complex((4 * 2 * (0.5 - d_wk[spilot]) / 3), 0) / val;
     }
     void
-    pilot_gen::advance_spilot()
+    pilot_gen::advance_spilot(int sindex)
     {
       //TODO - do in a simpler way?
       int size = d_spilot_carriers_size;
 
-      if (d_symbol_index == 0)
+      if (sindex == 0)
         size = d_spilot_carriers_size + 1;
 
       // TODO - fix this - what value should we use?
@@ -517,48 +519,88 @@ namespace gr {
       return pilot;
     }
 
-    void
+    int
     pilot_gen::process_spilot_data(const gr_complex * in)
     {
       // This is channel estimator
       // Interpolate the gain between carriers to obtain
       // gain for non pilot carriers - we use linear interpolation
             
-      // Scattered pilots positions depends on symbol index
-      if (!d_symbol_index_known)
-	return;
-
       // Use frequency correction
       gr_complex c = frequency_correction();
 
 #if 1
-      d_spilot_index = 0; d_cpilot_index = 0;
-      d_chanestim_index = 0;
-
-      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+      // Find out the OFDM symbol index (value 0 to 3) sent
+      // in current block by correlating scattered symbols with
+      // current block - result is (symbol index % 4)
+      float max = 0; float sum = 0;
+      float known_phase = 0; float phase = 0;
+ 
+      for (int scount = 0; scount < 4; scount++)
       {
-        // Keep data for channel estimation
-        if (k == get_current_spilot())
+ 	d_spilot_index = 0; d_cpilot_index = 0;
+      	d_chanestim_index = 0;
+
+	for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+	{
+	  // Keep data for channel estimation
+	  if (k == get_current_spilot(scount))
+	  {
+	    set_chanestim_carrier(k);
+	    advance_spilot(scount); 
+	    advance_chanestim();
+	  }
+	}
+	//printf("d_chanestim_index: %i\n", d_chanestim_index);
+
+	sum = 0;
+	float s = 0;
+        for (int j = 0; j < (d_chanestim_index - 1); j++)
         {
-	  set_chanestim_carrier(k);
-	  advance_spilot(); 
-	  advance_chanestim();
+	  known_phase = norm(get_spilot_value(d_chanestim_carriers[j + 1]) - get_spilot_value(d_chanestim_carriers[j]));
+          phase = norm(c * in[d_zeros_on_left + d_chanestim_carriers[j + 1] + d_freq_offset] - \
+			  c * in[d_zeros_on_left + d_chanestim_carriers[j] + d_freq_offset]);
+
+          sum += known_phase * phase;
         }
 
-        // Keep data for channel estimation
-        if (k == get_current_cpilot())
+      	//printf("sum: %f, max: %f, scount: %i\n", sum, max, scount);
+        if (sum > max)
         {
-          set_chanestim_carrier(k);
-          advance_cpilot();
-          advance_chanestim();
+          max = sum;
+          d_mod_symbol_index = scount;
         }
       }
- 
+
+      //printf("sindex: %i, d_trigger_index: %i\n", sindex, d_trigger_index);
+
       // Keep data for channel estimator
       // This method interpolates scattered measurements across one OFDM symbol
       // It does not use measurements from the previous OFDM symnbols (does not use history)
       // as it may have encountered a phase change for the current phase only
 
+      d_spilot_index = 0; d_cpilot_index = 0;
+      d_chanestim_index = 0;
+
+      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+      {
+	// Keep data for channel estimation
+	if (k == get_current_spilot(d_mod_symbol_index))
+	{
+	  set_chanestim_carrier(k);
+	  advance_spilot(d_mod_symbol_index); 
+	  advance_chanestim();
+	}
+
+	// Keep data for channel estimation
+	if (k == get_current_cpilot())
+	{
+	  set_chanestim_carrier(k);
+	  advance_cpilot();
+	  advance_chanestim();
+	}
+      }
+ 
       // We use both scattered pilots and continual pilots
       for (int i = 0, startk = d_chanestim_carriers[0]; i < d_chanestim_index; i++)
       {
@@ -624,7 +666,13 @@ namespace gr {
       // Signal that equalizer is ready
       d_equalizer_ready = 1;
 #endif
+      int diff_sindex = d_mod_symbol_index - d_prev_mod_symbol_index;
+      if (diff_sindex < 0)
+	diff_sindex += 4;
 
+      d_prev_mod_symbol_index = d_mod_symbol_index;
+
+      return diff_sindex;
     }
 
     /*
@@ -679,6 +727,7 @@ namespace gr {
       PRINTF("d_freq_offset: %i\n", d_freq_offset);
     }
     
+    // TODO - return d_freq_offset and c
     gr_complex
     pilot_gen::frequency_correction()
     {
@@ -783,61 +832,61 @@ namespace gr {
     }
 
     int
-    pilot_gen::process_tps_data(const gr_complex * in)
+    pilot_gen::process_tps_data(const gr_complex * in, const int diff_symbol_index)
     {
-      int next_symbol_index = d_symbol_index;
+      int end_frame = 0;
 
       // Shift the spectrum according to freq offset
-      // TODO - this should be done for entire symbol at once
-      // TODO - also use equalized data too
       gr_complex c = frequency_correction();
 
-      for (int k = 0; k < d_tps_carriers_size; k++)
-        d_tps_symbol[k] = c * in[d_tps_carriers[k] + d_zeros_on_left + d_freq_offset]; 
-
-      //Look for TPS data only - demodulate DBPSK
-      //
-      // Compare previous symbol with current one to obtain bit values
+      // Look for TPS data only - demodulate DBPSK
+      // Calculate phase difference between previous symbol 
+      // and current one to determine the current bit.
       // Use majority voting for decission
       int tps_majority_zero = 0;
 
       for (int k = 0; k < d_tps_carriers_size; k++)
       {
+	// Use equilizer to correct data and frequency correction
+	gr_complex val = c * in[d_zeros_on_left + d_tps_carriers[k] + d_freq_offset] * d_channel_gain[d_tps_carriers[k] + d_freq_offset];
+
         if (!d_symbol_index_known || (d_symbol_index != 0))
         {
-          gr_complex phdiff = d_tps_symbol[k] * conj(d_prev_tps_symbol[k]);
+          gr_complex phdiff = val * conj(d_prev_tps_symbol[k]);
 
           if (phdiff.real() >= 0.0)
             tps_majority_zero++;
           else
             tps_majority_zero--;
         }
-        else
-          PRINTF("S0[k]: k=%i, real: %f, imag: %f\n", k, d_tps_symbol[k].real(), d_tps_symbol[k].imag());
 
-        d_prev_tps_symbol[k] = d_tps_symbol[k]; // TODO - don't we need to init according to PRBS?
+        d_prev_tps_symbol[k] = val;
       }
 
       PRINTF("tps_majority_zero: %i\n", tps_majority_zero);
 
       // Insert obtained TPS bit into FIFO
+      // Insert the same bit into FIFO in the case
+      // diff_symbol_index is more than one. This will happen
+      // in the case of losting 1 to 3 symbols.
+      // This could be corrected by BCH decoder afterwards.
 
-      // Take out the front entry first
-      d_rcv_tps_data.pop_front();
-
-      // Add data at tail
-      if (!d_symbol_index_known || (d_symbol_index != 0))
+      for (int i = 0; i < diff_symbol_index; i++)
       {
-        if (tps_majority_zero >= 0)
-          d_rcv_tps_data.push_back(0);
-        else
-          d_rcv_tps_data.push_back(1);
-      }
-      else
-        d_rcv_tps_data.push_back(0);
+      	// Take out the front entry first
+      	d_rcv_tps_data.pop_front();
 
-      if (d_symbol_index_known)
-        next_symbol_index++;
+        // Add data at tail
+	if (!d_symbol_index_known || (d_symbol_index != 0))
+	{
+	  if (tps_majority_zero >= 0)
+	    d_rcv_tps_data.push_back(0);
+	  else
+	    d_rcv_tps_data.push_back(1);
+	}
+	else
+	  d_rcv_tps_data.push_back(0);
+      }
 
       // Match synchronization signatures
       if (std::equal(d_rcv_tps_data.begin() + 1, d_rcv_tps_data.begin() + d_tps_sync_evenv.size(), d_tps_sync_evenv.begin()))
@@ -846,20 +895,16 @@ namespace gr {
         if (!verify_bch_code(d_rcv_tps_data))
         {
           printf("Aquired sync - TPS OK for frame 0 or 2\n");
-	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
 
           d_symbol_index_known = 1;
-          d_symbol_index = d_symbols_per_frame - 1;
-          next_symbol_index = 0;
+	  end_frame = 1;
         }
         else
         {
           printf("Lost sync - TPS Not OK for frame 0 or 2\n");
-	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
 
           d_symbol_index_known = 0;
-          d_symbol_index = 0;
-          next_symbol_index = 0;
+	  end_frame = 0;
         }
 
         for (int i = 0; i < d_symbols_per_frame; i++)
@@ -876,20 +921,16 @@ namespace gr {
         if (!verify_bch_code(d_rcv_tps_data))
         {
           printf("Aquired sync - TPS OK for frame 1 or 3\n");
-	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
 
           d_symbol_index_known = 1;
-          d_symbol_index = d_symbols_per_frame - 1;
-          next_symbol_index = 0;
+	  end_frame = 1;
         }
         else
         {
-          printf("Lost synck - TPS Not OK for frame 1 or 3\n");
-	  printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
+          printf("Lost sync - TPS Not OK for frame 1 or 3\n");
 
           d_symbol_index_known = 0;
-          d_symbol_index = 0;
-          next_symbol_index = 0;
+	  end_frame = 0;
         }
 
 	for (int i = 0; i < d_symbols_per_frame; i++)
@@ -904,7 +945,7 @@ namespace gr {
       PRINTF("d_symbol_index: %i\n", d_symbol_index);
       PRINTF("next_symbol_index: %i\n", next_symbol_index);
 
-      return next_symbol_index;
+      return end_frame;
     }
 
     void
@@ -940,15 +981,56 @@ namespace gr {
     void
     pilot_gen::process_payload_data(const gr_complex *in, gr_complex *out)
     {
+      //reset indexes
+      d_spilot_index = 0; d_cpilot_index = 0; d_tpilot_index = 0;
+      d_payload_index = 0;d_chanestim_index = 0;
+      int is_payload = 1;
+
+      //process one block - one symbol
+      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+      {
+        is_payload = 1;
+
+        // Keep data for channel estimation
+	// This depends on the symbol index
+        if (k == get_current_spilot(d_mod_symbol_index))
+        {
+          advance_spilot(d_mod_symbol_index); 
+          is_payload = 0;
+        }
+
+        // Keep data for frequency correction
+        // and channel estimation
+        if (k == get_current_cpilot())
+        {
+          advance_cpilot();
+          is_payload = 0;
+        }
+        
+        if (k == get_current_tpilot())
+        {
+          advance_tpilot();
+          is_payload = 0;
+        } 
+
+        // Keep payload carrier number
+	// This depends on the symbol index
+        if (is_payload)
+        {
+          set_payload_carrier(k);
+          advance_payload();
+        }
+      }
+
       // Use frequency correction
       gr_complex c = frequency_correction();
       
-      if (d_symbol_index_known && d_equalizer_ready)
+      if (d_equalizer_ready)
       {
 	// Equalize payload data according to channel estimator
 	for (int i = 0; i < d_payload_index; i++)
 	{
-	  out[i] = c * in[d_payload_carriers[i] + d_zeros_on_left + d_freq_offset] * d_channel_gain[d_payload_carriers[i]];
+	  out[i] = c * in[d_zeros_on_left + d_payload_carriers[i] + d_freq_offset] * d_channel_gain[d_payload_carriers[i] + d_freq_offset];
 	}
       }
       else
@@ -956,7 +1038,7 @@ namespace gr {
 	// If equ not ready, copy payload from input to output as is
 	for (int i = 0; i < d_payload_length; i++)
         {
-	  out[0] = 0; // TODO - remove trigger in this case
+	  out[0] = gr_complex(0.0, 0.0); // TODO - remove trigger in this case
 	  //out[i] = c * in[d_payload_carriers[i] + d_zeros_on_left + d_freq_offset];
         }
       }
@@ -980,10 +1062,10 @@ namespace gr {
       for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
           is_payload = 1;
-          if (k == get_current_spilot())
+          if (k == get_current_spilot(d_symbol_index))
           {
             out[k] = get_spilot_value(k);
-            advance_spilot();
+            advance_spilot(d_symbol_index);
             is_payload = 0;
           }
 
@@ -1024,79 +1106,51 @@ namespace gr {
       {
         printf("Not Trigger sync: d_trigger_index: %i\n", d_trigger_index);
 	trigger_out[0] = 0;
+	// clear out the output
+	for (int i = 0; i < d_payload_index; i++)
+	  out[i] = gr_complex(0.0, 0.0);
         return;
       }
       else
       {
-	trigger_out[0] = 1;
         d_trigger_index++;
-      }
+      } 
 
-      //reset indexes
-      d_spilot_index = 0; d_cpilot_index = 0; d_tpilot_index = 0;
-      d_payload_index = 0;d_chanestim_index = 0;
-      int is_payload = 1;
-
-      //process one block - one symbol
-      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
-      {
-        is_payload = 1;
-
-        // Keep data for channel estimation
-	// This depends on the symbol index
-        if (k == get_current_spilot())
-        {
-          advance_spilot(); 
-          is_payload = 0;
-        }
-
-        // Keep data for frequency correction
-        // and channel estimation
-        if (k == get_current_cpilot())
-        {
-          advance_cpilot();
-          is_payload = 0;
-        }
-        
-        if (k == get_current_tpilot())
-        {
-          advance_tpilot();
-          is_payload = 0;
-        } 
-
-        // Keep payload carrier number
-	// This depends on the symbol index
-        if (is_payload)
-        {
-          set_payload_carrier(k);
-          advance_payload();
-        }
-      }
+      // We use spilot correlation for finding the symbol index modulo 4
+      // The diff between previous sym index and current index is used
+      // to advance the symbol index inside a frame (0 to 67)
+      // Then based on the TPS data we find out the start of a frame
 
       // Process cpilot data
       // This is coarse frequency offset estimation
       // This is called before all other processing
       process_cpilot_data(in);
 
-      // Process TPS data
-      // If a frame is recognized then return next symbol index
-      int next_symbol_index = process_tps_data(in);
-
       // Process spilot data
-      // This is channel estimation
-      process_spilot_data(in);
-      
-      // Process payload data 
+      // This is channel estimation function
+      int diff_symbol_index = process_spilot_data(in);
+
+      // Correct symbol index so that all subsequent processing
+      // use correct symbol index
+      d_symbol_index = (d_symbol_index + diff_symbol_index) % d_symbols_per_frame;
+      // Trigger for the beginning of a frame
+      if (d_symbol_index == 0)
+	trigger_out[0] = 1;
+
+      // Process TPS data
+      // If a frame is recognized then signal end of frame
+      int frame_end = process_tps_data(in, diff_symbol_index);
+
+      // We are just at the end of a frame
+      if (frame_end)
+	d_symbol_index = d_symbols_per_frame - 1;
+ 
+      // Process payload data with correct symbol index
       process_payload_data(in, out);
 
 #if 0
-      for (int i = 0; i < d_fft_length; i++)
-        printf("d_trigger_index: %i, d_symbol_index: %i, in[%i]: angle:%f, abs:%f, %f, %f\n", \
-            d_trigger_index, d_symbol_index, i, 360 * arg(in[i]) / 6.28, abs(in[i]), in[i].real(), in[i].imag());
-
       int bigger = 0;
       int smaller = 0;
-      printf("d_trigger_index: %i, d_symbol_index: %i\n", d_trigger_index, d_symbol_index);
       for (int i = 0; i < d_payload_length; i++)
       {
         if (abs(out[i]) > 1.5)
@@ -1109,7 +1163,12 @@ namespace gr {
         printf("bigger: %i\n", bigger);
       if (smaller > 0)
       {
-        printf("smaller: %i, d_trigger_index: %i, d_symbol_index: %i\n", smaller, d_trigger_index, d_symbol_index);
+        printf("smaller: %i, d_trigger_index: %i, d_symbol_index: %i, diff_symbol_index: %i\n", \
+	  smaller, d_trigger_index, d_symbol_index, diff_symbol_index);
+
+      	for (int i = 0; i < d_fft_length; i++)
+          printf("d_trigger_index: %i, d_symbol_index: %i, in[%i]: angle:%f, abs:%f, %f, %f\n", \
+            d_trigger_index, d_symbol_index, i, 360 * arg(in[i]) / 6.28, abs(in[i]), in[i].real(), in[i].imag());
 
         for (int i = 0; i < d_fft_length; i++)
           printf("d_trigger_index: %i, d_symbol_index: %i, d_channel_gain[%i]: re: %f, img: %f, in[%i]: angle:%f, abs:%f, %f, %f\n", \
@@ -1121,10 +1180,6 @@ namespace gr {
           printf("d_symbol_index: %i, out[%i]: abs:%f, re: %f, img:%f\n", d_symbol_index, i, abs(out[i]), out[i].real(), out[i].imag());
       }
 #endif
-
-      // Set the next symbol index
-      // This is updated at the end only
-      set_symbol_index(next_symbol_index);
     }
 
     reference_signals::sptr

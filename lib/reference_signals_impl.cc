@@ -529,10 +529,11 @@ namespace gr {
       // Use frequency correction
       gr_complex c = frequency_correction();
 
-#if 1
+      /*************************************************************/
       // Find out the OFDM symbol index (value 0 to 3) sent
       // in current block by correlating scattered symbols with
       // current block - result is (symbol index % 4)
+      /*************************************************************/
       float max = 0; float sum = 0;
       float known_phase = 0; float phase = 0;
  
@@ -572,12 +573,15 @@ namespace gr {
         }
       }
 
+#if 1
       //printf("sindex: %i, d_trigger_index: %i\n", sindex, d_trigger_index);
 
+      /*************************************************************/
       // Keep data for channel estimator
       // This method interpolates scattered measurements across one OFDM symbol
       // It does not use measurements from the previous OFDM symnbols (does not use history)
       // as it may have encountered a phase change for the current phase only
+      /*************************************************************/
 
       d_spilot_index = 0; d_cpilot_index = 0;
       d_chanestim_index = 0;
@@ -633,26 +637,28 @@ namespace gr {
       d_equalizer_ready = 1;
 
 #else
+      /*************************************************************/
       // This methigs waits for 4 symbols to have a valid spilot measurement
       // in each fourth carrier (uses history)
       // Suppose we have g[k] and g[k+3] then
       // g[k+1]=(2/3)v[k]+(1/3)v[k+3]
       // g[k+2]=(1/3)v[k]+(2/3)v[k+3]
+      /*************************************************************/
 
       d_spilot_index = 0;
 
       for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
-        if (k == get_current_spilot())
+        if (k == get_current_spilot(d_mod_symbol_index))
         {
           set_channel_gain(k, c * in[k + d_zeros_on_left + d_freq_offset]);
-          advance_spilot();
+          advance_spilot(d_mod_symbol_index);
         }
       }
 
       // Wait for at least 4 symbols to have an estimation on each third carrier
       if (d_symbol_index < 4)
-	      return;
+	return 1;
       
       // Suppose we have a pilot each third carrier.
       for (int i = 0; i < (d_Kmax - d_Kmin + 1 - 3); i += 3)
@@ -666,9 +672,8 @@ namespace gr {
       // Signal that equalizer is ready
       d_equalizer_ready = 1;
 #endif
-      int diff_sindex = d_mod_symbol_index - d_prev_mod_symbol_index;
-      if (diff_sindex < 0)
-	diff_sindex += 4;
+
+      int diff_sindex = (d_mod_symbol_index - d_prev_mod_symbol_index + 4) % 4;
 
       d_prev_mod_symbol_index = d_mod_symbol_index;
 

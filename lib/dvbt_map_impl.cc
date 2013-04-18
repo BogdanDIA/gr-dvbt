@@ -29,13 +29,7 @@
 
 namespace gr {
   namespace dvbt {
-
-    unsigned int
-    gray_to_bin(unsigned int val)
-    {
-      return (val >> 1) ^ val;
-    }
-
+ 
     dvbt_map::sptr
     dvbt_map::make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain)
     {
@@ -71,6 +65,12 @@ namespace gr {
      */
     dvbt_map_impl::~dvbt_map_impl()
     {
+    }
+
+    unsigned int
+    dvbt_map_impl::bin_to_gray(unsigned int val)
+    {
+      return (val >> 1) ^ val;
     }
 
     void
@@ -118,8 +118,8 @@ namespace gr {
 
                 x = ((bits >> 2) | (bits >> 1)) & 0x3; y = ((bits >> 1) | bits) & 0x3;
 
-                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - gray_to_bin(x))) / d_gain;
-                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - gray_to_bin(y))) / d_gain;
+                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(x))) / d_gain;
+                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(y))) / d_gain;
               } break;
               default:
               {

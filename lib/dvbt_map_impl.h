@@ -55,8 +55,8 @@ namespace gr {
       //Gain for the complex values
       float d_gain;
 
-      //Return natural binary from grey representation
-      unsigned int grey_to_bin(unsigned int);
+      //Return gray representation from natural binary
+      unsigned int bin_to_gray(unsigned int val);
 
     public:
       dvbt_map_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain);

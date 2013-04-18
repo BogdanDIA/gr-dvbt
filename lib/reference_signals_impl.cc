@@ -1032,19 +1032,19 @@ namespace gr {
       
       if (d_equalizer_ready)
       {
-	// Equalize payload data according to channel estimator
-	for (int i = 0; i < d_payload_index; i++)
-	{
-	  out[i] = c * in[d_zeros_on_left + d_payload_carriers[i] + d_freq_offset] * d_channel_gain[d_payload_carriers[i] + d_freq_offset];
-	}
+        // Equalize payload data according to channel estimator
+        for (int i = 0; i < d_payload_index; i++)
+        {
+          out[i] = c * in[d_zeros_on_left + d_payload_carriers[i] + d_freq_offset] * d_channel_gain[d_payload_carriers[i] + d_freq_offset];
+        }
       }
       else
       {
-	// If equ not ready, copy payload from input to output as is
-	for (int i = 0; i < d_payload_length; i++)
+        // If equ not ready, copy payload from input to output as is
+        for (int i = 0; i < d_payload_length; i++)
         {
-	  out[0] = gr_complex(0.0, 0.0); // TODO - remove trigger in this case
-	  //out[i] = c * in[d_payload_carriers[i] + d_zeros_on_left + d_freq_offset];
+          out[0] = gr_complex(0.0, 0.0); // TODO - remove trigger in this case
+          //out[i] = c * in[d_payload_carriers[i] + d_zeros_on_left + d_freq_offset];
         }
       }
     }

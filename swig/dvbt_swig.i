@@ -21,6 +21,7 @@
 #include "dvbt/convolutional_interleaver.h"
 #include "dvbt/test2.h"
 #include "dvbt/demod_reference_signals.h"
+#include "dvbt/dvbt_demap.h"
 %}
 
 %include "dvbt/test.h"
@@ -36,6 +37,7 @@
 %include "dvbt/convolutional_interleaver.h"
 %include "dvbt/test2.h"
 %include "dvbt/demod_reference_signals.h"
+%include "dvbt/dvbt_demap.h"
 GR_SWIG_BLOCK_MAGIC2(dvbt, test);
 GR_SWIG_BLOCK_MAGIC2(dvbt, vector_pad);
 GR_SWIG_BLOCK_MAGIC2(dvbt, reference_signals);
@@ -48,3 +50,4 @@ GR_SWIG_BLOCK_MAGIC2(dvbt, energy_dispersal);
 GR_SWIG_BLOCK_MAGIC2(dvbt, convolutional_interleaver);
 GR_SWIG_BLOCK_MAGIC2(dvbt, test2);
 GR_SWIG_BLOCK_MAGIC2(dvbt, demod_reference_signals);
+GR_SWIG_BLOCK_MAGIC2(dvbt, dvbt_demap);

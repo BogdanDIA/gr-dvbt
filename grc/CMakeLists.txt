@@ -29,5 +29,6 @@ install(FILES
     dvbt_convolutional_interleaver.xml
     dvbt_ofdm_demod.xml
     dvbt_test2.xml
-    dvbt_demod_reference_signals.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt_demod_reference_signals.xml
+    dvbt_dvbt_demap.xml DESTINATION share/gnuradio/grc/blocks
 )

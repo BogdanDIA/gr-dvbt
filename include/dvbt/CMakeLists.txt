@@ -34,5 +34,6 @@ install(FILES
     energy_dispersal.h
     convolutional_interleaver.h
     test2.h
-    demod_reference_signals.h DESTINATION include/dvbt
+    demod_reference_signals.h
+    dvbt_demap.h DESTINATION include/dvbt
 )

@@ -122,15 +122,23 @@ namespace gr {
       switch (d_constellation)
       {
 	case gr::dvbt::QPSK:
+	  d_constellation_size = 2;
+	  d_step = 2;
 	  d_m = 2;
 	  break;
 	case gr::dvbt::QAM16:
+	  d_constellation_size = 16;
+	  d_step = 2;
 	  d_m = 4;
 	  break;
 	case gr::dvbt::QAM64:
+	  d_constellation_size = 64;
+	  d_step = 2;
 	  d_m = 6;
 	  break;
 	default:
+	  d_constellation_size = 16;
+	  d_step = 2;
 	  d_m = 4;
 	  break;
       }
@@ -210,6 +218,30 @@ namespace gr {
           d_alpha = 4;break;
         default:
           d_alpha = 1; break;
+      }
+
+      // ETSI EN 400 744 Clause 4.4
+      // Normalization factor
+      switch (d_m)
+      {
+	case 2:
+	  d_norm = 1.0 / sqrt(2);
+	  break;
+	case 16:
+	  if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
+	  if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
+	  if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
+	  break;
+	case 64:
+	  if (d_alpha == 1) d_norm = 1.0 / sqrt(42);
+	  if (d_alpha == 2) d_norm = 1.0 / sqrt(60);
+	  if (d_alpha == 4) d_norm = 1.0 / sqrt(108);
+	  break;
+	default:
+	  if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
+	  if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
+	  if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
+	  break;
       }
     }
 

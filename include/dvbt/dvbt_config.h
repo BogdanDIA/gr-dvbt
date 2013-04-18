@@ -107,7 +107,10 @@ namespace gr {
 
       //Constelaltion parameters
       dvbt_constellation_t d_constellation;
+      int d_constellation_size;
+      int d_step;
       int d_m;
+      float d_norm;
 
       //Inner Coding + puncturer parameters
       dvbt_code_rate_t d_code_rate_HP;

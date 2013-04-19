@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<block>
+  <name>dvbt_demap</name>
+  <key>dvbt_dvbt_demap</key>
+  <category>dvbt</category>
+  <import>import dvbt</import>
+  <make>dvbt.dvbt_demap($nsize, $constellation.val, $hierarchy.val, $gain)</make>
+  <param>
+    <name>Block size</name>
+    <key>nsize</key>
+    <value>1512</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Constellation Type</name>
+		<key>constellation</key>
+    <type>enum</type>
+    <option>
+			<name>QPSK</name>
+			<key>qpsk</key>
+			<opt>val:dvbt.QPSK</opt>
+		</option>
+    <option>
+			<name>16QAM</name>
+			<key>qam16</key>
+			<opt>val:dvbt.QAM16</opt>
+		</option>
+		<option>
+			<name>64QAM</name>
+			<key>qam64</key>
+      <opt>val:dvbt.QAM64</opt>
+		</option>
+  </param>
+  <param>
+    <name>Hieracrchy Type</name>
+		<key>hierarchy</key>
+		<type>enum</type>
+		<option>
+			<name>Non Hierarchical</name>
+			<key>nh</key>
+			<opt>val:dvbt.NH</opt>
+		</option>
+    <option>
+			<name>Alpha 1</name>
+			<key>alpha1</key>
+			<opt>val:dvbt.ALPHA1</opt>
+		</option>
+    <option>
+      <name>Alpha 2</name>
+			<key>alpha2</key>
+			<opt>val:dvbt.ALPHA2</opt>
+		</option>
+    <option>
+      <name>Alpha 4</name>
+			<key>alpha4</key>
+			<opt>val:dvbt.ALPHA4</opt>
+		</option>
+    <option>
+      <name>HRES1</name>
+      <key>HRES1</key>
+			<opt>val:dvbt.HRES1</opt>
+		</option>
+    <option>
+      <name>HRES2</name>
+      <key>HRES2</key>
+			<opt>val:dvbt.HRES2</opt>
+		</option>
+    <option>
+      <name>HRES3</name>
+      <key>HRES3</key>
+			<opt>val:dvbt.HRES3</opt>
+		</option>
+    <option>
+      <name>HRES4</name>
+      <key>HRES4</key>
+			<opt>val:dvbt.HRES4</opt>
+		</option>
+  </param>
+  <param>
+    <name>Gain</name>
+    <key>gain</key>
+    <value>1</value>
+    <type>complex</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+    <vlen>$nsize</vlen>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>byte</type>
+    <vlen>$nsize</vlen>
+  </source>
+</block>

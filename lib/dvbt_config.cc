@@ -109,7 +109,7 @@ namespace gr {
 	case gr::dvbt::T8k:
 	  d_Kmin = 0; d_Kmax = 6816;
 	  d_fft_length = 8192;
-	  d_payload_length = 1512; //TODO
+	  d_payload_length = 6048;
 	  break;
 	default:
 	  d_Kmin = 0; d_Kmax = 1704;

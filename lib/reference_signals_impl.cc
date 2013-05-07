@@ -112,7 +112,8 @@ namespace gr {
     3298, 3391, 3442, 3458, 3617, 3754, 3821, 3977, \
     4003, 4096, 4198, 4309, 4481, 4627, 4670, 4694, \
     4877, 5002, 5095, 5146, 5162, 5321, 5458, 5525, \
-    5681, 5707, 5800, 5902, 6013, 6185, 6331, 6374
+    5681, 5707, 5800, 5902, 6013, 6185, 6331, 6374, \
+    6398, 6581, 6706, 6799
     };
 
     // TPS sync sequence for odd and even frames
@@ -150,12 +151,12 @@ namespace gr {
       d_zeros_on_left = config.d_zeros_on_left;
       d_cp_length = config.d_cp_length;
 
-      PRINTF("d_Kmin: %i\n", d_Kmin);
-      PRINTF("d_Kmax: %i\n", d_Kmax);
-      PRINTF("d_fft_length: %i\n", d_fft_length);
-      PRINTF("d_payload_length_length: %i\n", d_payload_length);
-      PRINTF("d_zeros_on_left: %i\n", d_zeros_on_left);
-      PRINTF("d_cp_length: %i\n", d_cp_length);
+      printf("d_Kmin: %i\n", d_Kmin);
+      printf("d_Kmax: %i\n", d_Kmax);
+      printf("d_fft_length: %i\n", d_fft_length);
+      printf("d_payload_length_length: %i\n", d_payload_length);
+      printf("d_zeros_on_left: %i\n", d_zeros_on_left);
+      printf("d_cp_length: %i\n", d_cp_length);
 
       //Set-up pilot data depending on transmission mode
       if (config.d_transmission_mode == gr::dvbt::T2k)

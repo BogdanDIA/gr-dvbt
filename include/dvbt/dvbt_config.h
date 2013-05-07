@@ -92,6 +92,9 @@ namespace gr {
 
       public:
 
+      int d_symbols_per_frame;
+      int d_frames_per_superframe;
+
       int d_symbol_index;
       int d_frame_index;
       int d_superframe_index;

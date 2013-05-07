@@ -41,15 +41,15 @@ namespace gr {
         case 0:
           rez = w; break;
         case 1:
-          rez = (w + 63) % 126; break;
+          rez = (w + 63) % d_bsize; break;
         case 2:
-          rez = (w + 105) % 126; break;
+          rez = (w + 105) % d_bsize; break;
         case 3:
-          rez = (w + 42) % 126; break;
+          rez = (w + 42) % d_bsize; break;
         case 4:
-          rez = (w + 21) % 126; break;
+          rez = (w + 21) % d_bsize; break;
         case 5:
-          rez = (w + 84) % 126; break;
+          rez = (w + 84) % d_bsize; break;
         default:
           break;
       }
@@ -95,7 +95,6 @@ namespace gr {
           d_perm[i] = (i % (d_v - 2)) / ((d_v - 2) / 2) + 2 * (i % ((d_v -2)/2)) + 2;
         }
       }
-
 
       if (ninput % d_bsize)
         std::cout << "Input size must be multiple of block size: " \

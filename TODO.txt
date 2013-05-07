@@ -5,3 +5,4 @@ Add copyright
 Document enum types.
 Move pilot_generator class in it's own file
 Write docs for demod_reference_signals
+Do not input block length directly in grc. Instead use transmission mode. Assert when data from xml differs from data from transmission mode.

@@ -29,14 +29,17 @@
 namespace gr {
   namespace dvbt {
 
+    const char symbol_inner_interleaver_impl::d_bit_perm_2k[] = {4, 3, 9, 6, 2, 8, 1, 5, 7, 0};
+    const char symbol_inner_interleaver_impl::d_bit_perm_8k[] = {7, 1, 4, 2, 9, 6, 8, 10, 0, 3, 11, 5};
+
     void
     symbol_inner_interleaver_impl::generate_H()
     {
-      unsigned int Mmax = 2048;
-      unsigned int Nmax = 1512;
-      unsigned int Nr = 11;
-      unsigned int q = 0;
-      unsigned int hq = 0;
+      const int Mmax = d_fft_length;
+      const int Nmax = d_payload_length;
+      const int Nr = int(ceil(log2(d_fft_length)));
+      int q = 0;
+      int hq = 0;
 
       for (int i = 0; i < Mmax; i++)
       {
@@ -54,10 +57,8 @@ namespace gr {
     int
     symbol_inner_interleaver_impl::calculate_R(int i)
     {
-      const int Nr = 11;
+      const int Nr = int(ceil(log2(d_fft_length)));
       int reg = 0;
-
-      unsigned char bit_perm[Nr - 1] = {4, 3, 9, 6, 2, 8, 1, 5, 7, 0};
 
       if (i == 0)
         reg = 0;
@@ -70,8 +71,17 @@ namespace gr {
         reg = 1;
         for (int k = 3; k <= i; k++)
         {
-          unsigned char new_bit = (reg ^ (reg >> 3)) & 0x1;
-          reg = ((reg >> 1) | (new_bit << 9)) & 0x3ff;
+          char new_bit = 0;
+
+          if (d_transmission_mode == gr::dvbt::T2k)
+            new_bit = (reg ^ (reg >> 3)) & 1;
+          else if (d_transmission_mode == gr::dvbt::T8k)
+            new_bit = (reg ^ (reg >> 1) ^ (reg >> 4) ^ (reg >> 6)) & 1;
+          else
+            new_bit = (reg ^ (reg >> 3)) & 1;
+
+          int mask = (1 << Nr) - 1;
+          reg = ((reg >> 1) | (new_bit << (Nr - 2))) & mask;
         }
       }
 
@@ -79,33 +89,59 @@ namespace gr {
 
       for (int k = 0; k < (Nr - 1); k++)
       {
-        unsigned char bit = (reg >> k) & 0x1;
-        newreg = newreg | (bit << bit_perm[k]); 
+        char bit = (reg >> k) & 1;
+        newreg = newreg | (bit << d_bit_perm[k]); 
       }
 
       return newreg;
     }
 
     symbol_inner_interleaver::sptr
-    symbol_inner_interleaver::make(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy)
+    symbol_inner_interleaver::make(int nsize, \
+        dvbt_transmission_mode_t transmission, int direction)
     {
-      return gnuradio::get_initial_sptr (new symbol_inner_interleaver_impl(ninput, \
-		    noutput, constellation, hierarchy));
+      return gnuradio::get_initial_sptr (new symbol_inner_interleaver_impl(nsize, \
+		    transmission, direction));
     }
 
     /*
      * The private constructor
      */
-    symbol_inner_interleaver_impl::symbol_inner_interleaver_impl(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy)
+    symbol_inner_interleaver_impl::symbol_inner_interleaver_impl(int nsize, \
+        dvbt_transmission_mode_t transmission, int direction)
       : gr_block("symbol_inner_interleaver",
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * ninput),
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * noutput)),
-      config(constellation, hierarchy),
-      d_ninput(ninput), d_noutput(noutput),
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize),
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize)),
+      config(gr::dvbt::QAM16, gr::dvbt::NH, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
+      d_nsize(nsize), d_direction(direction),
+      d_fft_length(0), d_payload_length(0),
       d_symbol_index(0)
     {
+      d_symbols_per_frame = config.d_symbols_per_frame;
+      d_transmission_mode = config.d_transmission_mode;
+      d_fft_length = config.d_fft_length;
+      d_payload_length = config.d_payload_length;
+      d_direction = direction;
+
+      // Verify if transmission mode matches with size of block
+      assert(d_payload_length != d_nsize);
+
+      // Allocate memory for h vector
+      d_h = new int[d_fft_length];
+      if (d_h == NULL)
+      {
+        std::cout << "cannot allocate memory" << std::endl;
+      }
+
+      // Setup bit permutation vectors
+      if (d_transmission_mode == gr::dvbt::T2k)
+        d_bit_perm = d_bit_perm_2k;
+      else if (d_transmission_mode == gr::dvbt::T8k)
+        d_bit_perm = d_bit_perm_8k;
+      else
+        d_bit_perm = d_bit_perm_2k;
+
+      // Generate the h function
       generate_H();
     }
 
@@ -114,6 +150,7 @@ namespace gr {
      */
     symbol_inner_interleaver_impl::~symbol_inner_interleaver_impl()
     {
+      delete [] d_h;
     }
 
     void
@@ -133,16 +170,22 @@ namespace gr {
 
         for (int k = 0; k < noutput_items; k++)
         {
-          for (int q = 0; q < d_ninput; q++)
+          for (int q = 0; q < d_nsize; q++)
           {
-            int blocks = k * d_ninput;
+            int blocks = k * d_nsize;
 
             if (d_symbol_index % 2)
-              out[blocks + q] = in[blocks + H(q)];
+              if (d_direction)
+                out[blocks + q] = in[blocks + H(q)];
+              else
+                out[blocks + H(q)] = in[blocks + q];
             else
-              out[blocks + H(q)] = in[blocks + q];
+              if (d_direction)
+                out[blocks + H(q)] = in[blocks + q];
+              else
+                out[blocks + q] = in[blocks + H(q)];
           }
-          d_symbol_index++;
+          d_symbol_index = (++d_symbol_index) % d_symbols_per_frame;
         }
 
         // Do <+signal processing+>

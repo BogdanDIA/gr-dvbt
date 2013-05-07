@@ -59,12 +59,12 @@ namespace gr {
       d_transmission_mode = config.d_transmission_mode;
       d_step = config.d_step;
       d_alpha = config.d_alpha;
-      d_norm = gain * config.d_norm;
+      d_gain = gain / config.d_norm;
 
       printf("d_constellation_size: %i\n", d_constellation_size);
       printf("d_step: %i\n", d_step);
       printf("d_alpha: %i\n", d_alpha);
-      printf("d_norm: %f\n", d_norm);
+      printf("d_gain: %f\n", d_gain);
 
       d_constellation_points = new gr_complex[d_constellation_size];
       if (d_constellation_points == NULL)
@@ -167,7 +167,7 @@ namespace gr {
 
         for (int i = 0; i < noutput_items; i++)
         {
-          out[i] = find_constellation_point(in[i] / d_norm);
+          out[i] = find_constellation_point(in[i] * d_gain);
         }
 
         consume_each (noutput_items);

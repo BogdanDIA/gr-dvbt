@@ -52,8 +52,6 @@ namespace gr {
       unsigned char d_qaxis_steps;
       //Gain for the complex values
       float d_gain;
-      //Normalization factor for complex values
-      float d_norm;
 
       gr_complex * d_constellation_points;
       int * d_constellation_bits;

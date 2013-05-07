@@ -65,13 +65,13 @@ namespace gr {
       printf("d_norm: %f\n", d_norm);
 
       d_constellation_points = new gr_complex[d_constellation_size];
-      if (d_constellation_points != NULL)
+      if (d_constellation_points == NULL)
       {
         std::cout << "cannot allocate memory" << std::endl;
       }
 
       d_constellation_bits = new int[d_constellation_size];
-      if (d_constellation_bits != NULL)
+      if (d_constellation_bits == NULL)
       {
         std::cout << "cannot allocate memory" << std::endl;
       }

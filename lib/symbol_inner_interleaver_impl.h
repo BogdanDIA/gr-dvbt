@@ -22,6 +22,7 @@
 #define INCLUDED_DVBT_SYMBOL_INNER_INTERLEAVER_IMPL_H
 
 #include <dvbt/symbol_inner_interleaver.h>
+#include <dvbt/reference_signals.h>
 
 namespace gr {
   namespace dvbt {
@@ -38,10 +39,18 @@ namespace gr {
     private:
       const dvbt_config config;
 
-      int d_ninput;
-      int d_noutput;
+      int d_nsize;
 
-      unsigned int d_h[2048];
+      int d_symbols_per_frame;
+      dvbt_transmission_mode_t d_transmission_mode;
+      int d_fft_length;
+      int d_payload_length;
+      int d_direction;
+
+      int * d_h;
+      const char * d_bit_perm;
+      static const char d_bit_perm_2k[];
+      static const char d_bit_perm_8k[];
 
       //Keeps the symbol index
       unsigned int d_symbol_index;
@@ -51,8 +60,8 @@ namespace gr {
       int calculate_R(int i);
 
     public:
-      symbol_inner_interleaver_impl(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy);
+      symbol_inner_interleaver_impl(int nsize, \
+        dvbt_transmission_mode_t transmission, int direction);
       ~symbol_inner_interleaver_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

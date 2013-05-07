@@ -99,6 +99,9 @@ namespace gr {
 	    d_code_rate_LP(code_rate_LP), d_guard_interval(guard_interval), d_transmission_mode(transmission_mode),
 	    d_include_cell_id(include_cell_id), d_cell_id(cell_id)
     {
+      d_symbols_per_frame = 68;
+      d_frames_per_superframe = 4;
+
       switch (d_transmission_mode)
       {
 	case gr::dvbt::T2k:

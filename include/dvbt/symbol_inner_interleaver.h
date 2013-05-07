@@ -47,8 +47,8 @@ namespace gr {
         * class. dvbt::symbol_inner_interleaver::make is the public interface for
         * creating new instances.
         */
-       static sptr make(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy);
+       static sptr make(int ninput, \
+        dvbt_transmission_mode_t transmission, int direction);
     };
 
   } // namespace dvbt

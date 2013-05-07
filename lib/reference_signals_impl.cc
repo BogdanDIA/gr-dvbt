@@ -998,7 +998,7 @@ namespace gr {
         is_payload = 1;
 
         // Keep data for channel estimation
-	// This depends on the symbol index
+	      // This depends on the symbol index
         if (k == get_current_spilot(d_mod_symbol_index))
         {
           advance_spilot(d_mod_symbol_index); 
@@ -1020,7 +1020,7 @@ namespace gr {
         } 
 
         // Keep payload carrier number
-	// This depends on the symbol index
+	      // This depends on the symbol index
         if (is_payload)
         {
           set_payload_carrier(k);

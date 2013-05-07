@@ -24,6 +24,7 @@
 
 #include <gr_io_signature.h>
 #include "demod_reference_signals_impl.h"
+#include <stdio.h>
 
 namespace gr {
   namespace dvbt {

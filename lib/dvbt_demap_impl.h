@@ -32,11 +32,12 @@ namespace gr {
     private:
       const dvbt_config config;
 
-      int d_ninput;
-      int d_noutput;
+      int d_nsize;
 
       //Constellation size
       unsigned char d_constellation_size;
+      //Transmission mode
+      dvbt_transmission_mode_t d_transmission_mode;
       //Step on each axis of the constellation
       unsigned char d_step;
       //Keep Alpha internally
@@ -62,7 +63,7 @@ namespace gr {
       int bin_to_gray(int val);
 
     public:
-      dvbt_demap_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain);
+      dvbt_demap_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission, float gain);
       ~dvbt_demap_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

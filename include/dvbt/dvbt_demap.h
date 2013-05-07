@@ -47,7 +47,7 @@ namespace gr {
         * class. dvbt::dvbt_demap::make is the public interface for
         * creating new instances.
         */
-       static sptr make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain);
+       static sptr make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission, float gain);
     };
 
   } // namespace dvbt

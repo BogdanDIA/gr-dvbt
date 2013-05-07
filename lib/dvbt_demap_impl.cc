@@ -33,20 +33,22 @@ namespace gr {
   namespace dvbt {
 
     dvbt_demap::sptr
-    dvbt_demap::make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain)
+    dvbt_demap::make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, \
+        dvbt_transmission_mode_t transmission, float gain)
     {
-      return gnuradio::get_initial_sptr (new dvbt_demap_impl(nsize, constellation, hierarchy, gain));
+      return gnuradio::get_initial_sptr (new dvbt_demap_impl(nsize, constellation, hierarchy, transmission, gain));
     }
 
     /*
      * The private constructor
      */
-    dvbt_demap_impl::dvbt_demap_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain)
+    dvbt_demap_impl::dvbt_demap_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, \
+        dvbt_transmission_mode_t transmission, float gain)
       : gr_block("dvbt_demap",
 		      gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize),
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize)),
       config(constellation, hierarchy),
-      d_ninput(nsize), d_noutput(nsize),
+      d_nsize(nsize),
       d_gain(gain),
       d_constellation_size(0),
       d_step(0),
@@ -55,6 +57,7 @@ namespace gr {
     {
       //Get parameters from config object
       d_constellation_size = config.d_constellation_size;
+      d_transmission_mode = config.d_transmission_mode;
       d_step = config.d_step;
       d_alpha = config.d_alpha;
       d_norm = config.d_norm;

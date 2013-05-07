@@ -39,8 +39,10 @@ namespace gr {
     private:
       const dvbt_config config;
 
-      int d_ninput;
-      int d_noutput;
+      int d_nsize;
+
+      // Keeps transmission mode
+      dvbt_transmission_mode_t d_transmission_mode;
 
       //Keep Alpha internally
       unsigned char d_alpha;
@@ -59,7 +61,7 @@ namespace gr {
       unsigned int bin_to_gray(unsigned int val);
 
     public:
-      dvbt_map_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain);
+      dvbt_map_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission, float gain);
       ~dvbt_map_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

@@ -31,20 +31,21 @@ namespace gr {
   namespace dvbt {
  
     dvbt_map::sptr
-    dvbt_map::make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain)
+    dvbt_map::make(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, \
+        dvbt_transmission_mode_t transmission, float gain)
     {
-      return gnuradio::get_initial_sptr (new dvbt_map_impl(nsize, constellation, hierarchy, gain));
+      return gnuradio::get_initial_sptr (new dvbt_map_impl(nsize, constellation, hierarchy, transmission, gain));
     }
 
     /*
      * The private constructor
      */
-    dvbt_map_impl::dvbt_map_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, float gain)
+    dvbt_map_impl::dvbt_map_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission, float gain)
       : gr_block("dvbt_map",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
 		      gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize)),
-      config(constellation, hierarchy),
-      d_ninput(nsize), d_noutput(nsize),
+      config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
+      d_nsize(nsize),
       d_gain(gain)
     {
       //TODO - clean up here
@@ -53,6 +54,7 @@ namespace gr {
       d_gain = (float)(-1) / float(*pf);
 
       //Get parameters from config object
+      d_transmission_mode = config.d_transmission_mode;
       d_alpha = config.d_alpha;
       d_bits_per_symbol = config.d_m;
 
@@ -92,9 +94,9 @@ namespace gr {
         
         for (int i = 0; i < noutput_items; i++)
         {
-          for (int k = 0; k < d_noutput; k++)
+          for (int k = 0; k < d_nsize; k++)
           {
-            unsigned char bits = in[k + i * d_noutput];
+            unsigned char bits = in[k + i * d_nsize];
 
             //TODO - use VOLK for multiplication
             switch (config.d_constellation)
@@ -131,7 +133,7 @@ namespace gr {
 
             int sign0 = 1 - 2 * q0; 
             int sign1 = 1 - 2 * q1; 
-            out[k + d_noutput * i] = gr_complex(sign0 * v_x, sign1 * v_y);
+            out[k + d_nsize * i] = gr_complex(sign0 * v_x, sign1 * v_y);
           }
         }
 

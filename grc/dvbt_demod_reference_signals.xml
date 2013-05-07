@@ -230,8 +230,8 @@
       <name>8K</name>
 			<key>T8k</key>
 			<opt>val:dvbt.T8k</opt>
-      <opt>fft_length:2048</opt>
-      <opt>payload_length:1512</opt>
+      <opt>fft_length:8192</opt>
+      <opt>payload_length:6048</opt>
 		</option>
 		<option>
       <name>TRES1</name>

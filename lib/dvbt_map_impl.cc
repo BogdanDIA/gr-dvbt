@@ -48,15 +48,11 @@ namespace gr {
       d_nsize(nsize),
       d_gain(gain)
     {
-      //TODO - clean up here
-      unsigned char c_gain[4] = {0x9b, 0xe8, 0xa1, 0xbe};
-      float * pf = (float *)&c_gain;
-      d_gain = (float)(-1) / float(*pf);
-
       //Get parameters from config object
       d_transmission_mode = config.d_transmission_mode;
       d_alpha = config.d_alpha;
       d_bits_per_symbol = config.d_m;
+      d_gain = gain * config.d_norm;
 
       d_qaxis_points = d_bits_per_symbol - 2;
       d_qaxis_steps = d_qaxis_points - 1;
@@ -104,15 +100,15 @@ namespace gr {
               case (gr::dvbt::QPSK):
               {
                 q0 = (bits >> 1) & 0x1; q1 = bits & 0x1;
-                v_x = (float)(d_alpha) / d_gain; v_y = (float)(d_alpha) / d_gain;
+                v_x = (float)(d_alpha) * d_gain; v_y = (float)(d_alpha) * d_gain;
               }; break;
               case (gr::dvbt::QAM16):
               {
                 q0 = (bits >> 3) & 0x1; q1 = (bits >> 2) & 0x1;
                 x = (bits >> 1) & 0x1; y = bits & 0x1;
 
-                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - x)) / d_gain;
-                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - y)) / d_gain;
+                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - x)) * d_gain;
+                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - y)) * d_gain;
               }; break;
               case (gr::dvbt::QAM64):
               {
@@ -120,14 +116,14 @@ namespace gr {
 
                 x = ((bits >> 2) | (bits >> 1)) & 0x3; y = ((bits >> 1) | bits) & 0x3;
 
-                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(x))) / d_gain;
-                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(y))) / d_gain;
+                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(x))) * d_gain;
+                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(y))) * d_gain;
               } break;
               default:
               {
                 //Defaults to QPSK
                 q0 = (bits >> 1) & 0x1; q1 = bits & 0x1;
-                v_x = (float)(d_alpha) / d_gain; v_y = (float)(d_alpha) / d_gain;
+                v_x = (float)(d_alpha) / d_gain; v_y = (float)(d_alpha) * d_gain;
               }; break;
             }
 

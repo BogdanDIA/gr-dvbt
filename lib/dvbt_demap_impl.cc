@@ -49,18 +49,17 @@ namespace gr {
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize)),
       config(constellation, hierarchy),
       d_nsize(nsize),
-      d_gain(gain),
       d_constellation_size(0),
       d_step(0),
       d_alpha(0),
-      d_norm(0.0)
+      d_gain(0.0)
     {
       //Get parameters from config object
       d_constellation_size = config.d_constellation_size;
       d_transmission_mode = config.d_transmission_mode;
       d_step = config.d_step;
       d_alpha = config.d_alpha;
-      d_norm = config.d_norm;
+      d_norm = gain * config.d_norm;
 
       printf("d_constellation_size: %i\n", d_constellation_size);
       printf("d_step: %i\n", d_step);
@@ -168,7 +167,7 @@ namespace gr {
 
         for (int i = 0; i < noutput_items; i++)
         {
-          out[i] = find_constellation_point(d_norm * in[i]);
+          out[i] = find_constellation_point(in[i] / d_norm);
         }
 
         consume_each (noutput_items);

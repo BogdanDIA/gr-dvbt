@@ -35,6 +35,11 @@ namespace gr {
     class energy_dispersal_impl : public energy_dispersal
     {
     private:
+      static const int d_nblocks;
+      static const int d_bsize;
+      static const int d_sync;
+      static const int d_nsync;
+
       int d_reg;
 
       void init_prbs();	

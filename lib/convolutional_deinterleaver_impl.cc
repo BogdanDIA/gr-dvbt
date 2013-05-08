@@ -45,7 +45,7 @@ namespace gr {
       d_blocks(blocks), d_I(I), d_M(M)
     {
       //The positions are shift registers (FIFOs)
-      //of lenght i*M, except the first position
+      //of lenght i*M
       for (int i = (d_I - 1); i >= 0; i--)
         d_shift.push_back(new std::deque<unsigned char>(d_M * i, 0));
     }

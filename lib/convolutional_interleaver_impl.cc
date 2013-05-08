@@ -44,12 +44,10 @@ namespace gr {
 		      gr_make_io_signature(1, 1, sizeof (unsigned char)), I * blocks),
       d_blocks(blocks), d_I(I), d_M(M)
     {
-      //The rest of positions are shift registers (FIFOs)
+      //Positions are shift registers (FIFOs)
       //of lenght i*M
       for (int i = 0; i < d_I; i++)
-      {
         d_shift.push_back(new std::deque<unsigned char>(d_M * i, 0));
-      }
     }
 
     /*
@@ -57,7 +55,7 @@ namespace gr {
      */
     convolutional_interleaver_impl::~convolutional_interleaver_impl()
     {
-      for (int i = 1; i < d_shift.size(); i++)
+      for (int i = 0; i < d_shift.size(); i++)
       {
         delete d_shift.back();
         d_shift.pop_back();

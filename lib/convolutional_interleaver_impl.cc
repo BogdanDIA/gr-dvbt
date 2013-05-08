@@ -41,16 +41,12 @@ namespace gr {
     convolutional_interleaver_impl::convolutional_interleaver_impl(int blocks, int I, int M)
       : gr_sync_interpolator("convolutional_interleaver",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
-          I * blocks),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char)), I * blocks),
       d_blocks(blocks), d_I(I), d_M(M)
     {
-      //Zero elements in the first position
-      d_shift.push_back(new std::deque<unsigned char>(0, 0));
-
       //The rest of positions are shift registers (FIFOs)
       //of lenght i*M
-      for (int i = 1; i < d_I; i++)
+      for (int i = 0; i < d_I; i++)
       {
         d_shift.push_back(new std::deque<unsigned char>(d_M * i, 0));
       }

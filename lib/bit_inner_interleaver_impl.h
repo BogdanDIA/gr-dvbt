@@ -47,10 +47,10 @@ namespace gr {
       // Bit interleaver block size
       static const int d_bsize;
 
-      //Table to keep interleaved indices
+      // Table to keep interleaved indices
       unsigned char * d_perm;
-
-      // permutation function
+      
+      // Permutation function
       int H(int e, int w);
 
     public:

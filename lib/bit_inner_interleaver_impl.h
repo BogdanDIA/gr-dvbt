@@ -29,10 +29,10 @@ namespace gr {
     /*!
      * \brief Bit Inner interleaver
      * \ingroup dvbt
-     * \param ninput length of input stream \n
-     * \param noutput length of output stream \n
+     * \param nsize length of input stream \n
      * \param constellation constelaltion used \n
      * \param hierarchy hierarchy used \n
+     * \param transmission transmission mode used \n
      */
     class bit_inner_interleaver_impl : public bit_inner_interleaver
     {

@@ -4,19 +4,7 @@
   <key>dvbt_bit_inner_interleaver</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.bit_inner_interleaver($ninput, $noutput, $constellation.val, $hierarchy.val)</make>
-  <param>
-    <name>Input size</name>
-    <key>ninput</key>
-    <value>6048</value>
-    <type>int</type>
-  </param>
-  <param>
-    <name>Output size</name>
-    <key>noutput</key>
-    <value>1512</value>
-    <type>int</type>
-  </param>
+  <make>dvbt.bit_inner_interleaver($transmission_mode.payload_length, $constellation.val, $hierarchy.val, $transmission_mode.val)</make>
   <param>
     <name>Constellation Type</name>
 		<key>constellation</key>
@@ -90,18 +78,44 @@
       <opt>num_streams:2</opt>
 		</option>
   </param>
-  <check>$ninput &gt; 0</check>
-  <check>$noutput &gt; 0</check>
-  <check>$ninput &gt;= $noutput</check>
+  <param>
+    <name>Transmission Mode</name>
+		<key>transmission_mode</key>
+		<type>enum</type>
+		<option>
+      <name>2K</name>
+			<key>T2k</key>
+			<opt>val:dvbt.T2k</opt>
+      <opt>payload_length:1512</opt>
+		</option>
+		<option>
+      <name>8K</name>
+			<key>T8k</key>
+			<opt>val:dvbt.T8k</opt>
+      <opt>payload_length:1512</opt>
+		</option>
+		<option>
+      <name>TRES1</name>
+			<key>TRES1</key>
+			<opt>val:dvbt.TRES1</opt>
+      <opt>payload_length:1512</opt>
+		</option>
+		<option>
+      <name>TRES2</name>
+			<key>TRES2</key>
+			<opt>val:dvbt.TRES2</opt>
+      <opt>payload_length:1512</opt>
+		</option>
+  </param>
   <sink>
     <name>in</name>
     <type>byte</type>
-    <vlen>$ninput</vlen>
+    <vlen>$transmission_mode.payload_length</vlen>
     <nports>$hierarchy.num_streams</nports>
   </sink>
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>$noutput</vlen>
+    <vlen>$transmission_mode.payload_length</vlen>
   </source>
 </block>

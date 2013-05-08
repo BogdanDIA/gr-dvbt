@@ -30,5 +30,6 @@ install(FILES
     dvbt_ofdm_demod.xml
     dvbt_test2.xml
     dvbt_demod_reference_signals.xml
-    dvbt_dvbt_demap.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt_dvbt_demap.xml
+    dvbt_bit_inner_deinterlever.xml DESTINATION share/gnuradio/grc/blocks
 )

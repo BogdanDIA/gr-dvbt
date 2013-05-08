@@ -58,25 +58,27 @@ namespace gr {
     }
 
     bit_inner_interleaver::sptr
-    bit_inner_interleaver::make(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy)
+    bit_inner_interleaver::make(int nsize, \
+        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission)
     {
-      return gnuradio::get_initial_sptr (new bit_inner_interleaver_impl(ninput, noutput, \
-        constellation, hierarchy));
+      return gnuradio::get_initial_sptr (new bit_inner_interleaver_impl(nsize, \
+        constellation, hierarchy, transmission));
     }
 
     /*
      * The private constructor
      */
-    bit_inner_interleaver_impl::bit_inner_interleaver_impl(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy)
+    bit_inner_interleaver_impl::bit_inner_interleaver_impl(int nsize, dvbt_constellation_t constellation, \
+        dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission)
       : gr_block("bit_inner_interleaver",
-		      gr_make_io_signature(1, 2, sizeof(unsigned char) * ninput),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput)),
-      config(constellation, hierarchy),
-      d_ninput(ninput), d_noutput(noutput)
+		      gr_make_io_signature(1, 2, sizeof(unsigned char) * nsize),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize)),
+      config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
+      d_nsize(nsize),
+      d_hierarchy(hierarchy)
     {
       d_v = config.d_m;
+      d_hierarchy = config.d_hierarchy;
 
       d_perm = (unsigned char *)new unsigned char[d_v * d_bsize];
       if (d_perm == NULL)
@@ -96,17 +98,9 @@ namespace gr {
         }
       }
 
-      if (ninput % d_bsize)
+      if (d_nsize % d_bsize)
         std::cout << "Input size must be multiple of block size: " \
-          << "ninput: " << ninput << "bsize: " << d_bsize << std::endl;
-
-      if (noutput % d_bsize)
-        std::cout << "Output size must be multiple of block size: " \
-          << "noutput: " << ninput << "bsize: " << d_bsize << std::endl;
-
-      if (ninput != noutput)
-        std::cout << "Input size must be ninput=noutput: "  \
-          << "ninput: " << ninput << "noutput: " << noutput << std::endl;
+          << "nsize: " << d_nsize << "bsize: " << d_bsize << std::endl;
     }
 
     /*
@@ -136,13 +130,13 @@ namespace gr {
 
 
         unsigned char d_b[d_v][d_bsize];
-        int bmax = noutput_items * d_ninput / d_bsize;
+        int bmax = noutput_items * d_nsize / d_bsize;
 
          for (int bcount = 0; bcount < bmax; bcount++)
          {
           for (int i = 0; i < d_bsize; i++)
           {
-            if (config.d_hierarchy == gr::dvbt::NH)
+            if (d_hierarchy == gr::dvbt::NH)
             {
               int c = inh[bcount * d_bsize + i];
 

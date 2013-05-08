@@ -39,8 +39,8 @@ namespace gr {
     private:
       const dvbt_config config;
 
-      int d_ninput;
-      int d_noutput;
+      int d_nsize;
+      dvbt_hierarchy_t d_hierarchy;
 
       // constellation
       int d_v;
@@ -54,8 +54,8 @@ namespace gr {
       int H(int e, int w);
 
     public:
-      bit_inner_interleaver_impl(int ninput, int noutput, \
-        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy);
+      bit_inner_interleaver_impl(int nsize, \
+        dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission);
       ~bit_inner_interleaver_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

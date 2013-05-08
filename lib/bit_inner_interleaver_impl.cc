@@ -90,7 +90,7 @@ namespace gr {
       //Init permutation table
       for (int i = 0; i <  d_bsize * d_v; i++)
       {
-        if (config.d_hierarchy == gr::dvbt::NH)
+        if (d_hierarchy == gr::dvbt::NH)
           d_perm[i] = ((i % d_v) / (d_v / 2)) + 2 * (i % (d_v / 2));
         else
         {

@@ -40,6 +40,7 @@
 #include "qa_convolutional_interleaver.h"
 #include "qa_test2.h"
 #include "qa_demod_reference_signals.h"
+#include "qa_bit_inner_deinterleaver.h"
 
 CppUnit::TestSuite *
 qa_dvbt::suite()
@@ -59,6 +60,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_convolutional_interleaver::suite());
   s->addTest(gr::dvbt::qa_test2::suite());
   s->addTest(gr::dvbt::qa_demod_reference_signals::suite());
+  s->addTest(gr::dvbt::qa_bit_inner_deinterleaver::suite());
 
   return s;
 }

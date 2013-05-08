@@ -35,5 +35,6 @@ install(FILES
     convolutional_interleaver.h
     test2.h
     demod_reference_signals.h
-    dvbt_demap.h DESTINATION include/dvbt
+    dvbt_demap.h
+    bit_inner_deinterleaver.h DESTINATION include/dvbt
 )

@@ -62,3 +62,4 @@ GR_ADD_TEST(qa_test2 ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_test2.p
 GR_ADD_TEST(qa_demod_reference_signals ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_demod_reference_signals.py)
 GR_ADD_TEST(qa_dvbt_demap ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dvbt_demap.py)
 GR_ADD_TEST(qa_bit_inner_deinterleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_bit_inner_deinterleaver.py)
+GR_ADD_TEST(qa_convolutional_deinterleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_convolutional_deinterleaver.py)

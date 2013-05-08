@@ -87,19 +87,19 @@ namespace gr {
         return;
       }
 
-      //Init permutation table
+      //Init permutation table (used for b[e][do])
       for (int i = 0; i <  d_bsize * d_v; i++)
       {
         if (d_hierarchy == gr::dvbt::NH)
           d_perm[i] = ((i % d_v) / (d_v / 2)) + 2 * (i % (d_v / 2));
         else
         {
-          d_perm[i] = (i % (d_v - 2)) / ((d_v - 2) / 2) + 2 * (i % ((d_v -2)/2)) + 2;
+          d_perm[i] = (i % (d_v - 2)) / ((d_v - 2) / 2) + 2 * (i % ((d_v - 2) / 2)) + 2;
         }
       }
 
       if (d_nsize % d_bsize)
-        std::cout << "Input size must be multiple of block size: " \
+        std::cout << "Error: Input size must be multiple of block size: " \
           << "nsize: " << d_nsize << "bsize: " << d_bsize << std::endl;
     }
 
@@ -128,33 +128,36 @@ namespace gr {
         const unsigned char *inl = (const unsigned char *) input_items[1];
         unsigned char *out = (unsigned char *) output_items[0];
 
-
-        unsigned char d_b[d_v][d_bsize];
         int bmax = noutput_items * d_nsize / d_bsize;
 
-         for (int bcount = 0; bcount < bmax; bcount++)
-         {
+        // First index of d_b is Bit interleaver number
+        // Second index of d_b is the position inside the Bit interleaver
+        unsigned char d_b[d_v][d_bsize];
+
+        for (int bcount = 0; bcount < bmax; bcount++)
+        {
           for (int i = 0; i < d_bsize; i++)
           {
             if (d_hierarchy == gr::dvbt::NH)
             {
               int c = inh[bcount * d_bsize + i];
 
+              // Create the demultiplexer
               for (int k = 0; k < d_v; k++)
-                d_b[d_perm[(d_v * i) + k]][((d_v * i) + k) / d_v] = (c >> (d_v - k - 1)) & 0x1;
+                d_b[d_perm[(d_v * i) + k]][i] = (c >> (d_v - k - 1)) & 1;
             }
             else
             {
-              int ch = inh[(bcount * d_bsize * (d_v - 2)) + i];
-              int cl = inl[(bcount * d_bsize * (d_v - 2)) + i];
-              for (int k = 0; k < (d_v / 2); k++)
-              {
-                //TODO - error - fix this!
-                //High priority input
-                d_b[(d_v * i + k) % 2][i / 2] = (ch >> ((d_v / 2) - k - 1)) & 0x1;
-                //Low priority input
-                d_b[d_perm[d_v * i + k]][(d_v * i + k) / (d_v - 2)] = (cl >> ((d_v / 2) - k - 1)) % 0x1;
-              }
+              int ch = inh[(bcount * d_bsize) + i];
+              int cl = inl[(bcount * d_bsize) + i];
+
+              // High priority input - first 2 streams
+              for (int k = 0; k < 2; k++)
+                d_b[(d_v * i + k) % 2][(d_v * i + k) / 2] = (ch >> (1 - k)) & 1;
+
+              // Low priority input - (v - 2) streams
+              for (int k = 2; k < (d_v - 2); k++)
+                d_b[d_perm[d_v * i + k]][(d_v * i + k) / (d_v - 2)] = (cl >> (d_v - k - 1)) & 1;
             }
           }
 

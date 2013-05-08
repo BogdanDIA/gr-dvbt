@@ -29,6 +29,11 @@
 namespace gr {
   namespace dvbt {
 
+    const int energy_dispersal_impl::d_nblocks = 8;
+    const int energy_dispersal_impl::d_bsize = 188;
+    const int energy_dispersal_impl::d_sync = 0x47;
+    const int energy_dispersal_impl::d_nsync = 0xB8;
+
     void
     energy_dispersal_impl::init_prbs()
     {
@@ -53,18 +58,18 @@ namespace gr {
     }
 
     energy_dispersal::sptr
-    energy_dispersal::make(int nsize)
+    energy_dispersal::make(int nblocks)
     {
-      return gnuradio::get_initial_sptr (new energy_dispersal_impl(nsize));
+      return gnuradio::get_initial_sptr (new energy_dispersal_impl(nblocks));
     }
 
     /*
      * The private constructor
      */
-    energy_dispersal_impl::energy_dispersal_impl(int nsize)
+    energy_dispersal_impl::energy_dispersal_impl(int nblocks)
       : gr_block("energy_dispersal",
-		      gr_make_io_signature(1, 1, nsize * 188 * sizeof(unsigned char)),
-		      gr_make_io_signature(1, 1, nsize * 188 * sizeof(unsigned char)))
+		      gr_make_io_signature(1, 1, d_nblocks * d_bsize * sizeof(unsigned char)),
+		      gr_make_io_signature(1, 1, d_nblocks * d_bsize * sizeof(unsigned char)))
     {}
 
     /*
@@ -91,25 +96,26 @@ namespace gr {
 
         int count = 0;
 
-                for (int i = 0; i < noutput_items; i++)
+        //TODO - look for sync first
+
+        for (int i = 0; i < noutput_items; i++)
         {
           init_prbs();
 
-          int sync = 0xB8;
+          int sync = d_nsync;
 
-          for (int j = 0; j < 8; j++)
+          for (int j = 0; j < d_nblocks; j++)
           {
             out[count++] = sync;
 
-            for (int k = 0; k < 187; k++)
-              out[count++] = in[count] ^ clock_prbs(8);
+            for (int k = 0; k < (d_bsize - 1); k++)
+              out[count++] = in[count] ^ clock_prbs(d_nblocks);
 
-            sync = 0x47;
-            clock_prbs(8);
+            sync = d_sync;
+            clock_prbs(d_nblocks);
           }
         }
 
-        // Do <+signal processing+>
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (noutput_items);

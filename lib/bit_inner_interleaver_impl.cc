@@ -161,8 +161,8 @@ namespace gr {
             }
           }
 
-          //Take one bit from each interleaver
-          //and format the output
+          // Take one bit from each interleaver
+          // and format the output
 
           for (int w = 0; w < d_bsize; w++)
           {

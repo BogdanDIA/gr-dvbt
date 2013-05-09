@@ -129,7 +129,7 @@ namespace gr {
     dvbt_demap_impl::find_constellation_value(gr_complex val)
     {
       float min_dist = norm(val - d_constellation_points[0]);
-      int min_index;
+      int min_index = 0;
 
       for (int i = 0; i < d_constellation_size; i++)
       {

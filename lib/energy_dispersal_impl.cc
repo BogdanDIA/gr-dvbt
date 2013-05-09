@@ -31,8 +31,8 @@ namespace gr {
 
     const int energy_dispersal_impl::d_nblocks = 8;
     const int energy_dispersal_impl::d_bsize = 188;
-    const int energy_dispersal_impl::d_sync = 0x47;
-    const int energy_dispersal_impl::d_nsync = 0xB8;
+    const int energy_dispersal_impl::d_SYNC = 0x47;
+    const int energy_dispersal_impl::d_NSYNC = 0xB8;
 
     void
     energy_dispersal_impl::init_prbs()
@@ -68,9 +68,11 @@ namespace gr {
      */
     energy_dispersal_impl::energy_dispersal_impl(int nblocks)
       : gr_block("energy_dispersal",
-		      gr_make_io_signature(1, 1, d_nblocks * d_bsize * sizeof(unsigned char)),
-		      gr_make_io_signature(1, 1, d_nblocks * d_bsize * sizeof(unsigned char)))
-    {}
+		      gr_make_io_signature(1, 1, sizeof(unsigned char)),
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * d_nblocks * d_bsize))
+    {
+      set_relative_rate(1.0/(double) (d_nblocks * d_bsize)); 
+    }
 
     /*
      * Our virtual destructor.
@@ -82,7 +84,8 @@ namespace gr {
     void
     energy_dispersal_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        ninput_items_required[0] = noutput_items;
+      // Add one block size for SYNC search
+      ninput_items_required[0] = d_nblocks * (d_bsize + 1) * noutput_items;
     }
 
     int
@@ -94,36 +97,53 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
+        int index = 0;
         int count = 0;
+        int ret = 0;
+        int is_sync = 0;
 
-        //TODO - look for sync first
+        // Search for SYNC byte
+        while(is_sync == 0 && index < d_bsize)
+          if (in[index] == d_SYNC)
+            is_sync = 1;
+          else
+            index++;
 
-        for (int i = 0; i < noutput_items; i++)
+        // If we found a SYNC byte
+        if (is_sync)
         {
-          init_prbs();
-
-          int sync = d_nsync;
-
-          for (int j = 0; j < d_nblocks; j++)
+          for (int i = 0; i < noutput_items; i++)
           {
-            out[count++] = sync;
+            init_prbs();
 
-            for (int k = 0; k < (d_bsize - 1); k++)
-              out[count++] = in[count] ^ clock_prbs(d_nblocks);
+            int sync = d_NSYNC;
 
-            sync = d_sync;
-            clock_prbs(d_nblocks);
+            for (int j = 0; j < d_nblocks; j++)
+            {
+              if (in[index + count] != d_SYNC)
+                printf("error: Malformed MPEG-TS!\n");
+
+              out[count++] = sync;
+
+              for (int k = 1; k < d_bsize; k++)
+                out[count++] = in[index + count] ^ clock_prbs(d_nblocks);
+
+              sync = d_SYNC;
+              clock_prbs(d_nblocks);
+            }
           }
+          consume_each(index + d_nblocks * d_bsize * noutput_items);
+          ret = noutput_items;
+        }
+        else
+        {
+          consume_each(index);
+          ret = 0;
         }
 
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (noutput_items);
-
         // Tell runtime system how many output items we produced.
-        return noutput_items;
+        return ret;
     }
-
   } /* namespace dvbt */
 } /* namespace gr */
 

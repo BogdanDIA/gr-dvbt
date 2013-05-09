@@ -37,9 +37,10 @@ namespace gr {
     private:
       static const int d_nblocks;
       static const int d_bsize;
-      static const int d_sync;
-      static const int d_nsync;
+      static const int d_SYNC;
+      static const int d_NSYNC;
 
+      // Register for PRBS
       int d_reg;
 
       void init_prbs();	

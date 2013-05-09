@@ -162,13 +162,13 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-        const float *in = (const float *) input_items[0];
-        float *out = (float *) output_items[0];
+        const gr_complex *in = (const gr_complex *) input_items[0];
+        unsigned char *out = (unsigned char *) output_items[0];
 
-        for (int i = 0; i < noutput_items; i++)
-        {
+        // TODO - use DFE (Decission Feedback Equalizer)
+
+        for (int i = 0; i < (noutput_items * d_nsize); i++)
           out[i] = find_constellation_point(in[i] * d_gain);
-        }
 
         consume_each (noutput_items);
 

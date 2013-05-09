@@ -1020,7 +1020,7 @@ namespace gr {
         } 
 
         // Keep payload carrier number
-	      // This depends on the symbol index
+	// This depends on the symbol index
         if (is_payload)
         {
           set_payload_carrier(k);
@@ -1104,23 +1104,18 @@ namespace gr {
       }
     }
 
-    void
+    int
     pilot_gen::parse_input(const gr_complex *in, const unsigned char *trigger_in, gr_complex *out, unsigned char *trigger_out)
     {
       // If this block does not have a trigger then we just exit
       if (trigger_in[0] != 1)
       {
-        printf("Not Trigger sync: d_trigger_index: %i\n", d_trigger_index);
 	trigger_out[0] = 0;
-	// clear out the output
-	for (int i = 0; i < d_payload_index; i++)
-	  out[i] = gr_complex(0.0, 0.0);
-        return;
+	// noutput_items would be 0 in this case
+        return 0;
       }
       else
-      {
         d_trigger_index++;
-      } 
 
       // Obtain frequency correction based on cpilots.
       // Obtain channel estimation based on both
@@ -1189,6 +1184,9 @@ namespace gr {
           printf("d_symbol_index: %i, out[%i]: abs:%f, re: %f, img:%f\n", d_symbol_index, i, abs(out[i]), out[i].real(), out[i].imag());
       }
 #endif
+
+      // noutput_items should be 1 in this case
+      return 1;
     }
 
     reference_signals::sptr

@@ -83,15 +83,15 @@ namespace gr {
       gr_complex *out = (gr_complex *) output_items[0];
       unsigned char *trigger_out = (unsigned char *) output_items[1];
 
-      {
-        for (int i = 0; i < noutput_items; i++)
-          d_pg.parse_input(&in[i * d_ninput], &trigger_in[i * d_ninput], &out[i * d_noutput], &trigger_out[i * d_noutput]);
-      }
+      int to_out = 0;
+
+      for (int i = 0; i < noutput_items; i++)
+        to_out += d_pg.parse_input(&in[i * d_ninput], &trigger_in[i * d_ninput], &out[i * d_noutput], &trigger_out[i * d_noutput]);
 
       consume_each (noutput_items);
 
       // Tell runtime system how many output items we produced.
-      return noutput_items;
+      return to_out;
     }
 
   } /* namespace dvbt */

@@ -215,8 +215,11 @@ class pilot_gen {
 
     /*!
      * TODO
+     * ETSI EN 300 744 Clause 4.5. \n
+     * Extract data from a set of carriers using pilot signals. \n
+     * This is doing frequency correcton, equalization. \n
      */
-    void parse_input(const gr_complex *in, const unsigned char *trigger_in, gr_complex *out, unsigned char *trigger_out);
+    int parse_input(const gr_complex *in, const unsigned char *trigger_in, gr_complex *out, unsigned char *trigger_out);
 
     };
 

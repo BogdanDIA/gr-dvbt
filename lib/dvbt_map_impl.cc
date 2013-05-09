@@ -46,16 +46,37 @@ namespace gr {
 		      gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize)),
       config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize),
-      d_gain(gain)
+      d_constellation_size(0),
+      d_step(0),
+      d_alpha(0),
+      d_gain(0.0)
+
     {
       //Get parameters from config object
+      d_constellation_size = config.d_constellation_size;
       d_transmission_mode = config.d_transmission_mode;
+      d_step = config.d_step;
       d_alpha = config.d_alpha;
-      d_bits_per_symbol = config.d_m;
       d_gain = gain * config.d_norm;
 
-      d_qaxis_points = d_bits_per_symbol - 2;
-      d_qaxis_steps = d_qaxis_points - 1;
+      printf("d_constellation_size: %i\n", d_constellation_size);
+      printf("d_step: %i\n", d_step);
+      printf("d_alpha: %i\n", d_alpha);
+      printf("d_gain: %f\n", d_gain);
+
+      d_constellation_points = new gr_complex[d_constellation_size];
+      if (d_constellation_points == NULL)
+      {
+        std::cout << "cannot allocate memory" << std::endl;
+      }
+
+      d_constellation_bits = new int[d_constellation_size];
+      if (d_constellation_bits == NULL)
+      {
+        std::cout << "cannot allocate memory" << std::endl;
+      }
+
+      make_constellation_points(d_constellation_size, d_step, d_alpha);
     }
 
     /*
@@ -63,12 +84,62 @@ namespace gr {
      */
     dvbt_map_impl::~dvbt_map_impl()
     {
+      delete [] d_constellation_points;
+      delete [] d_constellation_bits;
     }
 
     unsigned int
     dvbt_map_impl::bin_to_gray(unsigned int val)
     {
       return (val >> 1) ^ val;
+    }
+
+    void
+    dvbt_map_impl::make_constellation_points(int size, int step, int alpha)
+    {
+      //TODO - verify if QPSK works
+      
+      int bits_per_axis = log2(size) / 2;
+
+      for (int i = 0; i < size; i++)
+      {
+        int x = i >> bits_per_axis;
+        int y = i & ((1 << bits_per_axis) - 1);
+
+        d_constellation_points[i] = gr_complex(alpha + step - 2 * x, alpha + step - 2 * y);
+        d_constellation_bits[i] = (bin_to_gray(x) << bits_per_axis) + bin_to_gray(y);
+
+        // ETSI EN 300 744 Clause 4.3.5
+        // Actually the constellation is gray coded
+        // but the bits on each axis are not taken in consecutive order
+        // So we need to convert from b0b2b4b1b3b5->b0b1b2b3b4b5(QAM64)
+
+        x = 0; y = 0;
+
+        for (int j = 0; j < bits_per_axis; j++)
+        {
+          x += ((d_constellation_bits[i] >> (1 + 2 * j)) & 1) << j;
+          y += ((d_constellation_bits[i] >> (2 * j)) & 1) << j;
+        }
+
+        d_constellation_bits[i] = (x << bits_per_axis) + y;
+      }
+
+      for (int i = 0; i < size; i++)
+        printf("constellation points: %f, %f, bits: %x\n", d_constellation_points[i].real(), d_constellation_points[i].imag(), \
+            d_constellation_bits[i]);
+    }
+
+    gr_complex
+    dvbt_map_impl::find_constellation_point(int val)
+    {
+      gr_complex point;
+
+      for (int i = 0; i < d_constellation_size; i++)
+        if (d_constellation_bits[i] == val)
+          point = d_constellation_points[i];
+
+      return point;
     }
 
     void
@@ -85,55 +156,10 @@ namespace gr {
     {
         const unsigned char *in = (const unsigned char *) input_items[0];
         gr_complex *out = (gr_complex *) output_items[0];
-        char q0, q1, x, y;
-        float v_x, v_y;
-        
-        for (int i = 0; i < noutput_items; i++)
-        {
-          for (int k = 0; k < d_nsize; k++)
-          {
-            unsigned char bits = in[k + i * d_nsize];
 
-            //TODO - use VOLK for multiplication
-            switch (config.d_constellation)
-            {
-              case (gr::dvbt::QPSK):
-              {
-                q0 = (bits >> 1) & 0x1; q1 = bits & 0x1;
-                v_x = (float)(d_alpha) * d_gain; v_y = (float)(d_alpha) * d_gain;
-              }; break;
-              case (gr::dvbt::QAM16):
-              {
-                q0 = (bits >> 3) & 0x1; q1 = (bits >> 2) & 0x1;
-                x = (bits >> 1) & 0x1; y = bits & 0x1;
+        for (int i = 0; i < (noutput_items * d_nsize); i++)
+          out[i] = d_gain * find_constellation_point(in[i]);
 
-                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - x)) * d_gain;
-                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - y)) * d_gain;
-              }; break;
-              case (gr::dvbt::QAM64):
-              {
-                q0 = (bits >> 5) & 0x1; q1 = (bits >> 4) & 0x1;
-
-                x = ((bits >> 2) | (bits >> 1)) & 0x3; y = ((bits >> 1) | bits) & 0x3;
-
-                v_x = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(x))) * d_gain;
-                v_y = (float)(d_alpha + 2 * (d_qaxis_steps - bin_to_gray(y))) * d_gain;
-              } break;
-              default:
-              {
-                //Defaults to QPSK
-                q0 = (bits >> 1) & 0x1; q1 = bits & 0x1;
-                v_x = (float)(d_alpha) / d_gain; v_y = (float)(d_alpha) * d_gain;
-              }; break;
-            }
-
-            int sign0 = 1 - 2 * q0; 
-            int sign1 = 1 - 2 * q1; 
-            out[k + d_nsize * i] = gr_complex(sign0 * v_x, sign1 * v_y);
-          }
-        }
-
-        // Do <+signal processing+>
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (noutput_items);

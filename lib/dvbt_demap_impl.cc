@@ -47,7 +47,7 @@ namespace gr {
       : gr_block("dvbt_demap",
 		      gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize),
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize)),
-      config(constellation, hierarchy),
+      config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize),
       d_constellation_size(0),
       d_step(0),
@@ -126,7 +126,7 @@ namespace gr {
     }
 
     int
-    dvbt_demap_impl::find_constellation_point(gr_complex val)
+    dvbt_demap_impl::find_constellation_value(gr_complex val)
     {
       float min_dist = norm(val - d_constellation_points[0]);
       int min_index;
@@ -168,7 +168,7 @@ namespace gr {
         // TODO - use DFE (Decission Feedback Equalizer)
 
         for (int i = 0; i < (noutput_items * d_nsize); i++)
-          out[i] = find_constellation_point(in[i] * d_gain);
+          out[i] = find_constellation_value(in[i] * d_gain);
 
         consume_each (noutput_items);
 

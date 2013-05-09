@@ -26,7 +26,15 @@
 
 namespace gr {
   namespace dvbt {
-
+    /*!
+     * \brief DVBT demapper class.
+     * \ingroup dvbt
+     * \param nsize length of input stream \n
+     * \param constellation constellation used \n
+     * \param hierarchy hierarchy used \n
+     * \param transmission transmission mode used \n
+     * \param gain gian of complex output stream \n
+     */
     class dvbt_demap_impl : public dvbt_demap
     {
     private:
@@ -57,7 +65,7 @@ namespace gr {
       int * d_constellation_bits;
 
       void make_constellation_points(int size, int step, int alpha);
-      int find_constellation_point(gr_complex val);
+      int find_constellation_value(gr_complex val);
       int bin_to_gray(int val);
 
     public:
@@ -66,7 +74,16 @@ namespace gr {
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-      // Where all the action really happens
+    	/*!
+	     * ETSI EN 300 744 Clause 4.3.5. \n
+       * Data input format: \n
+       * complex(real(float), imag(float)) \n
+       *
+       * Data output format: \n
+       * 000000Y0Y1 - QAM4 \n
+       * 0000Y0Y1Y2Y3 - QAM16 \n
+       * 00Y0Y1Y2Y3Y4Y5 - QAM64 \n
+       */
       int general_work(int noutput_items,
 		       gr_vector_int &ninput_items,
 		       gr_vector_const_void_star &input_items,

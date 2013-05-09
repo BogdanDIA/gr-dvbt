@@ -31,9 +31,10 @@ namespace gr {
      * \ingroup dvbt
      * \param nsize length of input stream \n
      * \param constellation constellation used \n
+     * \param hierarchy hierarchy used \n
+     * \param transmission transmission mode used \n
      * \param gain gian of complex output stream \n
      */
-
     class dvbt_map_impl : public dvbt_map
     {
     private:
@@ -41,9 +42,12 @@ namespace gr {
 
       int d_nsize;
 
+      //Constellation size
+      unsigned char d_constellation_size;
       // Keeps transmission mode
       dvbt_transmission_mode_t d_transmission_mode;
-
+      //Step on each axis of the constellation
+      unsigned char d_step;
       //Keep Alpha internally
       unsigned char d_alpha;
       //Quadrant of the current symbol
@@ -57,6 +61,12 @@ namespace gr {
       //Gain for the complex values
       float d_gain;
 
+      gr_complex * d_constellation_points;
+      int * d_constellation_bits;
+
+      void make_constellation_points(int size, int step, int alpha);
+      gr_complex find_constellation_point(int val);
+
       //Return gray representation from natural binary
       unsigned int bin_to_gray(unsigned int val);
 
@@ -66,7 +76,7 @@ namespace gr {
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-        /*!
+	/*!
 	 * ETSI EN 300 744 Clause 4.3.5. \n
          * Data input format: \n
          * 000000Y0Y1 - QAM4 \n

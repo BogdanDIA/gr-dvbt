@@ -81,19 +81,11 @@ namespace gr {
           {
             int c = in[(d_I * i) + j];
 
-            // Look for a SYNC or a /SYNC
-            // If we find a SYNC or a /SYNC
+            // TODO
+            // Look for a SYNC or a NSYNC
+            // If we find a SYNC or a NSYNC
             // route it to the branch with the null delay
 
-#if 0
-            if (c == 0x47 || c == 0xb8)
-            {
-              is_sync = 1;
-              j = (d_I - 1);
-            }
-
-            if (is_sync)
-#endif
             {
               d_shift[j]->push_back(c);
               out[(d_I * i) + j] = d_shift[j]->front();

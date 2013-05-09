@@ -18,21 +18,21 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DVBT_ENERGY_DISPERSAL_IMPL_H
-#define INCLUDED_DVBT_ENERGY_DISPERSAL_IMPL_H
+#ifndef INCLUDED_DVBT_ENERGY_DESCRAMBLE_IMPL_H
+#define INCLUDED_DVBT_ENERGY_DESCRAMBLE_IMPL_H
 
-#include <dvbt/energy_dispersal.h>
+#include <dvbt/energy_descramble.h>
 
 namespace gr {
   namespace dvbt {
     /*! 
      * \brief DVBT Energy dispersal class. \n 
      * \ingroup dvbt
-     * Randomizes MPEG-2 packets using a PRBS generator. \n
+     * Derandomizes MPEG-2 packets using a PRBS generator. \n
      * Each block has 188 bytes. \n
      * \param nsize	number of blocks \n
      */
-    class energy_dispersal_impl : public energy_dispersal
+    class energy_descramble_impl : public energy_descramble
     {
     private:
       static const int d_nblocks;
@@ -47,16 +47,16 @@ namespace gr {
       int clock_prbs(int clocks);
 
     public:
-      energy_dispersal_impl(int nsize);
-      ~energy_dispersal_impl();
+      energy_descramble_impl(int nblocks);
+      ~energy_descramble_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
       /*!
        * ETSI EN 300 744 - Clause 4.3.1. \n
-       * Input - MPEG-2 transport packets (including sync - 0x47). \n
-       * Output - Randomized MPEG-2 transport packets. \n
-       * If first byte is not a SYNC then look for it. \n
+       * Input - Randomized MPEG-2 transport packets. \n
+       * Output - MPEG-2 transport packets (including sync - 0x47). \n
+       * We assume the first byte is a NSYNC. \n
        * First sync in a row of 8 packets is reversed - 0xB8. \n
        * Block size is 188bytes. \n
        */
@@ -69,5 +69,5 @@ namespace gr {
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_ENERGY_DISPERSAL_IMPL_H */
+#endif /* INCLUDED_DVBT_ENERGY_DESCRAMBLE_IMPL_H */
 

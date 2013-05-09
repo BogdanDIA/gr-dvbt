@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <block>
-  <name>energy_dispersal</name>
-  <key>dvbt_energy_dispersal</key>
+  <name>energy_descramble</name>
+  <key>dvbt_energy_descramble</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.energy_dispersal($nsize)</make>
+  <make>dvbt.energy_descramble($nsize)</make>
   <param>
     <name>Blocks(188 Bytes)</name>
     <key>nsize</key>
@@ -15,11 +15,11 @@
   <sink>
     <name>in</name>
     <type>byte</type>
-    <vlen>1</vlen>
+    <vlen>188*8</vlen>
   </sink>
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>188*8</vlen>
+    <vlen>1</vlen>
   </source>
 </block>

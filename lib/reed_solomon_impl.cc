@@ -156,8 +156,7 @@ namespace gr {
     int
     reed_solomon_impl::rs_encode(const unsigned char *data_in, unsigned char *parity)
     {
-      for (int i = 0; i < (2 * d_t); i++)
-        parity[i] = 0;
+      memset(parity, 0, 2 * d_t);
 
       for (int i = 0; i < d_k; i++)
       {

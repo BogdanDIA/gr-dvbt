@@ -100,10 +100,29 @@ namespace gr {
         return gf_exp(d_gf_log[a] + d_gf_log[b]);
     }
 
+    int
+    reed_solomon_impl::gf_div(int a, int b)
+    {
+      // TODO division by zero
+      return (gf_exp(d_gf_log[a] - d_gf_log[b]));
+    }
+
+    int
+    reed_solomon_impl::gf_pow(int a, int power)
+    {
+      return gf_exp(d_gf_log[a] + power);
+    }
+
+    int
+    reed_solomon_impl::gf_lpow(int power)
+    {
+      return d_l[power % ((1 << d_m) - 1)];
+    }
+
     void
     reed_solomon_impl::rs_init(int lambda, int n, int k, int t)
     {
-      d_n = n; d_k = k; d_t = t;
+      d_lambda= lambda, d_n = n; d_k = k; d_t = t;
 
       d_l = new unsigned char[2 * d_t];
       if (d_l == NULL)
@@ -142,6 +161,16 @@ namespace gr {
 
         d_g[0] = gf_mul(d_g[0], d_l[i - 1]);
       }
+
+      // Init syndrome array 
+      d_syn = new unsigned char[2 * d_t];
+      if (d_syn == NULL)
+      {
+        std::cout << "Cannot allocate memory" << std::endl;
+        delete [] d_l;
+        delete [] d_g;
+        return;
+      }
     }
 
     void
@@ -151,6 +180,8 @@ namespace gr {
         delete [] d_l;
       if (d_g)
         delete [] d_g;
+      if (d_syn)
+        delete [] d_syn;
     }
 
     int
@@ -179,6 +210,205 @@ namespace gr {
         else
           parity[2 * d_t - 1] = 0;
       }
+
+      return (0);
+    }
+
+    int
+    reed_solomon_impl::rs_decode(const unsigned char *data_in, unsigned char *data_out, unsigned char *eras, int no_eras)
+    {
+      unsigned char tau[2 * d_t + 1];
+      unsigned char sigma[2 * d_t + 1];
+      unsigned char b[2 * d_t + 1];
+      unsigned char T[2 * d_t + 1];
+      unsigned char reg[2 * d_t + 1];
+      unsigned char root[2 * d_t + 1];
+      unsigned char loc[2 * d_t + 1];
+      unsigned char omega[2 * d_t];
+
+      // Compute erasure locator polynomial
+      // tau(x) = prod(1 + lambda^i_l) (from l=1 to mu)
+
+      memset(tau, 0, 2 * d_t + 1);
+
+      if (no_eras > 0)
+      {
+        tau[0] = 1;
+
+        for (int i = 1; i <= no_eras; i++)
+        {
+          for (int j = i; j > 0; j--)
+          {
+            if (tau[j] != 0) // TODO - verify if this is taken care in gf_mul
+              tau[j] = gf_add(tau[j], gf_mul(tau[j - 1], gf_lpow(eras[i - 1])));
+            else
+              tau[j] = gf_mul(tau[j - 1], gf_lpow(eras[i - 1]));
+          }
+        }
+      }
+
+      // Use Modified (errors+erasures) BMA. Algorithm of Berlekamp-Massey
+      // Compute syndrome polynomial
+      // S(i)=r(lambda^i)=e(lambda^i)
+      int syn_error = 0;
+
+      for (int i = 0; i < 2 * d_t; i++)
+      {
+        d_syn[i] = gf_mul(data_in[i], gf_lpow(i));
+        syn_error |= d_syn[i];
+      }
+
+      if (!syn_error)
+      {
+        // The syndrome is a codeword
+        memcpy(data_out, data_in, d_k);
+        return (0);
+      }
+
+      if (no_eras)
+      {
+        // Init sigma with erasure locator popynomial
+        for (int i = 0; i < no_eras; i++) sigma[i] = tau[i];
+        for (int i = no_eras; i < 2 * d_t; i++) sigma[i] = 0;
+      }
+      else
+      {
+        sigma[0] = 1;
+        for (int i = 1; i < 2 * d_t; i++) sigma[i] = 0;
+      }
+
+      int r = no_eras;
+      int el = no_eras;
+      unsigned char d_discr;
+
+      while (++r <= 2 * d_t)
+      {
+        int d_discr = 0;
+        for (int i = 0; i < r; i++)
+          d_discr = gf_add(d_discr, \
+              gf_mul(sigma[i], d_syn[r - i - 1]));
+
+        if (d_discr == 0)
+        {
+          memmove(&b[1], b, 2 * d_t);
+          b[0] = 0;
+        }
+        else
+        {
+          T[0] = sigma[0];
+
+          for (int i = 0; i < 2 * d_t; i++)
+            T[i + 1] = gf_add(sigma[i + 1], gf_mul(d_discr, b[i]));
+
+          if (2 * el <= r + no_eras - 1)
+          {
+            el = r + no_eras - el;
+
+            for (int i = 0; i < 2 * d_t; i++)
+              sigma[i] = gf_div(sigma[i], d_discr);
+          }
+          else
+          {
+            memmove(&b[1], b, 2 * d_t);
+            b[0] = 0;
+          }
+          memcpy(sigma, T, 2 * d_t + 1);
+        }
+      }
+
+      // Compute degree(sigma)
+      int deg_sigma = 0;
+
+      for (int i = 0; i < 2 * d_t + 1; i++)
+        if (sigma[i] != 0)
+          deg_sigma = i;
+
+      // Find the roots of sigma(x) by Chien search
+      // Test sum(1)=1+sigma(1)*(lambda^1)+...+sigma(nu)*lambda(^nu)
+      // ...
+      // Test sum(l)=1+sigma(1)*(lambda^l)+...+sigma(nu)*lambda(^nu*l)
+      // in order to see if lambda^(-1) is a root
+      // where nu is degree(sigma)
+
+      int no_roots = 0;
+
+      memcpy(reg, sigma, 2 * d_t);
+#define IPRIM 2
+
+      for (int i = 1, k = IPRIM - 1; i <= 2 * d_n; i++, k = k + IPRIM)
+      {
+        int q = 1;
+
+        for (int j = 0; j < deg_sigma; j++)
+        {
+          reg[j] = gf_pow(reg[j], j);
+          q = gf_add(q, reg[j]);
+        }
+
+        if (q != 0)
+          continue;
+
+        // We are here when we found roots of the sigma(x)
+        root[no_roots] = i;
+        loc[no_roots] = k;
+
+        if (++no_roots == deg_sigma)
+          break;
+      }
+
+      if (no_roots != deg_sigma)
+      {
+        // Uncorectable error detected
+        return (-1);
+        // TODO - output
+      }
+
+      // Compute erros+erasures evaluator polynomial
+      // omega(x)=sigma(x)S(x)
+      int deg_omega = 0;
+
+      for (int i = 0; i < 2 * d_t; i++)
+      {
+        int tmp = 0;
+        int j = (deg_sigma < i) ? deg_sigma : i;
+
+        for(;j >= 0; j--)
+          tmp ^= gf_mul(d_syn[i - j], sigma[j]);
+
+        if(tmp != 0)
+          deg_omega = i;
+      }
+      omega[2 * d_t] = 0;
+
+      // Compute error values using Forney formula (poly form)
+      // e(j(l))) = (lambda(j(l)) ^ 2) * omega(lambda ^ (-j(l))) / sigma_pr(lambda ^ (-j(l)))
+      // where sigma_pr is the formal derivative of sigma
+
+      for (int j = no_roots - 1; j >= 0; j--)
+      {
+        int num1 = 0;
+
+        for (int i = deg_omega; i >= 0; i--)
+          num1 = gf_add(num1, gf_mul(omega[i], i * root[j]));
+
+        int num2 = gf_pow(root[j], d_lambda - 1);
+
+        int den = 0;
+
+#define min(a,b) (a) < (b) ? (a) : (b)
+        for (int i = (int)min((unsigned int)deg_sigma, 2 * d_t - 1) & ~1; i >= 0; i -= 2)
+          den ^= gf_mul(sigma[i + 1], i * root[j]);
+
+        if (den == 0)
+        {
+          printf("RS: denominator is null\n");
+          return (-1);
+        }
+
+        data_out[loc[j]] = gf_div(gf_mul(num1, num2), den);
+      }
+
+      return(no_roots);
     }
 
     reed_solomon::sptr
@@ -246,9 +476,9 @@ namespace gr {
 
         for (int i = 0; i < (d_blocks * noutput_items); i++)
         {
+          //TODO - zero copy?
           memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
-          //TODO - zero copy?
           rs_encode(d_in, parity);
 
           memcpy(&out[i * out_bsize], &in[i * in_bsize], in_bsize);

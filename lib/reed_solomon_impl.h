@@ -40,6 +40,7 @@ namespace gr {
     class reed_solomon_impl : public reed_solomon
     {
     private:
+      int d_lambda;
       int d_gfpoly;
       int d_p;
       int d_m;
@@ -54,15 +55,22 @@ namespace gr {
       int d_s;
       int d_blocks;
       unsigned char *d_in;
+      unsigned char *d_syn;
 
       int gf_add(int a, int b);
       int gf_mul(int a, int b);
+      int gf_div(int a, int b);
       int gf_exp(int a);
+      int gf_pow(int a, int power);
+      int gf_lpow(int power);
+
       void gf_init(int p, int m, int gfpoly);
       void gf_uninit();
       void rs_init(int lambda, int n, int k, int t);
       void rs_uninit();
-      int rs_encode(const unsigned char *data_in, unsigned char *data_out);
+      int rs_encode(const unsigned char *data_in, unsigned char *parity);
+      int rs_decode(const unsigned char *data_in, unsigned char *data_out, unsigned char *eras, int no_eras);
+
 
     public:
       reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);

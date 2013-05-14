@@ -68,8 +68,8 @@ namespace gr {
       void gf_uninit();
       void rs_init(int lambda, int n, int k, int t);
       void rs_uninit();
-      int rs_encode(const unsigned char *data_in, unsigned char *parity);
-      int rs_decode(const unsigned char *data_in, unsigned char *data_out, unsigned char *eras, int no_eras);
+      int rs_encode(const unsigned char *data, unsigned char *parity);
+      int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
 
 
     public:

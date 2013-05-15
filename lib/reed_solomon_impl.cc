@@ -26,6 +26,8 @@
 #include "reed_solomon_impl.h"
 #include <stdio.h>
 
+#define min(a,b) ((a) < (b)) ? (a) : (b)
+
 namespace gr {
   namespace dvbt {
 
@@ -82,7 +84,7 @@ namespace gr {
     int
     reed_solomon_impl::gf_exp(int a)
     {
-      return d_gf_exp[a % ((1 << d_m) - 1)];
+      return d_gf_exp[a % d_n];
     }
 
     int
@@ -103,20 +105,25 @@ namespace gr {
     int
     reed_solomon_impl::gf_div(int a, int b)
     {
-      // TODO division by zero
-      return (gf_exp(d_gf_log[a] - d_gf_log[b]));
+      if (a == 0 || b == 0)
+        return (0);
+
+      return (gf_exp(d_n + d_gf_log[a] - d_gf_log[b]));
     }
 
     int
     reed_solomon_impl::gf_pow(int a, int power)
     {
-      return gf_exp(d_gf_log[a] + power);
+      if (a == 0)
+        return (0);
+
+      return gf_exp(d_n + d_gf_log[a] + power);
     }
 
     int
     reed_solomon_impl::gf_lpow(int power)
     {
-      return d_l[power % ((1 << d_m) - 1)];
+      return d_l[power % d_n];
     }
 
     void
@@ -125,7 +132,7 @@ namespace gr {
       d_lambda= lambda, d_n = n; d_k = k; d_t = t;
       // 2t = n - k, dmin = 2t + 1 = n -k + 1
 
-      d_l = new unsigned char[(1 << d_m) - 1]; // 2* d_t
+      d_l = new unsigned char[d_n + 1]; // 2* d_t
       if (d_l == NULL)
         return;
 
@@ -139,7 +146,7 @@ namespace gr {
       //Generate roots of lambda
       d_l[0] = 1;
 
-      for (int i = 1; i < ((1 << d_m) - 1); i++) // 2 *d_t
+      for (int i = 1; i <= d_n; i++) // TODO - 2 *d_t
         d_l[i] = gf_mul(d_l[i - 1], lambda);
 
       //Init Generator polynomial buffer
@@ -247,32 +254,35 @@ namespace gr {
         }
       }
 
-      for (int i = 0; i <= no_eras; i++)
+      for (int i = 0; i < no_eras; i++)
         printf("tau[%i]: %i\n", i, tau[i]);
 
       // Use Modified (errors+erasures) BMA. Algorithm of Berlekamp-Massey
       // Compute syndrome polynomial
       // S(i)=r(lambda^i)=e(lambda^i)
       int syn_error = 0;
-      // Init S(i) with r(0)
-      memset(d_syn, data[0], 2 * d_t);
+
+      // Calculate syndrome
+
+      for (int j = 0; j < 2 * d_t; j++)
+        d_syn[j] = data[0];
+
+      for (int j = 1; j < d_n; j++)
+      {
+        for (int i = 0; i < 2 * d_t; i++)
+          d_syn[i] = gf_add(data[j], gf_pow(d_syn[i], i));
+
+        syn_error |= d_syn[j];
+      }
 
       for (int i = 0; i < 2 * d_t; i++)
-      {
-        for (int j = 1; j < d_n; j++)
-        {
-          //printf("data_s[%i]: %i\n", j, data[j]);
-          d_syn[i] = gf_add(d_syn[i], gf_mul(data[j], gf_lpow(j * i)));
-          syn_error |= d_syn[i];
-        }
-          printf("S[%i]: %i\n", i, d_syn[i]);
-
-      }
+        printf("S[%i]: %i\n", i, d_syn[i]);
 
       if (!syn_error)
       {
         // The syndrome is a codeword
         // Return data unmodified
+        printf("data is codeword\n");
         return (0);
       }
 
@@ -288,6 +298,9 @@ namespace gr {
         memset(&sigma[1], 0, 2 * d_t);
       }
 
+      for (int i = 0; i <= 2 * d_t; i++)
+        printf("init sigma[%i]: %i\n", i, sigma[i]);
+
       int r = no_eras;
       int el = no_eras;
       unsigned char d_discr;
@@ -297,8 +310,11 @@ namespace gr {
       while (++r <= 2 * d_t)
       {
         int d_discr = 0;
+
         for (int i = 0; i < r; i++)
           d_discr = gf_add(d_discr, gf_mul(sigma[i], d_syn[r - i - 1]));
+
+        printf("r: %i, discr: %i\n", r, d_discr);
 
         if (d_discr == 0)
         {
@@ -318,6 +334,7 @@ namespace gr {
           {
             el = r + no_eras - el;
 
+            // b(i) = sigma(i) / discr
             for (int i = 0; i <= 2 * d_t; i++)
               b[i] = gf_div(sigma[i], d_discr);
           }
@@ -335,8 +352,13 @@ namespace gr {
       int deg_sigma = 0;
 
       for (int i = 0; i < 2 * d_t + 1; i++)
+      {
+        printf("sigma[%i]: %i\n", i, sigma[i]);
         if (sigma[i] != 0)
           deg_sigma = i;
+      }
+
+      printf("deg_sigma: %i\n", deg_sigma);
 
       // Find the roots of sigma(x) by Chien search
       // Test sum(1)=1+sigma(1)*(lambda^1)+...+sigma(nu)*lambda(^nu)
@@ -350,7 +372,7 @@ namespace gr {
 
       memcpy(&reg[1], &sigma[1], 2 * d_t);
 
-      for (int i = 1; i <= 2 * d_n; i++)
+      for (int i = 1; i <= d_n; i++)
       {
         int q = 1;
 
@@ -364,8 +386,12 @@ namespace gr {
           continue;
 
         // We are here when we found roots of the sigma(x)
+        // Keep roots in index form
         root[no_roots] = i;
-        loc[no_roots] = d_n - i;
+        loc[no_roots] = i - 1;
+
+        printf("root[%i]: %i\n", no_roots, root[no_roots]);
+        printf("loc[%i]: %i\n", no_roots, loc[no_roots]);
 
         if (++no_roots == deg_sigma)
           break;
@@ -393,12 +419,19 @@ namespace gr {
         int j = (deg_sigma < i) ? deg_sigma : i;
 
         for(;j >= 0; j--)
-          tmp ^= gf_mul(d_syn[i - j], sigma[j]);
+          tmp = gf_add(tmp, gf_mul(d_syn[i - j], sigma[j]));
 
         if(tmp != 0)
           deg_omega = i;
+
+        omega[i] = tmp;
       }
       omega[2 * d_t] = 0;
+
+      printf("deg_omega: %i\n", deg_omega);
+
+      for (int i = 0; i < 2 * d_t; i++)
+        printf("omega[%i]: %i\n", i, omega[i]);
 
       // Compute error values using Forney formula (poly form)
       // e(j(l))) = (lambda(j(l)) ^ 2) * omega(lambda ^ (-j(l))) / sigma_pr(lambda ^ (-j(l)))
@@ -408,17 +441,25 @@ namespace gr {
       {
         int num1 = 0;
 
+        // roots[] are in index form
         for (int i = deg_omega; i >= 0; i--)
-          num1 = gf_add(num1, gf_mul(omega[i], i * root[j]));
+          num1 = gf_add(num1, gf_pow(omega[i], i * root[j]));
 
-        int num2 = gf_pow(root[j], d_lambda - 1);
+        // root[] is in index form
+        int num2 = gf_exp(root[j] * (-1) + d_n);
+
+        printf("num1: %i, num2: %i\n", num1, num2);
 
         int den = 0;
 
-#define min(a,b) (a) < (b) ? (a) : (b)
         /* lambda[i+1] for i even is the formal derivative lambda_pr of lambda[i] */
-        for (int i = (int)min((unsigned int)deg_sigma, 2 * d_t - 1) & ~1; i >= 0; i -= 2)
-          den ^= gf_mul(sigma[i + 1], i * root[j]);
+        int deg_max = min(deg_sigma, 2 * d_t - 1);
+
+        for (int i = 1; i <= deg_max; i += 2)
+          den = gf_add(den, gf_exp(d_gf_log[sigma[i]] + (i - 1) * root[j]));
+
+
+        printf("den: %i: %i\n", j, den);
 
         if (den == 0)
         {
@@ -431,7 +472,11 @@ namespace gr {
           return (-1);
         }
 
-        data[loc[j]] = gf_div(gf_mul(num1, num2), den);
+        int err = gf_div(gf_mul(num1, num2), den);
+
+        data[loc[j]] = gf_add(data[loc[j]], err);
+
+        printf("data[%i]: %i\n", loc[j], data[loc[j]]);
       }
 
       return(no_roots);
@@ -464,34 +509,54 @@ namespace gr {
       //For shortened code, first s bytes are zero
       memset(&d_in[0], 0, d_s);
 
+      /************************************************/
       printf("RS begin\n");
 
-      unsigned char * data = new unsigned char[255];
+      unsigned char * datak = new unsigned char[d_k];
+      unsigned char * datan = new unsigned char[d_n];
+      unsigned char * datap = new unsigned char[d_n - d_k];
 
-      for (int i = 0; i < 239; i++)
-        data[i] = i;
+      // Init datak
+      for (int i = 0; i < d_k; i++)
+      {
+        datak[i] = i;
+        printf("encode data_in[%i]: %i\n", i, datak[i]);
+      }
 
-      data[239 + 0] = 61; data[239 + 1] = 74; data[239 + 2] = 29; data[239 + 3] = 172; data[239 + 4] = 204; data[239 + 5] = 74; 
-      data[239 + 6] = 76; data[239 + 7] = 170; data[239 + 8] = 67; data[239 + 9] = 72; data[239 + 10] = 142; 
-      data[239 + 11]= 123; data[239 + 12] = 79; data[239 + 13] = 101; data[239 + 14] = 89; data[239 + 15] = 196;
+      rs_encode(datak, datap);
+
+      for (int i = 0; i < (d_n - d_k); i++)
+        printf("parity[%i]: %i\n", i, datap[i]);
+
+      // Format data for decoder
+      memcpy(&datan[0], &datak[0], d_k);
+      memcpy(&datan[d_k], &datap[0], d_n - d_k);
+
+#if 0
+      // Reverse the data
+      for (int i = 0; i < (d_n - d_k); i++)
+        datan[i] = datap[d_n - d_k - 1 - i];
+
+      for (int i = 0; i < d_k; i++)
+        datan[d_n - d_k + i] = datak[d_k - 1 - i];
+
+      for (int i = 0; i < d_n; i++)
+        printf("decode data_in[%i]: %i\n", i, datan[i]);
+#endif
 
       // Distort the data
+      datan[1] = 10;
+      datan[2] = 10;
+      datan[3] = 20;
 
-      for (int i = 0; i < 255; i++)
-        printf("data[%i]: %i\n", i, data[i]);
+      unsigned char eras[] = {100};
+      unsigned char no_eras = sizeof(eras) / sizeof(eras[0]);
 
-      //data[1] = 1;
-      //data[3] = 3;
-      data[1] = 0;
+      //rs_decode(datan, &eras[0], no_eras);
+      rs_decode(datan, NULL, 0);
 
-      unsigned char eras[] = {1,3};
-      unsigned char no_eras = 2;
-
-      //rs_decode(data, &eras[0], no_eras);
-      rs_decode(data, NULL, 0);
-
-      for (int i = 0; i < 255; i++)
-        printf("data_out[%i]: %i\n", i, data[i]);
+      for (int i = 0; i < d_k; i++)
+        printf("decode data_out[%i]: %i\n", i, datan[i]);
     }
 
     /*

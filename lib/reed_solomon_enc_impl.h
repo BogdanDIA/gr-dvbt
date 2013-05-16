@@ -18,10 +18,10 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DVBT_REED_SOLOMON_IMPL_H
-#define INCLUDED_DVBT_REED_SOLOMON_IMPL_H
+#ifndef INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H
+#define INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H
 
-#include <dvbt/reed_solomon.h>
+#include <dvbt/reed_solomon_enc.h>
 
 namespace gr {
   namespace dvbt {
@@ -47,30 +47,8 @@ namespace gr {
       int d_n;
       int d_k;
       int d_t;
-      unsigned char *d_gf_exp;
-      unsigned char *d_gf_log;
-      unsigned char *d_l;
-      unsigned char *d_g;
-
       int d_s;
       int d_blocks;
-      unsigned char *d_in;
-      unsigned char *d_syn;
-
-      int gf_add(int a, int b);
-      int gf_mul(int a, int b);
-      int gf_div(int a, int b);
-      int gf_exp(int a);
-      int gf_pow(int a, int power);
-      int gf_lpow(int power);
-
-      void gf_init(int p, int m, int gfpoly);
-      void gf_uninit();
-      void rs_init(int lambda, int n, int k, int t);
-      void rs_uninit();
-      int rs_encode(const unsigned char *data, unsigned char *parity);
-      int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
-
 
     public:
       reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
@@ -91,5 +69,5 @@ namespace gr {
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_REED_SOLOMON_IMPL_H */
+#endif /* INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H */
 

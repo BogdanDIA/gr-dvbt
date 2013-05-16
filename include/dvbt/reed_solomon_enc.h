@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_DVBT_REED_SOLOMON_H
-#define INCLUDED_DVBT_REED_SOLOMON_H
+#ifndef INCLUDED_DVBT_REED_SOLOMON_ENC_H
+#define INCLUDED_DVBT_REED_SOLOMON_ENC_H
 
 #include <dvbt/api.h>
 #include <gr_block.h>
@@ -51,5 +51,5 @@ namespace gr {
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_REED_SOLOMON_H */
+#endif /* INCLUDED_DVBT_REED_SOLOMON_ENC_H */
 

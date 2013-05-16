@@ -77,12 +77,12 @@ namespace gr {
       void rs_uninit();
 
     public:
-	    /*!
+      /*!
        * ETSI EN 300 744 Clause 4.3.2 \n
        * RS(N=204,K=239,T=8)
        */
-		  int rs_encode(const unsigned char *data, unsigned char *parity);
-		  int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
+      int rs_encode(const unsigned char *data, unsigned char *parity);
+      int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
 
       reed_solomon(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
       ~reed_solomon();

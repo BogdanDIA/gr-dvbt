@@ -32,10 +32,10 @@ namespace gr {
      * \brief Reed Solomon encoder
      * \ingroup dvbt
      */
-    class DVBT_API reed_solomon : virtual public gr_block
+    class DVBT_API reed_solomon_enc : virtual public gr_block
     {
     public:
-       typedef boost::shared_ptr<reed_solomon> sptr;
+       typedef boost::shared_ptr<reed_solomon_enc> sptr;
 
        /*!
         * \brief Return a shared_ptr to a new instance of dvbt::reed_solomon.

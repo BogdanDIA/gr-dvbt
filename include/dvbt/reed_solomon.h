@@ -23,29 +23,69 @@
 #define INCLUDED_DVBT_REED_SOLOMON_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
 
 namespace gr {
   namespace dvbt {
 
     /*!
-     * \brief Reed Solomon encoder
-     * \ingroup dvbt
+     * \brief <+description+>
+     *
      */
-    class DVBT_API reed_solomon : virtual public gr_block
+    class DVBT_API reed_solomon
     {
-    public:
-       typedef boost::shared_ptr<reed_solomon> sptr;
+    /*!
+     * \brief Reed Solomon encoder.
+     * \ingroup dvbt
+     * \param p characteristic of GF(p^m) \n
+     * \param m we use GF(p^m) \n
+     * \param gfpoly Generator Polynomial \n
+     * \param n length of codeword of RS coder \n
+     * \param k length of information sequence of RS encoder \n
+     * \param t number of corrected errors \n
+     * \param s shortened length \n
+     * \param blocks number of blocks to process at once\n
+     */
 
-       /*!
-        * \brief Return a shared_ptr to a new instance of dvbt::reed_solomon.
-        *
-        * To avoid accidental use of raw pointers, dvbt::reed_solomon's
-        * constructor is in a private implementation
-        * class. dvbt::reed_solomon::make is the public interface for
-        * creating new instances.
-        */
-       static sptr make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
+    private:
+      int d_lambda;
+      int d_gfpoly;
+      int d_p;
+      int d_m;
+      int d_n;
+      int d_k;
+      int d_t;
+      unsigned char *d_gf_exp;
+      unsigned char *d_gf_log;
+      unsigned char *d_l;
+      unsigned char *d_g;
+
+      int d_s;
+      int d_blocks;
+      unsigned char *d_in;
+      unsigned char *d_syn;
+
+      int gf_add(int a, int b);
+      int gf_mul(int a, int b);
+      int gf_div(int a, int b);
+      int gf_exp(int a);
+      int gf_pow(int a, int power);
+      int gf_lpow(int power);
+
+      void gf_init(int p, int m, int gfpoly);
+      void gf_uninit();
+      void rs_init(int lambda, int n, int k, int t);
+      void rs_uninit();
+
+    public:
+	    /*!
+       * ETSI EN 300 744 Clause 4.3.2 \n
+       * RS(N=204,K=239,T=8)
+       */
+		  int rs_encode(const unsigned char *data, unsigned char *parity);
+		  int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
+
+      reed_solomon(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
+      ~reed_solomon();
     };
 
   } // namespace dvbt

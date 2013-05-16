@@ -30,7 +30,7 @@ install(FILES
     bit_inner_interleaver.h
     symbol_inner_interleaver.h
     inner_coder.h
-    reed_solomon.h
+    reed_solomon_enc.h
     energy_dispersal.h
     convolutional_interleaver.h
     test2.h
@@ -38,5 +38,6 @@ install(FILES
     dvbt_demap.h
     bit_inner_deinterleaver.h
     convolutional_deinterleaver.h
-    energy_descramble.h DESTINATION include/dvbt
+    energy_descramble.h
+    reed_solomon.h DESTINATION include/dvbt
 )

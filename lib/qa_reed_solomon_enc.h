@@ -19,8 +19,8 @@
  */
 
 
-#ifndef _QA_REED_SOLOMON_H_
-#define _QA_REED_SOLOMON_H_
+#ifndef _QA_REED_SOLOMON_ENC_H_
+#define _QA_REED_SOLOMON_ENC_H_
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
@@ -28,10 +28,10 @@
 namespace gr {
   namespace dvbt {
 
-    class qa_reed_solomon : public CppUnit::TestCase
+    class qa_reed_solomon_enc : public CppUnit::TestCase
     {
     public:
-      CPPUNIT_TEST_SUITE(qa_reed_solomon);
+      CPPUNIT_TEST_SUITE(qa_reed_solomon_enc);
       CPPUNIT_TEST(t1);
       CPPUNIT_TEST_SUITE_END();
 
@@ -42,5 +42,5 @@ namespace gr {
   } /* namespace dvbt */
 } /* namespace gr */
 
-#endif /* _QA_REED_SOLOMON_H_ */
+#endif /* _QA_REED_SOLOMON_ENC_H_ */
 

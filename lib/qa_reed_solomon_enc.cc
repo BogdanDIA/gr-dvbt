@@ -19,16 +19,16 @@
  */
 
 
-#include "qa_reed_solomon.h"
+#include "qa_reed_solomon_enc.h"
 #include <cppunit/TestAssert.h>
 
-#include <dvbt/reed_solomon.h>
+#include <dvbt/reed_solomon_enc.h>
 
 namespace gr {
   namespace dvbt {
 
     void
-    qa_reed_solomon::t1()
+    qa_reed_solomon_enc::t1()
     {
         // Put test here
     }

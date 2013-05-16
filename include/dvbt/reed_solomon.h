@@ -61,7 +61,6 @@ namespace gr {
 
       int d_s;
       int d_blocks;
-      unsigned char *d_in;
       unsigned char *d_syn;
 
       int gf_add(int a, int b);

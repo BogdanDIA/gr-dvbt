@@ -39,5 +39,6 @@ install(FILES
     bit_inner_deinterleaver.h
     convolutional_deinterleaver.h
     energy_descramble.h
-    reed_solomon.h DESTINATION include/dvbt
+    reed_solomon.h
+    reed_solomon_dec.h DESTINATION include/dvbt
 )

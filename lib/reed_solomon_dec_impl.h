@@ -18,10 +18,10 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H
-#define INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H
+#ifndef INCLUDED_DVBT_REED_SOLOMON_DEC_IMPL_H
+#define INCLUDED_DVBT_REED_SOLOMON_DEC_IMPL_H
 
-#include <dvbt/reed_solomon_enc.h>
+#include <dvbt/reed_solomon_dec.h>
 #include <dvbt/reed_solomon.h>
 
 namespace gr {
@@ -38,7 +38,7 @@ namespace gr {
      * \param s shortened length \n
      * \param blocks number of blocks to process at once\n
      */
-    class reed_solomon_enc_impl : public reed_solomon_enc
+    class reed_solomon_dec_impl : public reed_solomon_dec
     {
     private:
       int d_lambda;
@@ -54,8 +54,8 @@ namespace gr {
       reed_solomon d_rs;
 
     public:
-      reed_solomon_enc_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
-      ~reed_solomon_enc_impl();
+      reed_solomon_dec_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
+      ~reed_solomon_dec_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
@@ -72,5 +72,5 @@ namespace gr {
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H */
+#endif /* INCLUDED_DVBT_REED_SOLOMON_DEC_IMPL_H */
 

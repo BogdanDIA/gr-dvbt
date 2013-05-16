@@ -23,59 +23,58 @@
 #endif
 
 #include <gr_io_signature.h>
-#include "reed_solomon_enc_impl.h"
+#include "reed_solomon_dec_impl.h"
 #include <stdio.h>
 
 namespace gr {
   namespace dvbt {
 
-    reed_solomon_enc::sptr
-    reed_solomon_enc::make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
+    reed_solomon_dec::sptr
+    reed_solomon_dec::make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
     {
-      return gnuradio::get_initial_sptr (new reed_solomon_enc_impl(p, m, gfpoly, n, k, t, s, blocks));
+      return gnuradio::get_initial_sptr (new reed_solomon_dec_impl(p, m, gfpoly, n, k, t, s, blocks));
     }
 
     /*
      * The private constructor
      */
-    reed_solomon_enc_impl::reed_solomon_enc_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
-      : gr_block("reed_solomon",
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (k - s)),
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (n - s))),
+    reed_solomon_dec_impl::reed_solomon_dec_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
+      : gr_block("reed_solomon_dec",
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (n - s)),
+		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (k - s))),
       d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks),
       d_rs(p, m, gfpoly, n, k, t, s, blocks)
     {
-
+    
     }
 
     /*
      * Our virtual destructor.
      */
-    reed_solomon_enc_impl::~reed_solomon_enc_impl()
+    reed_solomon_dec_impl::~reed_solomon_dec_impl()
     {
     }
 
     void
-    reed_solomon_enc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    reed_solomon_dec_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
         ninput_items_required[0] = noutput_items;
     }
 
     int
-    reed_solomon_enc_impl::general_work (int noutput_items,
+    reed_solomon_dec_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
- 
-        int in_bsize = d_k - d_s;
-        int out_bsize = d_n - d_s;
+
+        // We receive only nonzero data
+        int in_bsize = d_n - d_s;
+        int out_bsize = d_k - d_s;
 
         unsigned char d_in[d_n];
-
-        unsigned char parity[2 * d_t];
 
         int in_count = 0;
         int out_count = 0;
@@ -83,15 +82,34 @@ namespace gr {
         for (int i = 0; i < (d_blocks * noutput_items); i++)
         {
           //TODO - zero copy?
+          // Set first d_s symbols to zero
+          memset(&d_in[0], 0, d_s);
+          // Then copy actual data
           memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
-          d_rs.rs_encode(d_in, parity);
+#if 0
+          for (int j = 0; j < 8; j++)
+          {
+            unsigned char c = (unsigned char)rand();
+#define min(a, b) (a) < (b) ? (a) : (b)
+            c = min(c, d_n - d_s);
+            d_in[d_s + c] = 0;
+            printf("ccc: %i\n", c);
+          }
+#endif
 
-          memcpy(&out[i * out_bsize], &in[i * in_bsize], in_bsize);
-          memcpy(&out[i * out_bsize + in_bsize], parity, 2 * d_t);
+#if 0
+          int start = 134;
+
+          for (int j = (start - 1); j >= (start - 1 - 7); j--)
+            d_in[j] = 0;
+#endif
+
+          d_rs.rs_decode(d_in, NULL, 0);
+
+          memcpy(&out[i * out_bsize], &d_in[d_s], out_bsize);
         }
 
-        // Do <+signal processing+>
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (noutput_items);

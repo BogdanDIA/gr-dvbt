@@ -30,12 +30,12 @@
 
 #define min(a,b) ((a) < (b)) ? (a) : (b)
 
-#define DEBUG
+#define DEBUG 1
 
 #ifdef DEBUG
-#define PRINTF printf
+#define PRINTF(a...) printf(a)
 #else
-#define PRINTF
+#define PRINTF(a...)
 #endif
 
 namespace gr {
@@ -181,7 +181,7 @@ namespace gr {
       }
 
       // Init syndrome array 
-      d_syn = new unsigned char[2 * d_t];
+      d_syn = new unsigned char[2 * d_t + 1];
       if (d_syn == NULL)
       {
         std::cout << "Cannot allocate memory" << std::endl;
@@ -235,13 +235,13 @@ namespace gr {
     int
     reed_solomon::rs_decode(unsigned char *data, unsigned char *eras, const int no_eras)
     {
-      unsigned char *sigma = new unsigned char[2 * d_t + 1];
-      unsigned char *b = new unsigned char [2 * d_t + 1];
-      unsigned char *T = new unsigned char[2 * d_t + 1];
-      unsigned char *reg = new unsigned char[2 * d_t + 1];
-      unsigned char *root = new unsigned char[2 * d_t + 1];
-      unsigned char *loc = new unsigned char[2 * d_t + 1];
-      unsigned char *omega = new unsigned char[2 * d_t];
+      unsigned char sigma[2 * d_t + 1];
+      unsigned char b[2 * d_t + 1];
+      unsigned char T[2 * d_t + 1];
+      unsigned char reg[2 * d_t + 1];
+      unsigned char root[2 * d_t + 1];
+      unsigned char loc[2 * d_t + 1];
+      unsigned char omega[2 * d_t];
 
       // Compute erasure locator polynomial
       memset(sigma, 0, 2 * d_t + 1);
@@ -266,7 +266,6 @@ namespace gr {
       }
 
       // Calculate syndrome
-      int syn_error = 0;
 
       for (int j = 0; j < 2 * d_t; j++)
         d_syn[j] = data[0];
@@ -275,12 +274,16 @@ namespace gr {
       {
         for (int i = 0; i < 2 * d_t; i++)
           d_syn[i] = gf_add(data[j], gf_pow(d_syn[i], i));
-
-        syn_error |= d_syn[j];
       }
 
+      int syn_error = 0;
+
+      // Verify all syndromes
       for (int i = 0; i < 2 * d_t; i++)
-        PRINTF("S[%i]: %i\n", i, d_syn[i]);
+      {
+        syn_error |= d_syn[i];
+        PRINTF("S[%i]: %i, syn_error: %i\n", i, d_syn[i], syn_error);
+      }
 
       if (!syn_error)
       {
@@ -479,15 +482,7 @@ namespace gr {
       gf_init(d_p, d_m, d_gfpoly);
       rs_init(d_p, d_n, d_k, d_t);
 
-      //Allocate buffer for RS input
-      d_in = new unsigned char[d_k];
-      if (d_in == NULL)
-      {
-        std::cout << "Cannot allocate memory" << std::endl;
-      }
-      //For shortened code, first s bytes are zero
-      memset(&d_in[0], 0, d_s);
-
+#if 0
       /************************************************/
       PRINTF("RS begin\n");
 
@@ -532,13 +527,11 @@ namespace gr {
 
       for (int i = 0; i < d_k; i++)
         PRINTF("decode data_out[%i]: %i\n", i, datan[i]);
+#endif
     }
 
     reed_solomon::~reed_solomon()
     {
-      if (d_in)
-        delete [] d_in;
-
       rs_uninit();
       gf_uninit();
     }

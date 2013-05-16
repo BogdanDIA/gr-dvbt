@@ -42,8 +42,10 @@ namespace gr {
       : gr_block("reed_solomon",
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (k - s)),
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (n - s))),
-      d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks)
+      d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks),
+      d_rs(p, m, gfpoly, n, k, t, s, blocks)
     {
+
     }
 
     /*
@@ -81,7 +83,7 @@ namespace gr {
           //TODO - zero copy?
           //memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
-          //rs_encode(d_in, parity);
+          d_rs.rs_encode(&in[i * in_bsize], parity);
 
           memcpy(&out[i * out_bsize], &in[i * in_bsize], in_bsize);
           memcpy(&out[i * out_bsize + in_bsize], parity, 2 * d_t);

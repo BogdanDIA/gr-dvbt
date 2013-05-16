@@ -22,6 +22,7 @@
 #define INCLUDED_DVBT_REED_SOLOMON_ENC_IMPL_H
 
 #include <dvbt/reed_solomon_enc.h>
+#include <dvbt/reed_solomon.h>
 
 namespace gr {
   namespace dvbt {
@@ -49,6 +50,8 @@ namespace gr {
       int d_t;
       int d_s;
       int d_blocks;
+
+      reed_solomon d_rs;
 
     public:
       reed_solomon_enc_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);

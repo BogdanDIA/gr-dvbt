@@ -65,3 +65,4 @@ GR_ADD_TEST(qa_dvbt_demap ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dv
 GR_ADD_TEST(qa_bit_inner_deinterleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_bit_inner_deinterleaver.py)
 GR_ADD_TEST(qa_convolutional_deinterleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_convolutional_deinterleaver.py)
 GR_ADD_TEST(qa_energy_descramble ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_energy_descramble.py)
+GR_ADD_TEST(qa_reed_solomon_dec ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_dec.py)

@@ -29,16 +29,16 @@
 namespace gr {
   namespace dvbt {
 
-    reed_solomon::sptr
-    reed_solomon::make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
+    reed_solomon_enc::sptr
+    reed_solomon_enc::make(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
     {
-      return gnuradio::get_initial_sptr (new reed_solomon_impl(p, m, gfpoly, n, k, t, s, blocks));
+      return gnuradio::get_initial_sptr (new reed_solomon_enc_impl(p, m, gfpoly, n, k, t, s, blocks));
     }
 
     /*
      * The private constructor
      */
-    reed_solomon_impl::reed_solomon_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
+    reed_solomon_enc_impl::reed_solomon_enc_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
       : gr_block("reed_solomon",
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (k - s)),
 		      gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (n - s))),
@@ -49,18 +49,18 @@ namespace gr {
     /*
      * Our virtual destructor.
      */
-    reed_solomon_impl::~reed_solomon_impl()
+    reed_solomon_enc_impl::~reed_solomon_enc_impl()
     {
     }
 
     void
-    reed_solomon_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    reed_solomon_enc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
         ninput_items_required[0] = noutput_items;
     }
 
     int
-    reed_solomon_impl::general_work (int noutput_items,
+    reed_solomon_enc_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)

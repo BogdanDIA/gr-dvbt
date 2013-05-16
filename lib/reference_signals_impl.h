@@ -26,7 +26,7 @@
 #include <vector>
 #include <deque>
 
-// This should eventually go into a const file
+    // This should eventually go into a const file
     const int SYMBOLS_PER_FRAME = 68;
     const int FRAMES_PER_SUPERFRAME = 4;
 

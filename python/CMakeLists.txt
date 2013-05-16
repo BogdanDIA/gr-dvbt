@@ -56,6 +56,7 @@ GR_ADD_TEST(qa_bit_inner_interleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE
 GR_ADD_TEST(qa_symbol_inner_interleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_symbol_inner_interleaver.py)
 GR_ADD_TEST(qa_inner_coder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_inner_coder.py)
 GR_ADD_TEST(qa_reed_solomon ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon.py)
+GR_ADD_TEST(qa_reed_solomon ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_enc.py)
 GR_ADD_TEST(qa_energy_dispersal ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_energy_dispersal.py)
 GR_ADD_TEST(qa_convolutional_interleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_convolutional_interleaver.py)
 GR_ADD_TEST(qa_test2 ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_test2.py)
@@ -64,3 +65,4 @@ GR_ADD_TEST(qa_dvbt_demap ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dv
 GR_ADD_TEST(qa_bit_inner_deinterleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_bit_inner_deinterleaver.py)
 GR_ADD_TEST(qa_convolutional_deinterleaver ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_convolutional_deinterleaver.py)
 GR_ADD_TEST(qa_energy_descramble ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_energy_descramble.py)
+GR_ADD_TEST(qa_reed_solomon_dec ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_dec.py)

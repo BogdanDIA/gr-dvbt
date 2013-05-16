@@ -18,21 +18,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#ifndef INCLUDED_DVBT_REED_SOLOMON_DEC_IMPL_H
+#define INCLUDED_DVBT_REED_SOLOMON_DEC_IMPL_H
 
-#ifndef INCLUDED_DVBT_REED_SOLOMON_H
-#define INCLUDED_DVBT_REED_SOLOMON_H
-
-#include <dvbt/api.h>
+#include <dvbt/reed_solomon_dec.h>
+#include <dvbt/reed_solomon.h>
 
 namespace gr {
   namespace dvbt {
-
-    /*!
-     * \brief <+description+>
-     *
-     */
-    class reed_solomon
-    {
     /*!
      * \brief Reed Solomon encoder.
      * \ingroup dvbt
@@ -45,7 +38,8 @@ namespace gr {
      * \param s shortened length \n
      * \param blocks number of blocks to process at once\n
      */
-
+    class reed_solomon_dec_impl : public reed_solomon_dec
+    {
     private:
       int d_lambda;
       int d_gfpoly;
@@ -54,41 +48,31 @@ namespace gr {
       int d_n;
       int d_k;
       int d_t;
-      unsigned char *d_gf_exp;
-      unsigned char *d_gf_log;
-      unsigned char *d_l;
-      unsigned char *d_g;
-
       int d_s;
       int d_blocks;
-      unsigned char *d_syn;
 
-      int gf_add(int a, int b);
-      int gf_mul(int a, int b);
-      int gf_div(int a, int b);
-      int gf_exp(int a);
-      int gf_pow(int a, int power);
-      int gf_lpow(int power);
+      unsigned char * d_in;
 
-      void gf_init(int p, int m, int gfpoly);
-      void gf_uninit();
-      void rs_init(int lambda, int n, int k, int t);
-      void rs_uninit();
+      reed_solomon d_rs;
 
     public:
+      reed_solomon_dec_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
+      ~reed_solomon_dec_impl();
+
+      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+
       /*!
        * ETSI EN 300 744 Clause 4.3.2 \n
        * RS(N=204,K=239,T=8)
        */
-      int rs_encode(const unsigned char *data, unsigned char *parity);
-      int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
-
-      reed_solomon(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);
-      ~reed_solomon();
+      int general_work(int noutput_items,
+		       gr_vector_int &ninput_items,
+		       gr_vector_const_void_star &input_items,
+		       gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt
 } // namespace gr
 
-#endif /* INCLUDED_DVBT_REED_SOLOMON_H */
+#endif /* INCLUDED_DVBT_REED_SOLOMON_DEC_IMPL_H */
 

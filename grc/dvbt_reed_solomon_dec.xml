@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <block>
-  <name>reed_solomon</name>
-  <key>dvbt_reed_solomon</key>
+  <name>reed_solomon_dec</name>
+  <key>dvbt_reed_solomon_dec</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.reed_solomon($p, $m, $gfpoly, $n, $k, $t, $s, $blocks)</make>
+  <make>dvbt.reed_solomon_dec($p, $m, $gfpoly, $n, $k, $t, $s, $blocks)</make>
   <param>
     <name>p</name>
     <key>p</key>
@@ -56,11 +56,11 @@
   <sink>
     <name>in</name>
     <type>byte</type>
-    <vlen>$blocks*($k-$s)</vlen>
+    <vlen>$blocks*($n-$s)</vlen>
   </sink>
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>$blocks*($n-$s)</vlen>
+    <vlen>$blocks*($k-$s)</vlen>
   </source>
 </block>

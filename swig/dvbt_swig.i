@@ -25,6 +25,7 @@
 #include "dvbt/bit_inner_deinterleaver.h"
 #include "dvbt/convolutional_deinterleaver.h"
 #include "dvbt/energy_descramble.h"
+#include "dvbt/reed_solomon.h"
 %}
 
 %include "dvbt/test.h"
@@ -36,6 +37,7 @@
 %include "dvbt/symbol_inner_interleaver.h"
 %include "dvbt/inner_coder.h"
 %include "dvbt/reed_solomon.h"
+%include "dvbt/reed_solomon_enc.h"
 %include "dvbt/energy_dispersal.h"
 %include "dvbt/convolutional_interleaver.h"
 %include "dvbt/test2.h"
@@ -60,3 +62,4 @@ GR_SWIG_BLOCK_MAGIC2(dvbt, dvbt_demap);
 GR_SWIG_BLOCK_MAGIC2(dvbt, bit_inner_deinterleaver);
 GR_SWIG_BLOCK_MAGIC2(dvbt, convolutional_deinterleaver);
 GR_SWIG_BLOCK_MAGIC2(dvbt, energy_descramble);
+GR_SWIG_BLOCK_MAGIC2(dvbt, reed_solomon);

@@ -31,7 +31,7 @@ namespace gr {
      * \brief <+description+>
      *
      */
-    class DVBT_API reed_solomon
+    class reed_solomon
     {
     /*!
      * \brief Reed Solomon encoder.

@@ -24,7 +24,7 @@ install(FILES
     dvbt_bit_inner_interleaver.xml
     dvbt_symbol_inner_interleaver.xml
     dvbt_inner_coder.xml
-    dvbt_reed_solomon.xml
+    dvbt_reed_solomon_enc.xml
     dvbt_energy_dispersal.xml
     dvbt_convolutional_interleaver.xml
     dvbt_ofdm_demod.xml
@@ -34,5 +34,5 @@ install(FILES
     dvbt_bit_inner_deinterlever.xml
     dvbt_convolutional_deinterleaver.xml
     dvbt_energy_descramble.xml
-    dvbt_reed_solomon.xml DESTINATION share/gnuradio/grc/blocks
+    DESTINATION share/gnuradio/grc/blocks
 )

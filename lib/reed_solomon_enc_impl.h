@@ -51,6 +51,8 @@ namespace gr {
       int d_s;
       int d_blocks;
 
+      unsigned char * d_in;
+
       reed_solomon d_rs;
 
     public:

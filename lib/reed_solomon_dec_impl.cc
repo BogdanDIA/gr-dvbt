@@ -45,7 +45,13 @@ namespace gr {
       d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks),
       d_rs(p, m, gfpoly, n, k, t, s, blocks)
     {
-    
+      d_in = new unsigned char[d_n];
+      if (d_in == NULL)
+      {
+        std::cout << "Cannot allocate memory" << std::endl;
+        return;
+      }
+      memset(&d_in[0], 0, d_n);
     }
 
     /*
@@ -53,6 +59,7 @@ namespace gr {
      */
     reed_solomon_dec_impl::~reed_solomon_dec_impl()
     {
+      delete [] d_in;
     }
 
     void
@@ -73,11 +80,6 @@ namespace gr {
         // We receive only nonzero data
         int in_bsize = d_n - d_s;
         int out_bsize = d_k - d_s;
-
-        unsigned char d_in[d_n];
-
-        int in_count = 0;
-        int out_count = 0;
 
         for (int i = 0; i < (d_blocks * noutput_items); i++)
         {

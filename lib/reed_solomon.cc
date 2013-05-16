@@ -139,7 +139,7 @@ namespace gr {
     void
     reed_solomon::rs_init(int lambda, int n, int k, int t)
     {
-      d_lambda= lambda, d_n = n; d_k = k; d_t = t;
+      d_lambda = lambda, d_n = n; d_k = k; d_t = t;
       // 2t = n - k, dmin = 2t + 1 = n -k + 1
 
       d_l = new unsigned char[d_n + 1]; // 2* d_t

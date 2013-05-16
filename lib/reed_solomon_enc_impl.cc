@@ -45,7 +45,13 @@ namespace gr {
       d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks),
       d_rs(p, m, gfpoly, n, k, t, s, blocks)
     {
-
+      d_in = new unsigned char[d_n];
+      if (d_in == NULL)
+      {
+        std::cout << "Cannot allocate memory" << std::endl;
+        return;
+      }
+      memset(&d_in[0], 0, d_n);
     }
 
     /*
@@ -53,6 +59,7 @@ namespace gr {
      */
     reed_solomon_enc_impl::~reed_solomon_enc_impl()
     {
+      delete [] d_in;
     }
 
     void
@@ -73,16 +80,12 @@ namespace gr {
         int in_bsize = d_k - d_s;
         int out_bsize = d_n - d_s;
 
-        unsigned char d_in[d_n];
-
         unsigned char parity[2 * d_t];
 
-        int in_count = 0;
-        int out_count = 0;
-
+        // We get a superblock of d_blocks blocks
         for (int i = 0; i < (d_blocks * noutput_items); i++)
         {
-          //TODO - zero copy?
+          //TODO - zero copy between in/out ?
           memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
           d_rs.rs_encode(d_in, parity);
@@ -91,7 +94,6 @@ namespace gr {
           memcpy(&out[i * out_bsize + in_bsize], parity, 2 * d_t);
         }
 
-        // Do <+signal processing+>
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (noutput_items);

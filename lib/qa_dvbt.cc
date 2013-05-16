@@ -43,6 +43,7 @@
 #include "qa_bit_inner_deinterleaver.h"
 #include "qa_convolutional_deinterleaver.h"
 #include "qa_energy_descramble.h"
+#include "qa_reed_solomon.h"
 
 CppUnit::TestSuite *
 qa_dvbt::suite()
@@ -65,6 +66,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_bit_inner_deinterleaver::suite());
   s->addTest(gr::dvbt::qa_convolutional_deinterleaver::suite());
   s->addTest(gr::dvbt::qa_energy_descramble::suite());
+  s->addTest(gr::dvbt::qa_reed_solomon::suite());
 
   return s;
 }

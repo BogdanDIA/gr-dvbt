@@ -34,7 +34,7 @@ using namespace std;
 
 #define min(a,b) ((a) < (b)) ? (a) : (b)
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
@@ -214,7 +214,7 @@ namespace gr {
     }
 
     int
-    reed_solomon::rs_encode(const unsigned char *data_in, unsigned char *parity)
+    reed_solomon::rs_encode(unsigned char *data_in, unsigned char *parity)
     {
       memset(parity, 0, 2 * d_t);
 

@@ -80,18 +80,15 @@ namespace gr {
         int in_bsize = d_k - d_s;
         int out_bsize = d_n - d_s;
 
-        unsigned char parity[2 * d_t];
-
         // We get a superblock of d_blocks blocks
         for (int i = 0; i < (d_blocks * noutput_items); i++)
         {
           //TODO - zero copy between in/out ?
           memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
-          d_rs.rs_encode(d_in, parity);
+          d_rs.rs_encode(&d_in[0], &d_in[d_k]);
 
-          memcpy(&out[i * out_bsize], &in[i * in_bsize], in_bsize);
-          memcpy(&out[i * out_bsize + in_bsize], parity, 2 * d_t);
+          memcpy(&out[i * out_bsize], &d_in[d_s], out_bsize);
         }
 
         // Tell runtime system how many input items we consumed on

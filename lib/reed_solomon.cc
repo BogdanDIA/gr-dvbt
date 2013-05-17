@@ -27,6 +27,10 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
+
+using namespace std;
+
 
 #define min(a,b) ((a) < (b)) ? (a) : (b)
 
@@ -96,6 +100,13 @@ namespace gr {
     {
       return d_gf_exp[a % d_n];
     }
+
+    int
+    reed_solomon::gf_log(int a)
+    {
+      return d_gf_log[a % d_n];
+    }
+
 
     int
     reed_solomon::gf_add(int a, int b)
@@ -449,7 +460,10 @@ namespace gr {
         int deg_max = min(deg_sigma, 2 * d_t - 1);
 
         for (int i = 1; i <= deg_max; i += 2)
-          den = gf_add(den, gf_exp(d_gf_log[sigma[i]] + (i - 1) * root[j]));
+        {
+          if (sigma[i] != 0)
+            den = gf_add(den, gf_exp(d_gf_log[sigma[i]] + (i - 1) * root[j]));
+        }
 
         PRINTF("num1: %i, num2: %i\n", num1, num2);
         PRINTF("den: %i: %i\n", j, den);
@@ -482,52 +496,59 @@ namespace gr {
       gf_init(d_p, d_m, d_gfpoly);
       rs_init(d_p, d_n, d_k, d_t);
 
-#if 0
       /************************************************/
-      PRINTF("RS begin\n");
 
       unsigned char * datak = new unsigned char[d_k];
       unsigned char * datan = new unsigned char[d_n];
       unsigned char * datap = new unsigned char[d_n - d_k];
+      d_index = 0;
 
       // Init datak
-      for (int i = 0; i < d_k; i++)
+
+      memset(&datak[0], 0, d_s);
+
+      //std::ifstream inf("/home/bogdan/din.bin", ios::in | ios::binary);
+      std::ifstream inf1("/home/bogdan/distors.bin", ios::in | ios::binary);
+      std::ifstream inf2("/home/bogdan/din.bin", ios::in | ios::binary);
+      while (!inf1.eof())
       {
-        datak[i] = i;
-        PRINTF("encode data_in[%i]: %i\n", i, datak[i]);
-      }
+        PRINTF("RS begin\n");
+#if 0
+        inf.read((char *)&datak[d_s], d_k - d_s);
 
-      rs_encode(datak, datap);
+        //for (int i = 0; i < d_k; i++)
+          //printf("datak[%i]: %i\n", i, datak[i]);
 
-      for (int i = 0; i < (d_n - d_k); i++)
-        PRINTF("parity[%i]: %i\n", i, datap[i]);
+        rs_encode(datak, datap);
 
-      // Format data for decoder
-      memcpy(&datan[0], &datak[0], d_k);
-      memcpy(&datan[d_k], &datap[0], d_n - d_k);
-
-      // Distort the data
-      
-      unsigned char no_eras = 6;
-      unsigned char eras[no_eras];
-
-      for (int i = 0; i < no_eras; i++)
-      {
-        datan[2 * i] = 0;
-        eras[i] = 2 * i;
-      }
-
-      int err = no_eras;
-
-      for (int i = 0; i < 5; i++)
-        datan[3 * (err++)] = 0;
-
-      rs_decode(datan, &eras[0], no_eras);
-      //rs_decode(datan, NULL, 0);
-
-      for (int i = 0; i < d_k; i++)
-        PRINTF("decode data_out[%i]: %i\n", i, datan[i]);
+        // Format data for decoder
+        memcpy(&datan[0], &datak[0], d_k);
+        memcpy(&datan[d_k], &datap[0], d_n - d_k);
 #endif
+        memset(&datan[0], 0, d_s);
+        inf1.read((char *)&datan[d_s], d_n - d_s);
+
+        unsigned char tmp[d_n];
+        memset(&tmp[0], 0, d_s);
+        inf2.read((char *)&tmp[d_s], d_k - d_s); 
+
+        rs_decode(datan, NULL, 0);
+
+        int err = 0;
+
+        for (int i = 0; i < d_k; i++)
+          if (tmp[i] ^ datan[i])
+            err++;
+
+        if (err)
+          PRINTF("out_err: %i\n", err);
+
+        PRINTF("RS end: %i\n", d_index++);
+      }
+
+
+      inf1.close();
+      inf2.close();
     }
 
     reed_solomon::~reed_solomon()

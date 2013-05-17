@@ -62,11 +62,13 @@ namespace gr {
       int d_s;
       int d_blocks;
       unsigned char *d_syn;
+      int d_index;
 
       int gf_add(int a, int b);
       int gf_mul(int a, int b);
       int gf_div(int a, int b);
       int gf_exp(int a);
+      int gf_log(int a);
       int gf_pow(int a, int power);
       int gf_lpow(int power);
 

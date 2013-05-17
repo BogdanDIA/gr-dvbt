@@ -495,48 +495,6 @@ namespace gr {
     {
       gf_init(d_p, d_m, d_gfpoly);
       rs_init(d_p, d_n, d_k, d_t);
-
-      /************************************************/
-
-      unsigned char * datak = new unsigned char[d_k];
-      unsigned char * datan = new unsigned char[d_n];
-      unsigned char * datap = new unsigned char[d_n - d_k];
-      d_index = 0;
-
-      // Init datak
-
-      memset(&datak[0], 0, d_s);
-
-      std::ifstream inf1("/media/BCD/distors.bin", ios::in | ios::binary);
-      std::ifstream inf2("/media/BCD/din.bin", ios::in | ios::binary);
-      while (!inf1.eof())
-      {
-        PRINTF("RS begin\n");
-
-        memset(&datan[0], 0, d_s);
-        inf1.read((char *)&datan[d_s], d_n - d_s);
-
-        unsigned char tmp[d_n];
-        memset(&tmp[0], 0, d_s);
-        inf2.read((char *)&tmp[d_s], d_k - d_s); 
-
-        rs_decode(datan, NULL, 0);
-
-        int err = 0;
-
-        for (int i = 0; i < d_k; i++)
-          if (tmp[i] ^ datan[i])
-            err++;
-
-        if (err)
-          PRINTF("out_err: %i\n", err);
-
-        PRINTF("RS end: %i\n", d_index++);
-      }
-
-
-      inf1.close();
-      inf2.close();
     }
 
     reed_solomon::~reed_solomon()

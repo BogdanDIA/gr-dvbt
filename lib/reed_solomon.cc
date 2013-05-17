@@ -153,7 +153,7 @@ namespace gr {
       d_lambda = lambda, d_n = n; d_k = k; d_t = t;
       // 2t = n - k, dmin = 2t + 1 = n -k + 1
 
-      d_l = new unsigned char[d_n + 1]; // 2* d_t
+      d_l = new unsigned char[d_n + 1];
       if (d_l == NULL)
         return;
 
@@ -167,7 +167,7 @@ namespace gr {
       //Generate roots of lambda
       d_l[0] = 1;
 
-      for (int i = 1; i <= d_n; i++) // TODO - 2 *d_t
+      for (int i = 1; i <= d_n; i++)
         d_l[i] = gf_mul(d_l[i - 1], lambda);
 
       //Init Generator polynomial buffer

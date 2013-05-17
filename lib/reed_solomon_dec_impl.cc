@@ -89,24 +89,6 @@ namespace gr {
           // Then copy actual data
           memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
-#if 0
-          for (int j = 0; j < 8; j++)
-          {
-            unsigned char c = (unsigned char)rand();
-#define min(a, b) (a) < (b) ? (a) : (b)
-            c = min(c, d_n - d_s);
-            d_in[d_s + c] = 0;
-            printf("ccc: %i\n", c);
-          }
-#endif
-
-#if 0
-          int start = 134;
-
-          for (int j = (start - 1); j >= (start - 1 - 7); j--)
-            d_in[j] = 0;
-#endif
-
           d_rs.rs_decode(d_in, NULL, 0);
 
           memcpy(&out[i * out_bsize], &d_in[d_s], out_bsize);

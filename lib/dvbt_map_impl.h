@@ -75,21 +75,20 @@ namespace gr {
       ~dvbt_map_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
-
-	/*!
-	 * ETSI EN 300 744 Clause 4.3.5. \n
-         * Data input format: \n
-         * 000000Y0Y1 - QAM4 \n
-         * 0000Y0Y1Y2Y3 - QAM16 \n
-         * 00Y0Y1Y2Y3Y4Y5 - QAM64 \n
-         *
-         * Data output format: \n
-         * complex(real(float), imag(float)) \n
-         */
+      /*!
+        * ETSI EN 300 744 Clause 4.3.5. \n
+        * Data input format: \n
+        * 000000Y0Y1 - QAM4 \n
+        * 0000Y0Y1Y2Y3 - QAM16 \n
+        * 00Y0Y1Y2Y3Y4Y5 - QAM64 \n
+        *
+        * Data output format: \n
+        * complex(real(float), imag(float)) \n
+        */
       int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

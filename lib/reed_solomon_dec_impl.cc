@@ -65,7 +65,7 @@ namespace gr {
     void
     reed_solomon_dec_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        ninput_items_required[0] = noutput_items;
+      ninput_items_required[0] = noutput_items;
     }
 
     int
@@ -74,32 +74,32 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-        const unsigned char *in = (const unsigned char *) input_items[0];
-        unsigned char *out = (unsigned char *) output_items[0];
+      const unsigned char *in = (const unsigned char *) input_items[0];
+      unsigned char *out = (unsigned char *) output_items[0];
 
-        // We receive only nonzero data
-        int in_bsize = d_n - d_s;
-        int out_bsize = d_k - d_s;
+      // We receive only nonzero data
+      int in_bsize = d_n - d_s;
+      int out_bsize = d_k - d_s;
 
-        for (int i = 0; i < (d_blocks * noutput_items); i++)
-        {
-          //TODO - zero copy?
-          // Set first d_s symbols to zero
-          memset(&d_in[0], 0, d_s);
-          // Then copy actual data
-          memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
+      for (int i = 0; i < (d_blocks * noutput_items); i++)
+      {
+        //TODO - zero copy?
+        // Set first d_s symbols to zero
+        memset(&d_in[0], 0, d_s);
+        // Then copy actual data
+        memcpy(&d_in[d_s], &in[i * in_bsize], in_bsize);
 
-          d_rs.rs_decode(d_in, NULL, 0);
+        d_rs.rs_decode(d_in, NULL, 0);
 
-          memcpy(&out[i * out_bsize], &d_in[d_s], out_bsize);
-        }
+        memcpy(&out[i * out_bsize], &d_in[d_s], out_bsize);
+      }
 
-        // Tell runtime system how many input items we consumed on
-        // each input stream.
-        consume_each (noutput_items);
+      // Tell runtime system how many input items we consumed on
+      // each input stream.
+      consume_each (noutput_items);
 
-        // Tell runtime system how many output items we produced.
-        return noutput_items;
+      // Tell runtime system how many output items we produced.
+      return noutput_items;
     }
 
   } /* namespace dvbt */

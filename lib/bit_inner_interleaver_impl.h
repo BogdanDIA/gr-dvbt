@@ -59,32 +59,31 @@ namespace gr {
       ~bit_inner_interleaver_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
-
-	/*!
-	* ETSI EN 300 744 Clause 4.3.4.1 \n
-	* Data Input format Non-Hierarchical: \n
-	* 000000X0X1 - QPSK \n
-	* 0000X0X1X2X3 - QAM16 \n
-	* 00X0X1X2X3X4X5 - QAM64 \n
-	*
-	* Data Input format Hierarchical: \n
-	* 0000000X0 - H-QPSK \n
-	* 0000000X1 - L-QPSK \n
-	* 000000X0X1 - H-QAM16 \n
-	* 000000X0X1 - L-QAM16 \n
-	* 000000X0X1 - H-QAM64 \n
-	* 0000X0X1X2X3 - L-QAM64 \n
-	*
-	* Data Output format: \n
-	* 000000B0B1 - QPSK \n
-	* 0000B0B1B2B3 - QAM16 \n
-	* 00B0B1B2B3B4B5 - QAM64 \n
-	* bit interleaver block size is 126 \n
-	*/
+      /*!
+        * ETSI EN 300 744 Clause 4.3.4.1 \n
+        * Data Input format Non-Hierarchical: \n
+        * 000000X0X1 - QPSK \n
+        * 0000X0X1X2X3 - QAM16 \n
+        * 00X0X1X2X3X4X5 - QAM64 \n
+        *
+        * Data Input format Hierarchical: \n
+        * 0000000X0 - H-QPSK \n
+        * 0000000X1 - L-QPSK \n
+        * 000000X0X1 - H-QAM16 \n
+        * 000000X0X1 - L-QAM16 \n
+        * 000000X0X1 - H-QAM64 \n
+        * 0000X0X1X2X3 - L-QAM64 \n
+        *
+        * Data Output format: \n
+        * 000000B0B1 - QPSK \n
+        * 0000B0B1B2B3 - QAM16 \n
+        * 00B0B1B2B3B4B5 - QAM64 \n
+        * bit interleaver block size is 126 \n
+        */
       int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

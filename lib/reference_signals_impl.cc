@@ -136,7 +136,7 @@ namespace gr {
                                         d_symbol_index_known(0),
                                         d_frame_index(0),
                                         d_superframe_index(0),
-                                        d_freq_offset_max(30),
+                                        d_freq_offset_max(4),
                                         d_trigger_index(0),
                                         d_payload_index(0),
                                         d_chanestim_index(0),
@@ -542,102 +542,102 @@ namespace gr {
  
       for (int scount = 0; scount < 4; scount++)
       {
- 	d_spilot_index = 0; d_cpilot_index = 0;
+        d_spilot_index = 0; d_cpilot_index = 0;
       	d_chanestim_index = 0;
-
-	for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
-	{
-	  // Keep data for channel estimation
-	  if (k == get_current_spilot(scount))
-	  {
-	    set_chanestim_carrier(k);
-	    advance_spilot(scount); 
-	    advance_chanestim();
-	  }
-	}
-	//printf("d_chanestim_index: %i\n", d_chanestim_index);
-
-	sum = 0;
-	float s = 0;
-        for (int j = 0; j < (d_chanestim_index - 1); j++)
-        {
-	  known_phase = norm(get_spilot_value(d_chanestim_carriers[j + 1]) - get_spilot_value(d_chanestim_carriers[j]));
-          phase = norm(c * in[d_zeros_on_left + d_chanestim_carriers[j + 1] + d_freq_offset] - \
-			  c * in[d_zeros_on_left + d_chanestim_carriers[j] + d_freq_offset]);
-
-          sum += known_phase * phase;
-        }
-
-      	//printf("sum: %f, max: %f, scount: %i\n", sum, max, scount);
-        if (sum > max)
-        {
-          max = sum;
-          d_mod_symbol_index = scount;
-        }
-      }
-
-#if 1
-      //printf("sindex: %i, d_trigger_index: %i\n", sindex, d_trigger_index);
-
-      /*************************************************************/
-      // Keep data for channel estimator
-      // This method interpolates scattered measurements across one OFDM symbol
-      // It does not use measurements from the previous OFDM symnbols (does not use history)
-      // as it may have encountered a phase change for the current phase only
-      /*************************************************************/
-
-      d_spilot_index = 0; d_cpilot_index = 0;
-      d_chanestim_index = 0;
 
       for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
-	// Keep data for channel estimation
-	if (k == get_current_spilot(d_mod_symbol_index))
-	{
-	  set_chanestim_carrier(k);
-	  advance_spilot(d_mod_symbol_index); 
-	  advance_chanestim();
-	}
-
-	// Keep data for channel estimation
-	if (k == get_current_cpilot())
-	{
-	  set_chanestim_carrier(k);
-	  advance_cpilot();
-	  advance_chanestim();
-	}
-      }
- 
-      // We use both scattered pilots and continual pilots
-      for (int i = 0, startk = d_chanestim_carriers[0]; i < d_chanestim_index; i++)
-      {
-        // Get a carrier from the list of carriers
-        // used for channel estimation
-        int k = d_chanestim_carriers[i];
-
-        set_channel_gain(k, c * in[k + d_zeros_on_left + d_freq_offset]);
-
-        // Calculate tg(alpha) due to linear interpolation
-        gr_complex tg_alpha = (d_channel_gain[k] - d_channel_gain[startk]) / gr_complex(11.0, 0.0);
-
-        //printf("tg_alpha: re: %f, img: %f\n", tg_alpha.real(), tg_alpha.imag());
-
-        // Calculate interpolation for all intermediate values
-        for (int j = 1; j < (k - startk); j++)
+        // Keep data for channel estimation
+        if (k == get_current_spilot(scount))
         {
-          gr_complex current = d_channel_gain[startk] + tg_alpha * gr_complex(j, 0.0);
-          d_channel_gain[startk + j] = current;
-
-          //printf("currentgain[%i]: re: %f, img: %f\n", j, current.real(), current.imag());
-          //printf("d_symbol_index: %i, set_d_channel_gain[%i]: re: %f, img: %f\n", \
-            d_symbol_index, startk + j, d_channel_gain[startk + j].real(), d_channel_gain[startk + j].imag());
+          set_chanestim_carrier(k);
+          advance_spilot(scount); 
+          advance_chanestim();
         }
+      }
+	    //printf("d_chanestim_index: %i\n", d_chanestim_index);
 
-        startk = k;
+	    sum = 0;
+	    float s = 0;
+      for (int j = 0; j < (d_chanestim_index - 1); j++)
+      {
+        known_phase = norm(get_spilot_value(d_chanestim_carriers[j + 1]) - get_spilot_value(d_chanestim_carriers[j]));
+        phase = norm(c * in[d_zeros_on_left + d_chanestim_carriers[j + 1] + d_freq_offset] - \
+        c * in[d_zeros_on_left + d_chanestim_carriers[j] + d_freq_offset]);
+
+        sum += known_phase * phase;
       }
 
-      // Signal that equalizer is ready
-      d_equalizer_ready = 1;
+      //printf("sum: %f, max: %f, scount: %i\n", sum, max, scount);
+      if (sum > max)
+      {
+        max = sum;
+        d_mod_symbol_index = scount;
+      }
+    }
+
+#if 1
+    //printf("sindex: %i, d_trigger_index: %i\n", sindex, d_trigger_index);
+
+    /*************************************************************/
+    // Keep data for channel estimator
+    // This method interpolates scattered measurements across one OFDM symbol
+    // It does not use measurements from the previous OFDM symnbols (does not use history)
+    // as it may have encountered a phase change for the current phase only
+    /*************************************************************/
+
+    d_spilot_index = 0; d_cpilot_index = 0;
+    d_chanestim_index = 0;
+
+    for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+    {
+      // Keep data for channel estimation
+	    if (k == get_current_spilot(d_mod_symbol_index))
+	    {
+	      set_chanestim_carrier(k);
+	      advance_spilot(d_mod_symbol_index); 
+	      advance_chanestim();
+	    }
+
+	    // Keep data for channel estimation
+	    if (k == get_current_cpilot())
+	    {
+	      set_chanestim_carrier(k);
+	      advance_cpilot();
+	      advance_chanestim();
+	    }
+    }
+ 
+    // We use both scattered pilots and continual pilots
+    for (int i = 0, startk = d_chanestim_carriers[0]; i < d_chanestim_index; i++)
+    {
+      // Get a carrier from the list of carriers
+      // used for channel estimation
+      int k = d_chanestim_carriers[i];
+
+      set_channel_gain(k, c * in[k + d_zeros_on_left + d_freq_offset]);
+
+      // Calculate tg(alpha) due to linear interpolation
+      gr_complex tg_alpha = (d_channel_gain[k] - d_channel_gain[startk]) / gr_complex(11.0, 0.0);
+
+      //printf("tg_alpha: re: %f, img: %f\n", tg_alpha.real(), tg_alpha.imag());
+
+      // Calculate interpolation for all intermediate values
+      for (int j = 1; j < (k - startk); j++)
+      {
+        gr_complex current = d_channel_gain[startk] + tg_alpha * gr_complex(j, 0.0);
+        d_channel_gain[startk + j] = current;
+
+        //printf("currentgain[%i]: re: %f, img: %f\n", j, current.real(), current.imag());
+        //printf("d_symbol_index: %i, set_d_channel_gain[%i]: re: %f, img: %f\n", \
+          d_symbol_index, startk + j, d_channel_gain[startk + j].real(), d_channel_gain[startk + j].imag());
+      }
+
+      startk = k;
+    }
+
+    // Signal that equalizer is ready
+    d_equalizer_ready = 1;
 
 #else
       /*************************************************************/
@@ -661,15 +661,15 @@ namespace gr {
 
       // Wait for at least 4 symbols to have an estimation on each third carrier
       if (d_symbol_index < 4)
-	return 1;
+	      return 1;
       
       // Suppose we have a pilot each third carrier.
       for (int i = 0; i < (d_Kmax - d_Kmin + 1 - 3); i += 3)
       {
-	d_channel_gain[i + 1] = 
-	  (gr_complex(2.0, 0.0) * d_channel_gain[i] + d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
-	d_channel_gain[i + 2] = 
-	  (d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
+        d_channel_gain[i + 1] = 
+	        (gr_complex(2.0, 0.0) * d_channel_gain[i] + d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
+	      d_channel_gain[i + 2] = 
+	        (d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
       }
 
       // Signal that equalizer is ready
@@ -915,9 +915,9 @@ namespace gr {
 	  end_frame = 0;
         }
 
-        for (int i = 0; i < d_symbols_per_frame; i++)
-          printf("%i", d_rcv_tps_data[i]);
-        printf("\n");
+        //for (int i = 0; i < d_symbols_per_frame; i++)
+          //printf("%i", d_rcv_tps_data[i]);
+        //printf("\n");
 
         // Clear up FIFO
         for (int i = 0; i < d_symbols_per_frame; i++)
@@ -941,9 +941,9 @@ namespace gr {
 	  end_frame = 0;
         }
 
-	for (int i = 0; i < d_symbols_per_frame; i++)
-          printf("%i", d_rcv_tps_data[i]);
-	printf("\n");
+	//for (int i = 0; i < d_symbols_per_frame; i++)
+          //printf("%i", d_rcv_tps_data[i]);
+	//printf("\n");
 
 	// Clear up FIFO
         for (int i = 0; i < d_symbols_per_frame; i++)
@@ -1120,8 +1120,8 @@ namespace gr {
       // If this block does not have a trigger then we just exit
       if (trigger_in[0] != 1)
       {
-	trigger_out[0] = 0;
-	// noutput_items would be 0 in this case
+        trigger_out[0] = 0;
+	      // noutput_items would be 0 in this case
         return 0;
       }
       else
@@ -1149,7 +1149,7 @@ namespace gr {
       d_symbol_index = (d_symbol_index + diff_symbol_index) % d_symbols_per_frame;
       // Trigger for the beginning of a frame
       if (d_symbol_index == 0)
-	trigger_out[0] = 1;
+	      trigger_out[0] = 1;
 
       // Process TPS data
       // If a frame is recognized then signal end of frame
@@ -1157,7 +1157,7 @@ namespace gr {
 
       // We are just at the end of a frame
       if (frame_end)
-	d_symbol_index = d_symbols_per_frame - 1;
+	      d_symbol_index = d_symbols_per_frame - 1;
  
       // Process payload data with correct symbol index
       process_payload_data(in, out);

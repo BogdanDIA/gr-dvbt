@@ -34,7 +34,7 @@ namespace gr {
     class reed_solomon
     {
     /*!
-     * \brief Reed Solomon encoder.
+     * \brief Reed Solomon encoder/decoder.
      * \ingroup dvbt
      * \param p characteristic of GF(p^m) \n
      * \param m we use GF(p^m) \n
@@ -45,7 +45,6 @@ namespace gr {
      * \param s shortened length \n
      * \param blocks number of blocks to process at once\n
      */
-
     private:
       int d_lambda;
       int d_gfpoly;
@@ -82,7 +81,7 @@ namespace gr {
        * ETSI EN 300 744 Clause 4.3.2 \n
        * RS(N=204,K=239,T=8)
        */
-      int rs_encode(const unsigned char *data, unsigned char *parity);
+      int rs_encode(unsigned char *data, unsigned char *parity);
       int rs_decode(unsigned char *data, unsigned char *eras, const int no_eras);
 
       reed_solomon(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks);

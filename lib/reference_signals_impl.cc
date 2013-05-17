@@ -149,6 +149,7 @@ namespace gr {
       d_fft_length = config.d_fft_length;
       d_payload_length = config.d_payload_length;
       d_zeros_on_left = config.d_zeros_on_left;
+      d_zeros_on_right = config.d_zeros_on_right;
       d_cp_length = config.d_cp_length;
 
       printf("d_Kmin: %i\n", d_Kmin);
@@ -156,6 +157,7 @@ namespace gr {
       printf("d_fft_length: %i\n", d_fft_length);
       printf("d_payload_length_length: %i\n", d_payload_length);
       printf("d_zeros_on_left: %i\n", d_zeros_on_left);
+      printf("d_zeros_on_right: %i\n", d_zeros_on_right);
       printf("d_cp_length: %i\n", d_cp_length);
 
       //Set-up pilot data depending on transmission mode
@@ -1064,34 +1066,39 @@ namespace gr {
       payload_count = 0;
       d_spilot_index = 0; d_cpilot_index = 0; d_tpilot_index = 0;
 
+      for (int i = 0; i < d_zeros_on_left; i++)
+        out[i] = gr_complex(0.0, 0.0);
+
       //process one block - one symbol
-      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+      for (int k = d_Kmin; k < (d_Kmax - d_Kmin + 1); k++)
       {
           is_payload = 1;
           if (k == get_current_spilot(d_symbol_index))
           {
-            out[k] = get_spilot_value(k);
+            out[d_zeros_on_left + k] = get_spilot_value(k);
             advance_spilot(d_symbol_index);
             is_payload = 0;
           }
 
           if (k == get_current_cpilot())
           {
-            out[k] = get_cpilot_value(k);
+            out[d_zeros_on_left + k] = get_cpilot_value(k);
             advance_cpilot();
             is_payload = 0;
           }
 
           if (k == get_current_tpilot())
           {
-            out[k] = get_tpilot_value(k);
+            out[d_zeros_on_left + k] = get_tpilot_value(k);
             advance_tpilot();
             is_payload = 0;
           } 
 
           if (is_payload == 1)
-            out[k] = in[payload_count++];
+            out[d_zeros_on_left + k] = in[payload_count++];
       }
+      printf("\n");
+
       // update indexes
       if (++d_symbol_index == d_symbols_per_frame)
       {
@@ -1102,6 +1109,12 @@ namespace gr {
           d_superframe_index++;
         }
       }
+
+      for (int i = (d_fft_length - d_zeros_on_right); i < d_fft_length; i++)
+        out[i] = gr_complex(0.0, 0.0);
+
+      //for (int i = 0; i < d_fft_length; i++)
+          //printf("out[%i]: %f, %f \n", i, out[i].real(), out[i].imag());
     }
 
     int
@@ -1247,7 +1260,6 @@ namespace gr {
             d_pg.update_output(&in[i * d_ninput], &out[i * d_noutput]);
         }
 
-        // Do <+signal processing+>
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (noutput_items);

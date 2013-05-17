@@ -106,6 +106,7 @@ namespace gr {
       int d_fft_length;
       int d_payload_length;
       int d_zeros_on_left;
+      int d_zeros_on_right;
       int d_cp_length;
 
       //Constelaltion parameters

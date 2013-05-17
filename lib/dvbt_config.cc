@@ -121,6 +121,7 @@ namespace gr {
 	  break;
       }
       d_zeros_on_left = int(ceil((d_fft_length - (d_Kmax - d_Kmin + 1)) / 2.0));
+      d_zeros_on_right = d_fft_length - d_zeros_on_left - (d_Kmax - d_Kmin + 1);
 
       switch (d_constellation)
       {

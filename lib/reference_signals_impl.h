@@ -56,6 +56,7 @@ class pilot_gen {
     int d_fft_length;
     int d_payload_length;
     int d_zeros_on_left;
+    int d_zeros_on_right;
     int d_cp_length;
 
     static const int d_symbols_per_frame;

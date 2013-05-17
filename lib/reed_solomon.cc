@@ -507,24 +507,12 @@ namespace gr {
 
       memset(&datak[0], 0, d_s);
 
-      //std::ifstream inf("/home/bogdan/din.bin", ios::in | ios::binary);
-      std::ifstream inf1("/home/bogdan/distors.bin", ios::in | ios::binary);
-      std::ifstream inf2("/home/bogdan/din.bin", ios::in | ios::binary);
+      std::ifstream inf1("/media/BCD/distors.bin", ios::in | ios::binary);
+      std::ifstream inf2("/media/BCD/din.bin", ios::in | ios::binary);
       while (!inf1.eof())
       {
         PRINTF("RS begin\n");
-#if 0
-        inf.read((char *)&datak[d_s], d_k - d_s);
 
-        //for (int i = 0; i < d_k; i++)
-          //printf("datak[%i]: %i\n", i, datak[i]);
-
-        rs_encode(datak, datap);
-
-        // Format data for decoder
-        memcpy(&datan[0], &datak[0], d_k);
-        memcpy(&datan[d_k], &datap[0], d_n - d_k);
-#endif
         memset(&datan[0], 0, d_s);
         inf1.read((char *)&datan[d_s], d_n - d_s);
 

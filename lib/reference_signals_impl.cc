@@ -1097,7 +1097,6 @@ namespace gr {
           if (is_payload == 1)
             out[d_zeros_on_left + k] = in[payload_count++];
       }
-      printf("\n");
 
       // update indexes
       if (++d_symbol_index == d_symbols_per_frame)
@@ -1113,8 +1112,6 @@ namespace gr {
       for (int i = (d_fft_length - d_zeros_on_right); i < d_fft_length; i++)
         out[i] = gr_complex(0.0, 0.0);
 
-      //for (int i = 0; i < d_fft_length; i++)
-          //printf("out[%i]: %f, %f \n", i, out[i].real(), out[i].imag());
     }
 
     int

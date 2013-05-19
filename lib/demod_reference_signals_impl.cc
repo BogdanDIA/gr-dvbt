@@ -50,7 +50,7 @@ namespace gr {
           dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id)
       : gr_block("demod_reference_signals",
           gr_make_io_signature2(2, 2, itemsize * ninput, ninput),
-		      gr_make_io_signature2(2, 2, itemsize * noutput, noutput)),
+		      gr_make_io_signature2(2, 2, itemsize * noutput, noutput)), // TODO trigger is char based stream!
 		      config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
             guard_interval, transmission_mode, include_cell_id, cell_id),
           d_ninput(ninput), d_noutput(noutput),

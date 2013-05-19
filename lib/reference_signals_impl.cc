@@ -732,7 +732,9 @@ namespace gr {
       }
 
       d_freq_offset = start - d_zeros_on_left;
-      PRINTF("d_freq_offset: %i\n", d_freq_offset);
+
+      if (d_freq_offset)
+      	printf("d_freq_offset: %i\n", d_freq_offset);
     }
     
     // TODO - return d_freq_offset and c

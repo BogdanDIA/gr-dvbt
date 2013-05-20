@@ -4,35 +4,75 @@
   <key>dvbt_ofdm_sym_acquisition</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <make>dvbt.ofdm_sym_acquisition(blocks, fft_length, occupied_tones, cp_length, snr)</make>
-  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
-       Sub-nodes:
-       * name
-       * key (makes the value accessible as $keyname, e.g. in the make node)
-       * type -->
-  <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
-  </param>
-
-  <!-- Make one 'sink' node per input. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
-  <sink>
-    <name>in</name>
-    <type><!-- e.g. int, real, complex, byte, short, xxx_vector, ...--></type>
-  </sink>
-
-  <!-- Make one 'source' node per output. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
+  <make>dvbt.ofdm_sym_acquisition(1, $fft_length, $occupied_tones, $cp_length, $snr)</make>
+	<param>
+		<name>Output Type</name>
+		<key>type</key>
+		<value>float</value>
+		<type>enum</type>
+		<option>
+			<name>Complex</name>
+			<key>complex</key>
+			<opt>fcn:c</opt>
+		</option>
+		<option>
+			<name>Float</name>
+			<key>float</key>
+			<opt>fcn:f</opt>
+		</option>
+		<option>
+			<name>Int</name>
+			<key>int</key>
+			<opt>fcn:i</opt>
+		</option>
+		<option>
+			<name>Short</name>
+			<key>short</key>
+			<opt>fcn:s</opt>
+		</option>
+		<option>
+			<name>Byte</name>
+			<key>byte</key>
+			<opt>fcn:b</opt>
+		</option>
+	</param>
+	<param>
+		<name>FFT Length</name>
+		<key>fft_length</key>
+    <value>2048</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>Occupied Tones</name>
+		<key>occupied_tones</key>
+		<value>1705</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>Cyclic Prefix Length</name>
+		<key>cp_length</key>
+		<value>64</value>
+		<type>int</type>
+	</param>
+	<param>
+		<name>SNR</name>
+		<key>snr</key>
+		<value>10</value>
+		<type>real</type>
+	</param>
+	<sink>
+		<name>in</name>
+		<type>complex</type>
+	</sink>
+	<source>
+		<name>out</name>
+		<type>$type</type>
+    <vlen>$fft_length</vlen>
+	</source>
   <source>
-    <name>out</name>
-    <type><!-- e.g. int, real, complex, byte, short, xxx_vector, ...--></type>
-  </source>
+		<name>sync</name>
+		<type>byte</type>
+    <vlen>$fft_length</vlen>
+	</source>
+	<doc>Payload Length: 0 for automatic.</doc>
 </block>

@@ -29,8 +29,29 @@ namespace gr {
     class ofdm_sym_acquisition_impl : public ofdm_sym_acquisition
     {
     private:
-      // Nothing to declare in this block.
+      int d_blocks;
+      int d_fft_length;
+      int d_cp_length;
+      float d_snr;
+      float d_rho;
 
+      int d_index;
+
+      int d_search_max;
+
+      gr_complex * d_gamma;
+      float * d_lambda;
+      float * d_arg;
+
+      // For peak detector
+      float d_threshold_factor_rise;
+      float d_threshold_factor_fall;
+      float d_avg_alpha;
+      float d_avg;
+      
+      int peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha);
+      
+      int peak_detect_process(float * datain, int datain_length, unsigned char * peak_pos, int &peak_pos_length);
     public:
       ofdm_sym_acquisition_impl(int blocks, int fft_length, int occupied_tones, int cp_length, float snr);
       ~ofdm_sym_acquisition_impl();

@@ -34,5 +34,6 @@ install(FILES
     dvbt_bit_inner_deinterlever.xml
     dvbt_convolutional_deinterleaver.xml
     dvbt_energy_descramble.xml
-    dvbt_reed_solomon_dec.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt_reed_solomon_dec.xml
+    dvbt_ofdm_sym_acquisition.xml DESTINATION share/gnuradio/grc/blocks
 )

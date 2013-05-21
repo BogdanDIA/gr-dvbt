@@ -35,17 +35,18 @@ namespace gr {
     int ofdm_sym_acquisition_impl::peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha)
     {
       d_avg_alpha = alpha;
+      d_threshold_factor_rise = threshold_factor_rise;
+      d_threshold_factor_fall = threshold_factor_fall;
       d_avg = 0;
 
       return (0);
     }
 
-    int ofdm_sym_acquisition_impl::peak_detect_process(float * datain, int datain_length, unsigned char * peak_pos, int &peak_pos_length)
+    int ofdm_sym_acquisition_impl::peak_detect_process(const float * datain, const int datain_length, int * peak_pos)
     {
       int state = 0;
-      float peak_val = -(float)INFINITY; int peak_ind = 0;
+      float peak_val = -(float)INFINITY; int peak_index = 0; int peak_pos_length = 0;
 
-      peak_pos_length = 0;
       int i = 0;
 
       while(i < datain_length)
@@ -54,11 +55,13 @@ namespace gr {
         {
           if (datain[i] > d_avg * d_threshold_factor_rise)
           {
+            //printf("state 0, rise: datain: %f, d_avg: %f, d_threshold_factor_rise: %f\n", datain[i], d_avg, d_threshold_factor_rise);
             state = 1;
           }
           else
           {
             d_avg = d_avg_alpha * datain[i] + (1 - d_avg_alpha) * d_avg;
+            //printf("state 0: %i, avg: %f\n", i, d_avg);
             i++;
           }
         } 
@@ -67,18 +70,22 @@ namespace gr {
           if (datain[i] > peak_val)
           {
             peak_val = datain[i];
-            peak_ind = i;
+            peak_index = i;
+            //printf("state 1, index: %i, peak_val: %f, peak_index: %i, avg: %f, dtain: %f\n", i, peak_val, peak_index, d_avg, datain[i]);
             d_avg = d_avg_alpha * datain[i] + (1 - d_avg_alpha) * d_avg;
             i++;
           }
           else if (datain[i] > d_avg * d_threshold_factor_fall)
           {
+            //printf("state 1, fall: %i, avg: %f, datain: %f\n", i, d_avg, datain[i]);
             d_avg = (d_avg_alpha) * datain[i] + (1 - d_avg_alpha) * d_avg;
             i++;
           }
           else
           {
-            peak_pos[peak_pos_length++] = peak_ind;
+            peak_pos[peak_pos_length] = peak_index;
+            //printf("state 1, finish: %i, peak_pos[%i]: %i\n", i, peak_pos_length, peak_pos[peak_pos_length]);
+            peak_pos_length++;
             state = 0;
             peak_val = - (float)INFINITY;
           }
@@ -115,7 +122,7 @@ namespace gr {
       printf("blocks: %i\n", blocks);
       printf("fft_length: %i\n", fft_length);
       printf("occupied_tones: %i\n", occupied_tones);
-      printf("snr: %f\n", snr);
+      printf("SNR: %f\n", d_snr);
 
       d_gamma = new gr_complex[d_search_max];
       if (d_gamma == NULL)
@@ -128,6 +135,8 @@ namespace gr {
       peak_detect_init(0.2, 0.25, 30, 0.0005);
 
       d_index = 0;
+      d_phase = 0.0;
+      d_phaseinc = 0.0;
     }
 
     /*
@@ -159,18 +168,27 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
-        printf("ninput_items: %i\n", ninput_items[0]);
-        printf("noutput_items: %i\n", noutput_items);
+        gr_complex d_derot[d_cp_length + 2 * d_fft_length];
 
         // Array to store peak positions
-        unsigned char peak_pos[d_search_max];
+        int peak_pos[2048];
         int to_consume = 0;
+
+            int addr1 = (d_index) * 8 * 2112;
+            printf("work: index: %i, addr1: %x, %x, %x, %x, %x\n", d_index, addr1, \
+                ((char *)in)[0], ((char *)in)[1], ((char *)in)[2], ((char *)in)[3]);
+
+            int addr2 = (d_index) * 8 * 2112 + 8 * 2048;
+            printf("work: index: %i, addr2: %x, %x, %x, %x, %x\n", d_index, addr2, \
+                ((char *)in)[8 * 2048], ((char *)in)[1 + 8 * 2048], \
+                ((char *)in)[2 + 8 * 2048], ((char *)in)[3 + 8 * 2048]);
+
+            d_index++;
 
         {
           for (int i = 0; i < (d_fft_length); i++)
           {
             float phi = 0.0;
-
             d_gamma[i] = 0;
 
             // Moving sum for calculating gamma and phi
@@ -186,59 +204,103 @@ namespace gr {
               phi += std::norm(c1) + std::norm(c2);
             }
 
+            //printf("phi: %f\n", 1000000 * phi * d_rho / 2);
+
             // Keep angle for later
             // Calculate arg(gamma - rho*phi)
-            d_lambda[i] = abs(d_gamma[i]) - (phi * d_rho / 2.0);
+            d_lambda[i] = std::abs(d_gamma[i]) - (phi * d_rho / 2.0);
 
             //printf("gamma[%i]: %f, %f\n", i, d_gamma[i].real(), d_gamma[i].imag());
             //printf("in[%i]: %f, %f\n", i, in[i].real(), in[i].imag());
-            printf("lambda[%i]: %f\n", i, d_lambda[i]);
+            //printf("lambda[%i]: %f\n", i, 1000000 * d_lambda[i]);
           }
 
-          int peak_length = 0;
-
           // Find peaks of lambda
-          peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0], peak_length);
-
+          int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
           if (peak_length)
           {
+            trigger[0] = 1;
+
             for (int i = 0; i < peak_length; i++)
-              printf("peak[%i]: %i\n", i, i);
+              printf("peak_pos[%i]: %i\n", i, peak_pos[i]);
 
             // Calculate frequency correction
-            float peak_epsilon = (- 1.0 / M_2_PI) * std::arg(d_gamma[peak_pos[0]]);
-            printf("angle: %f\n", peak_epsilon);
+            float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
 
-            trigger[0] = 1;
+            printf("angle: %f\n", peak_epsilon);
+            printf("phaseinc: %f\n", d_phaseinc);
 
             // We found a CP starting at peak_pos[0]
             // Copy symbol data after CP
-            for (int i = 0; i < d_fft_length; i++)
-              out[i] = /*gr_expj(peak_epsilon * 2 * M_2_PI * i / (float)d_fft_length) */ in[i + d_cp_length + peak_pos[0]];
+            
+            // Increment phase for peak_pos[0] + cp_length
+            for (int i = 0; i < (peak_pos[0] - 1); i++)
+            {
+              d_phase += d_phaseinc;
+#if 0
+              while (d_phase > (float)M_PI)
+                d_phase -= (float)M_2_PI;
+              while (d_phase < (float)(-M_PI))
+                d_phase += (float)M_2_PI;
+#endif
+            }
 
-            // Then we consumed fft+cp length 
-            //to_consume += d_fft_length + d_cp_length;
+            d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
+
+            for (int i = 0; i < (d_cp_length); i++)
+            {
+              d_phase += d_phaseinc;
+#if 0
+              while (d_phase > (float)M_PI)
+                d_phase -= (float)M_2_PI;
+              while (d_phase < (float)(-M_PI))
+                d_phase += (float)M_2_PI;
+#endif
+            }
+
+            // Derotate the fft_length
+            for (int i = 0; i < d_fft_length; i++)
+            {
+              // Derotate the signal
+              // We are interested only in fft_length
+              d_phase += d_phaseinc;
+
+              while (d_phase > (float)M_PI)
+                d_phase -= (float)M_2_PI;
+              while (d_phase < (float)(-M_PI))
+                d_phase += (float)M_2_PI;
+
+              out[i] = gr_expj(d_phase) * in[peak_pos[0] - 1 + d_cp_length + i];
+            }
+
+            // Then we consumed peak_pos+cp_len
+            to_consume = peak_pos[0] + d_cp_length + d_fft_length;
           }
           else
           {
             printf("miss\n");
-            //to_consume += d_fft_length;
+
+            trigger[0] = 0;
+            to_consume = d_fft_length;
+
+            for (int i = 0; i < d_fft_length; i++)
+            {
+              // Set the phase for next symbol
+              d_phase += d_phaseinc; 
+
+              while (d_phase > (float)M_PI)
+                d_phase -= (float)M_2_PI;
+              while (d_phase < (float)(-M_PI))
+                d_phase += (float)M_2_PI;
+
+              // Set the output to zero
+              out[i] = gr_complex(0.0, 0.0);
+            }
           }
-
-          int addr1 = (d_index) * 8 * 2112;
-          printf("work: index: %i, addr1: %x, %x, %x, %x, %x\n", d_index, addr1, \
-              ((char *)in)[0], ((char *)in)[1], ((char *)in)[2], ((char *)in)[3]);
-
-          int addr2 = (d_index) * 8 * 2112 + 8 * 2048;
-          printf("work: index: %i, addr2: %x, %x, %x, %x, %x\n", d_index, addr2, \
-              ((char *)in)[8 * 2048], ((char *)in)[1 + 8 * 2048], \
-              ((char *)in)[2 + 8 * 2048], ((char *)in)[3 + 8 * 2048]);
-
-          d_index++;
         }
 
-        to_consume =  d_fft_length + d_cp_length;
-
+        printf("ninput_items: %i\n", ninput_items[0]);
+        printf("noutput_items: %i\n", noutput_items);
         printf("to_consume: %i\n", to_consume);
 
         // Tell runtime system how many input items we consumed on

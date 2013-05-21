@@ -48,10 +48,12 @@ namespace gr {
       float d_threshold_factor_fall;
       float d_avg_alpha;
       float d_avg;
+      float d_phase;
+      float d_phaseinc;
       
       int peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha);
       
-      int peak_detect_process(float * datain, int datain_length, unsigned char * peak_pos, int &peak_pos_length);
+      int peak_detect_process(const float * datain, const int datain_length, int * peak_pos);
     public:
       ofdm_sym_acquisition_impl(int blocks, int fft_length, int occupied_tones, int cp_length, float snr);
       ~ofdm_sym_acquisition_impl();

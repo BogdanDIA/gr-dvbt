@@ -212,7 +212,7 @@ namespace gr {
 
             //printf("gamma[%i]: %f, %f\n", i, d_gamma[i].real(), d_gamma[i].imag());
             //printf("in[%i]: %f, %f\n", i, in[i].real(), in[i].imag());
-            //printf("lambda[%i]: %f\n", i, 1000000 * d_lambda[i]);
+            printf("lambda[%i]: %f\n", i, 1000000 * d_lambda[i]);
           }
 
           // Find peaks of lambda
@@ -233,32 +233,17 @@ namespace gr {
             // We found a CP starting at peak_pos[0]
             // Copy symbol data after CP
             
-            // Increment phase for peak_pos[0] + cp_length
-            for (int i = 0; i < (peak_pos[0] - 1); i++)
-            {
-              d_phase += d_phaseinc;
-#if 0
-              while (d_phase > (float)M_PI)
-                d_phase -= (float)M_2_PI;
-              while (d_phase < (float)(-M_PI))
-                d_phase += (float)M_2_PI;
-#endif
-            }
-
+            // Increment phase for data before CP
+            d_phase += (float)d_phaseinc * (float)peak_pos[0];
+            // Calculate new phase increment (it aplies for the cp and fft lengths
             d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
+            // Increment phase for CP
+            d_phase += (float)d_phaseinc * (float)peak_pos[0];
+            // Increment the phase for the rest of data (cp_len + fft_len)
+            // We'll use this to update the final phase
+            int copy_phase = (float)d_phaseinc * (float)(d_fft_length - peak_pos[0]);
 
-            for (int i = 0; i < (d_cp_length); i++)
-            {
-              d_phase += d_phaseinc;
-#if 0
-              while (d_phase > (float)M_PI)
-                d_phase -= (float)M_2_PI;
-              while (d_phase < (float)(-M_PI))
-                d_phase += (float)M_2_PI;
-#endif
-            }
-
-            // Derotate the fft_length
+            // Derotate the data of size fft_length
             for (int i = 0; i < d_fft_length; i++)
             {
               // Derotate the signal
@@ -270,11 +255,12 @@ namespace gr {
               while (d_phase < (float)(-M_PI))
                 d_phase += (float)M_2_PI;
 
-              out[i] = gr_expj(d_phase) * in[peak_pos[0] - 1 + d_cp_length + i];
+              out[i] = gr_expj(d_phase) * in[peak_pos[0] + d_cp_length + i];
             }
 
-            // Then we consumed peak_pos+cp_len
-            to_consume = peak_pos[0] + d_cp_length + d_fft_length;
+            // Then we consumed peak_pos[0]+cp_len
+            to_consume = d_cp_length + d_fft_length;
+            d_phase = copy_phase;
           }
           else
           {

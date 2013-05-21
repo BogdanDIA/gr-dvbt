@@ -154,6 +154,11 @@ namespace gr {
         ninput_items_required[i] = (2 * d_fft_length + d_cp_length) * noutput_items;
     }
 
+    /*
+     * ML Estimation of Time and Frequency Offset in OFDM systems
+     * Jan-Jaap van de Beck
+     */
+
     int
     ofdm_sym_acquisition_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -168,6 +173,9 @@ namespace gr {
         int peak_pos[d_fft_length];
         int to_consume = 0;
 
+        /********************************************************/
+        // Calculate time delay and frequency correction
+        // This looks like spgetti code but it is fast
         for (int i = 0; i < (d_fft_length); i++)
         {
           float phi = 0.0;
@@ -186,33 +194,21 @@ namespace gr {
             phi += std::norm(c1) + std::norm(c2);
           }
 
-          //printf("phi: %f\n", 1000000 * phi * d_rho / 2);
-
           // Keep angle for later
           // Calculate arg(gamma - rho*phi)
           d_lambda[i] = std::abs(d_gamma[i]) - (phi * d_rho / 2.0);
-
-          //printf("gamma[%i]: %f, %f\n", i, d_gamma[i].real(), d_gamma[i].imag());
-          //printf("in[%i]: %f, %f\n", i, in[i].real(), in[i].imag());
-          //printf("lambda[%i]: %f\n", i, 1000000 * d_lambda[i]);
         }
 
         // Find peaks of lambda
         int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
 
+        // We found a CP starting at peak_pos[0]
         if (peak_length)
         {
-          // We found a CP starting at peak_pos[0]
           trigger[0] = 1;
-
-          //for (int i = 0; i < peak_length; i++)
-            //printf("peak_pos[%i]: %i\n", i, peak_pos[i]);
 
           // Calculate frequency correction
           float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
-
-          //printf("angle: %f\n", peak_epsilon);
-          //printf("phaseinc: %f\n", d_phaseinc);
 
           // Increment phase for data before CP
           d_phase += (float)d_phaseinc * (float)peak_pos[0];
@@ -241,12 +237,11 @@ namespace gr {
           // We'll consume cp_length+fft_length
           to_consume = d_cp_length + d_fft_length;
           // Even though we copied the fft data we consume only cp_length+fft_length
+          // So restore the phase corresponding to this block
           d_phase = copy_phase;
         }
         else
         {
-          printf("miss\n");
-
           trigger[0] = 0;
           to_consume = d_fft_length;
 
@@ -266,16 +261,12 @@ namespace gr {
           }
         }
 
-        //printf("ninput_items: %i\n", ninput_items[0]);
-        //printf("noutput_items: %i\n", noutput_items);
-        //printf("to_consume: %i\n", to_consume);
-
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each(to_consume);
 
         // Tell runtime system how many output items we produced.
-        return (1); //noutput_items
+        return (1);
     }
 
   } /* namespace dvbt */

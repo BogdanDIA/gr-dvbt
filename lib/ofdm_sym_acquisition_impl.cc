@@ -211,14 +211,15 @@ namespace gr {
           float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
 
           // Increment phase for data before CP
-          d_phase += (float)d_phaseinc * (float)peak_pos[0];
+          d_phase += d_phaseinc * (float)peak_pos[0];
           // Calculate new phase increment (it aplies for the cp and fft lengths)
+          // This emulates sample and hold
           d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
           // Increment phase for CP
-          d_phase += (float)d_phaseinc * (float)peak_pos[0];
+          d_phase += d_phaseinc * (float)peak_pos[0];
           // Increment the phase for the rest of data
           // We'll use this to update the final phase
-          int copy_phase = d_phase + (float)d_phaseinc * (float)(d_fft_length - peak_pos[0]);
+          int copy_phase = d_phase + d_phaseinc * (float)(d_fft_length - peak_pos[0]);
 
           // Derotate the data of size fft_length
           for (int i = 0; i < d_fft_length; i++)

@@ -96,6 +96,123 @@ namespace gr {
       return (peak_pos_length);
     }
 
+    int
+    ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume)
+    {
+      // Array to store peak positions
+      int peak_pos[d_fft_length];
+      float d_phi[d_fft_length];
+
+      gr_complex d_conj[2*d_fft_length + d_cp_length];
+      float d_norm[2*d_fft_length + d_cp_length];
+      gr_complex d_gm[2*d_fft_length + d_cp_length];
+
+      // Calculate norm
+      if(is_unaligned())
+        volk_32fc_magnitude_squared_32f_u(d_norm, in, 2*d_fft_length + d_cp_length);
+      else
+        volk_32fc_magnitude_squared_32f_a(d_norm, in, 2*d_fft_length + d_cp_length);
+      
+      // Calculate gamma on each point
+      if (is_unaligned())
+        volk_32fc_x2_multiply_conjugate_32fc_u(d_gm, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
+      else
+        volk_32fc_x2_multiply_conjugate_32fc_a(d_gm, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
+
+      /********************************************************/
+      // Calculate time delay and frequency correction
+      // This looks like spagetti code but it is fast
+      for (int i = 0; i < (d_fft_length); i++)
+      {
+        d_phi[i] = 0.0;
+        d_gamma[i] = 0.0;
+
+        // Moving sum for calculating gamma and phi
+        for (int j = 0; j < d_cp_length; j++)
+        {
+          // Calculate gamma and store it
+          d_gamma[i] += d_gm[i + j];
+          // Calculate phi and store it
+          d_phi[i] += d_norm[i + j] + d_norm[i + j + d_fft_length];
+        }
+      }
+
+      // Calculate lambda
+      if (is_unaligned())  
+        volk_32fc_magnitude_32f_a(d_lambda, d_gamma, d_fft_length);
+      else
+        volk_32fc_magnitude_32f_u(d_lambda, d_gamma, d_fft_length);
+
+      // TODO - do this with VOLK
+      for (int i = 0; i < d_fft_length; i++)
+        d_lambda[i] -= (d_phi[i] * d_rho / 2.0);
+
+      // Find peaks of lambda
+      int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
+
+      // We found a CP starting at peak_pos[0]
+      if (peak_length)
+      {
+        *cp_pos = peak_pos[0];
+
+        // Calculate frequency correction
+        float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
+
+        // Increment phase for data before CP
+        //d_phase += d_phaseinc * (float)peak_pos[0];
+        for (int i = 0; i < peak_pos[0]; i++)
+          d_phase += d_phaseinc;
+
+        // Calculate new phase increment (it aplies for the cp and fft lengths)
+        // This emulates sample and hold
+        d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
+        // Increment phase for CP
+        //d_phase += d_phaseinc * (float)d_cp_length;
+
+        for (int i = 0; i < d_cp_length; i++)
+          d_phase += d_phaseinc;
+
+        // Keep phase for returning
+        //float end_phase = (float)d_phase + (float)d_phaseinc * (float)(d_fft_length - peak_pos[0]);
+        float end_phase = 0;
+        for (int i = 0; i < (d_fft_length - peak_pos[0]); i++)
+          end_phase += d_phaseinc;
+
+        // Store phases for derotating the signal
+        for (int i = 0; i < d_fft_length; i++)
+        {
+          // We are interested only in fft_length
+          d_phase += d_phaseinc;
+
+          while (d_phase > (float)M_PI)
+            d_phase -= (float)M_2_PI;
+          while (d_phase < (float)(-M_PI))
+            d_phase += (float)M_2_PI;
+
+          derot[i] = gr_expj(d_phase);
+        }
+
+        d_phase = end_phase;
+
+        *to_consume = d_cp_length + d_fft_length;
+      }
+      else
+      {
+        d_phase += d_phaseinc * (float)d_fft_length;
+
+        while (d_phase > (float)M_PI)
+          d_phase -= (float)M_2_PI;
+        while (d_phase < (float)(-M_PI))
+          d_phase += (float)M_2_PI;
+
+        // We consume only fft_length
+        *to_consume = d_fft_length;
+      }
+
+      return (peak_length);
+    }
+
+
 
     ofdm_sym_acquisition::sptr
     ofdm_sym_acquisition::make(int blocks, int fft_length, int occupied_tones, int cp_length, float snr)
@@ -111,7 +228,7 @@ namespace gr {
           gr_make_io_signature(1, 1, sizeof (gr_complex) * blocks),
           gr_make_io_signature2(2, 2, sizeof (gr_complex) * blocks * fft_length, sizeof (char) * blocks * fft_length)),
       d_blocks(blocks), d_fft_length(fft_length), d_cp_length(cp_length), d_snr(snr),
-      d_index(0), d_phase(0.0), d_phaseinc(0)
+      d_index(0), d_phase(0.0), d_phaseinc(0), d_cp_found(0)
     {
       set_relative_rate(1.0 / (double) (d_cp_length + d_fft_length));
       // TODO - set this to use data for just one output item
@@ -133,6 +250,11 @@ namespace gr {
       if (d_lambda == NULL)
         std::cout << "cannot allocate memory" << std::endl;
 
+      d_derot = new gr_complex[d_fft_length];
+      if (d_derot == NULL)
+        std::cout << "cannot allocate memory" << std::endl;
+
+
       peak_detect_init(0.2, 0.25, 30, 0.0005);
     }
 
@@ -143,6 +265,7 @@ namespace gr {
     {
       delete [] d_gamma;
       delete [] d_lambda;
+      delete [] d_derot;
     }
 
     void
@@ -170,133 +293,35 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
-        // Array to store peak positions
-        int peak_pos[d_fft_length];
-        int to_consume = 0; int to_return = 0;
+        printf("ninput_items: %i\n", ninput_items[0]);
 
-        float d_phi[d_fft_length];
+        // We return the position in the stream where CP starts
+        // and a set of phases to derotate the actual data
 
-        gr_complex d_conj[2*d_fft_length + d_cp_length];
-        float d_norm[2*d_fft_length + d_cp_length];
-        gr_complex d_gm[2*d_fft_length + d_cp_length];
+        //if (d_index < 3)
+        d_cp_found = cp_sync(in, &d_cp_start, &d_derot[0], &d_to_consume);
+        printf("cp_start: %i\n", d_cp_start);
+        printf("to_consume: %i\n", d_to_consume);
 
-        gr_complex phaset[d_fft_length];
-
-        // Calculate norm
-        if(is_unaligned())
-          volk_32fc_magnitude_squared_32f_u(d_norm, in, 2*d_fft_length + d_cp_length);
-        else
-          volk_32fc_magnitude_squared_32f_a(d_norm, in, 2*d_fft_length + d_cp_length);
-        
-        // Calculate gamma on each point
-        if (is_unaligned())
-          volk_32fc_x2_multiply_conjugate_32fc_u(d_gm, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
-        else
-          volk_32fc_x2_multiply_conjugate_32fc_a(d_gm, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
-
-        /********************************************************/
-        // Calculate time delay and frequency correction
-        // This looks like spgetti code but it is fast
-        for (int i = 0; i < (d_fft_length); i++)
-        {
-          d_phi[i] = 0.0;
-          d_gamma[i] = 0;
-
-          // Moving sum for calculating gamma and phi
-          for (int j = 0; j < d_cp_length; j++)
-          {
-            // Calculate gamma and store it
-            d_gamma[i] += d_gm[i + j];
-            // Calculate phi and store it
-            d_phi[i] += d_norm[i + j] + d_norm[i + j + d_fft_length];
-          }
-        }
-
-        // Calculate lambda
-        if (is_unaligned())  
-          volk_32fc_magnitude_32f_a(d_lambda, d_gamma, d_fft_length);
-        else
-          volk_32fc_magnitude_32f_u(d_lambda, d_gamma, d_fft_length);
-
-        for (int i = 0; i < d_fft_length; i++)
-          d_lambda[i] -= (d_phi[i] * d_rho / 2.0);
-
-        // Find peaks of lambda
-        int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
-
-        // We found a CP starting at peak_pos[0]
-        if (peak_length)
+        if (d_cp_found)
         {
           trigger[0] = 1;
-
-          // Calculate frequency correction
-          float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
-
-          // Increment phase for data before CP
-          d_phase += d_phaseinc * (float)peak_pos[0];
-          // Calculate new phase increment (it aplies for the cp and fft lengths)
-          // This emulates sample and hold
-          d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
-          // Increment phase for CP
-          d_phase += d_phaseinc * (float)peak_pos[0];
-          // Increment the phase for the rest of data
-          // We'll use this to update the final phase
-          int copy_phase = d_phase + d_phaseinc * (float)(d_fft_length - peak_pos[0]);
-
-          // Derotate the data of size fft_length
-          for (int i = 0; i < d_fft_length; i++)
-          {
-            // We are interested only in fft_length
-            d_phase += d_phaseinc;
-
-            while (d_phase > (float)M_PI)
-              d_phase -= (float)M_2_PI;
-            while (d_phase < (float)(-M_PI))
-              d_phase += (float)M_2_PI;
-
-            phaset[i] = gr_expj(d_phase);
-          }
-
           // Derotate the signal and output
           if (is_unaligned())
-            volk_32fc_x2_multiply_32fc_u(out, phaset, &in[peak_pos[0] + d_cp_length], d_fft_length);
+            volk_32fc_x2_multiply_32fc_u(out, &d_derot[0], &in[d_cp_start + d_cp_length], d_fft_length);
           else
-            volk_32fc_x2_multiply_32fc_a(out, phaset, &in[peak_pos[0] + d_cp_length], d_fft_length);
-
-          // We'll consume cp_length+fft_length
-          to_consume = d_cp_length + d_fft_length;
-          to_return = 1;
-          // Even though we copied the fft data we consume only cp_length+fft_length
-          // So restore the phase corresponding to this block
-          d_phase = copy_phase;
+            volk_32fc_x2_multiply_32fc_a(out, &d_derot[0], &in[d_cp_start + d_cp_length], d_fft_length);
         }
         else
         {
           trigger[0] = 0;
-
-          // TODO - get rid of trigger
           for (int i = 0; i < d_fft_length; i++)
-          {
-            // Set the phase for next symbol
-            d_phase += d_phaseinc; 
-
-            while (d_phase > (float)M_PI)
-              d_phase -= (float)M_2_PI;
-            while (d_phase < (float)(-M_PI))
-              d_phase += (float)M_2_PI;
-
-            // Set the output to zero
             out[i] = gr_complex(0.0, 0.0);
-          }
-
-          to_consume = d_fft_length;
-          to_return = 0;
-          return (0);
         }
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
-        consume_each(to_consume);
+        consume_each(d_to_consume);
 
         // Tell runtime system how many output items we produced.
         return (1);

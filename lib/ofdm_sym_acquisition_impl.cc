@@ -24,10 +24,11 @@
 
 #include <gr_io_signature.h>
 #include "ofdm_sym_acquisition_impl.h"
-#include <complex.h>
+#include <complex>
 #include <gr_math.h>
 #include <gr_expj.h>
 #include <stdio.h>
+#include <volk/volk.h>
 
 namespace gr {
   namespace dvbt {
@@ -171,33 +172,54 @@ namespace gr {
 
         // Array to store peak positions
         int peak_pos[d_fft_length];
-        int to_consume = 0;
+        int to_consume = 0; int to_return = 0;
+
+        float d_phi[d_fft_length];
+
+        gr_complex d_conj[2*d_fft_length + d_cp_length];
+        float d_norm[2*d_fft_length + d_cp_length];
+        gr_complex d_gm[2*d_fft_length + d_cp_length];
+
+        gr_complex phaset[d_fft_length];
+
+        // Calculate norm
+        if(is_unaligned())
+          volk_32fc_magnitude_squared_32f_u(d_norm, in, 2*d_fft_length + d_cp_length);
+        else
+          volk_32fc_magnitude_squared_32f_a(d_norm, in, 2*d_fft_length + d_cp_length);
+        
+        // Calculate gamma on each point
+        if (is_unaligned())
+          volk_32fc_x2_multiply_conjugate_32fc_u(d_gm, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
+        else
+          volk_32fc_x2_multiply_conjugate_32fc_a(d_gm, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
 
         /********************************************************/
         // Calculate time delay and frequency correction
         // This looks like spgetti code but it is fast
         for (int i = 0; i < (d_fft_length); i++)
         {
-          float phi = 0.0;
+          d_phi[i] = 0.0;
           d_gamma[i] = 0;
 
           // Moving sum for calculating gamma and phi
           for (int j = 0; j < d_cp_length; j++)
           {
-            gr_complex c1 = in[i + j];
-            gr_complex c2 = in[i + j + d_fft_length];
-
-            // Calculate gamma
-            // Keep gamma for later
-            d_gamma[i] += c1 * std::conj(c2);
-            // Calculate phi
-            phi += std::norm(c1) + std::norm(c2);
+            // Calculate gamma and store it
+            d_gamma[i] += d_gm[i + j];
+            // Calculate phi and store it
+            d_phi[i] += d_norm[i + j] + d_norm[i + j + d_fft_length];
           }
-
-          // Keep angle for later
-          // Calculate arg(gamma - rho*phi)
-          d_lambda[i] = std::abs(d_gamma[i]) - (phi * d_rho / 2.0);
         }
+
+        // Calculate lambda
+        if (is_unaligned())  
+          volk_32fc_magnitude_32f_a(d_lambda, d_gamma, d_fft_length);
+        else
+          volk_32fc_magnitude_32f_u(d_lambda, d_gamma, d_fft_length);
+
+        for (int i = 0; i < d_fft_length; i++)
+          d_lambda[i] -= (d_phi[i] * d_rho / 2.0);
 
         // Find peaks of lambda
         int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
@@ -232,11 +254,18 @@ namespace gr {
             while (d_phase < (float)(-M_PI))
               d_phase += (float)M_2_PI;
 
-            out[i] = gr_expj(d_phase) * in[peak_pos[0] + d_cp_length + i];
+            phaset[i] = gr_expj(d_phase);
           }
+
+          // Derotate the signal and output
+          if (is_unaligned())
+            volk_32fc_x2_multiply_32fc_u(out, phaset, &in[peak_pos[0] + d_cp_length], d_fft_length);
+          else
+            volk_32fc_x2_multiply_32fc_a(out, phaset, &in[peak_pos[0] + d_cp_length], d_fft_length);
 
           // We'll consume cp_length+fft_length
           to_consume = d_cp_length + d_fft_length;
+          to_return = 1;
           // Even though we copied the fft data we consume only cp_length+fft_length
           // So restore the phase corresponding to this block
           d_phase = copy_phase;
@@ -244,7 +273,6 @@ namespace gr {
         else
         {
           trigger[0] = 0;
-          to_consume = d_fft_length;
 
           // TODO - get rid of trigger
           for (int i = 0; i < d_fft_length; i++)
@@ -260,6 +288,10 @@ namespace gr {
             // Set the output to zero
             out[i] = gr_complex(0.0, 0.0);
           }
+
+          to_consume = d_fft_length;
+          to_return = 0;
+          return (0);
         }
 
         // Tell runtime system how many input items we consumed on

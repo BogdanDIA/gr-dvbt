@@ -55,8 +55,9 @@ namespace gr {
       int d_cp_start;
       gr_complex * d_derot;
       int d_to_consume;
+      int d_to_out;
 
-      int cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume);
+      int cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out);
       
       int peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha);
       

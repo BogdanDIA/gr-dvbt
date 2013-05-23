@@ -857,8 +857,8 @@ namespace gr {
 
       for (int k = 0; k < d_tps_carriers_size; k++)
       {
-	// Use equilizer to correct data and frequency correction
-	gr_complex val = c * in[d_zeros_on_left + d_tps_carriers[k] + d_freq_offset] * d_channel_gain[d_tps_carriers[k] + d_freq_offset];
+        // Use equalizer to correct data and frequency correction
+        gr_complex val = c * in[d_zeros_on_left + d_tps_carriers[k] + d_freq_offset] * d_channel_gain[d_tps_carriers[k] + d_freq_offset];
 
         if (!d_symbol_index_known || (d_symbol_index != 0))
         {
@@ -887,8 +887,8 @@ namespace gr {
       	d_rcv_tps_data.pop_front();
 
         // Add data at tail
-	if (!d_symbol_index_known || (d_symbol_index != 0))
-	{
+  if (!d_symbol_index_known || (d_symbol_index != 0))
+  {
 	  if (tps_majority_zero >= 0)
 	    d_rcv_tps_data.push_back(0);
 	  else
@@ -907,14 +907,14 @@ namespace gr {
           printf("Aquired sync - TPS OK for frame 0 or 2\n");
 
           d_symbol_index_known = 1;
-	  end_frame = 1;
+          end_frame = 1;
         }
         else
         {
           printf("Lost sync - TPS Not OK for frame 0 or 2\n");
 
           d_symbol_index_known = 0;
-	  end_frame = 0;
+          end_frame = 0;
         }
 
         //for (int i = 0; i < d_symbols_per_frame; i++)
@@ -933,21 +933,21 @@ namespace gr {
           printf("Aquired sync - TPS OK for frame 1 or 3\n");
 
           d_symbol_index_known = 1;
-	  end_frame = 1;
+          end_frame = 1;
         }
         else
         {
           printf("Lost sync - TPS Not OK for frame 1 or 3\n");
 
           d_symbol_index_known = 0;
-	  end_frame = 0;
+          end_frame = 0;
         }
 
-	//for (int i = 0; i < d_symbols_per_frame; i++)
+        //for (int i = 0; i < d_symbols_per_frame; i++)
           //printf("%i", d_rcv_tps_data[i]);
-	//printf("\n");
+        //printf("\n");
 
-	// Clear up FIFO
+        // Clear up FIFO
         for (int i = 0; i < d_symbols_per_frame; i++)
           d_rcv_tps_data[i] = 0;
       }     
@@ -1123,7 +1123,7 @@ namespace gr {
       if (trigger_in[0] != 1)
       {
         trigger_out[0] = 0;
-	      // noutput_items would be 0 in this case
+	// noutput_items would be 0 in this case
         return 0;
       }
       else

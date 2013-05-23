@@ -51,6 +51,9 @@ class pilot_gen {
     // this should be first in order to be initialized first
     const dvbt_config &config;
 
+    // Debug only
+    int d_index;
+
     int d_Kmin;
     int d_Kmax;
     int d_fft_length;

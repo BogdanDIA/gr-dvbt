@@ -97,7 +97,7 @@ namespace gr {
     }
 
     int
-    ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume)
+    ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out)
     {
       // Array to store peak positions
       int peak_pos[d_fft_length];
@@ -159,24 +159,14 @@ namespace gr {
         float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
 
         // Increment phase for data before CP
-        //d_phase += d_phaseinc * (float)peak_pos[0];
-        for (int i = 0; i < peak_pos[0]; i++)
-          d_phase += d_phaseinc;
-
+        d_phase += d_phaseinc * (float)peak_pos[0];
         // Calculate new phase increment (it aplies for the cp and fft lengths)
         // This emulates sample and hold
         d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
         // Increment phase for CP
-        //d_phase += d_phaseinc * (float)d_cp_length;
-
-        for (int i = 0; i < d_cp_length; i++)
-          d_phase += d_phaseinc;
-
+        d_phase += d_phaseinc * (float)d_cp_length;
         // Keep phase for returning
-        //float end_phase = (float)d_phase + (float)d_phaseinc * (float)(d_fft_length - peak_pos[0]);
-        float end_phase = 0;
-        for (int i = 0; i < (d_fft_length - peak_pos[0]); i++)
-          end_phase += d_phaseinc;
+        float end_phase = (float)d_phase + (float)d_phaseinc * (float)(d_fft_length - peak_pos[0]);
 
         // Store phases for derotating the signal
         for (int i = 0; i < d_fft_length; i++)
@@ -192,9 +182,10 @@ namespace gr {
           derot[i] = gr_expj(d_phase);
         }
 
-        d_phase = end_phase;
+        d_phase = 0; //end_phase - TODO - fix this
 
         *to_consume = d_cp_length + d_fft_length;
+        *to_out = 1;
       }
       else
       {
@@ -207,6 +198,7 @@ namespace gr {
 
         // We consume only fft_length
         *to_consume = d_fft_length;
+        *to_out = 0;
       }
 
       return (peak_length);
@@ -293,16 +285,10 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
-        printf("ninput_items: %i\n", ninput_items[0]);
-
+        if (!(d_index++ % 680))
+          d_cp_found = cp_sync(in, &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
         // We return the position in the stream where CP starts
         // and a set of phases to derotate the actual data
-
-        //if (d_index < 3)
-        d_cp_found = cp_sync(in, &d_cp_start, &d_derot[0], &d_to_consume);
-        printf("cp_start: %i\n", d_cp_start);
-        printf("to_consume: %i\n", d_to_consume);
-
         if (d_cp_found)
         {
           trigger[0] = 1;
@@ -313,20 +299,15 @@ namespace gr {
             volk_32fc_x2_multiply_32fc_a(out, &d_derot[0], &in[d_cp_start + d_cp_length], d_fft_length);
         }
         else
-        {
           trigger[0] = 0;
-          for (int i = 0; i < d_fft_length; i++)
-            out[i] = gr_complex(0.0, 0.0);
-        }
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each(d_to_consume);
 
         // Tell runtime system how many output items we produced.
-        return (1);
+        return (d_to_out);
     }
-
   } /* namespace dvbt */
 } /* namespace gr */
 

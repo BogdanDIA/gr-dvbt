@@ -109,9 +109,9 @@ namespace gr {
 
       // Calculate norm
       if(is_unaligned())
-        volk_32fc_magnitude_squared_32f_u(d_norm, in, 2*d_fft_length + d_cp_length);
+        volk_32fc_magnitude_squared_32f_u(d_norm, in, 2 * d_fft_length + d_cp_length);
       else
-        volk_32fc_magnitude_squared_32f_a(d_norm, in, 2*d_fft_length + d_cp_length);
+        volk_32fc_magnitude_squared_32f_a(d_norm, in, 2 * d_fft_length + d_cp_length);
       
       // Calculate gamma on each point
       if (is_unaligned())
@@ -122,18 +122,20 @@ namespace gr {
       /********************************************************/
       // Calculate time delay and frequency correction
       // This looks like spagetti code but it is fast
-      for (int i = 0; i < (d_fft_length); i++)
+      for (int i = 2 * d_fft_length + d_cp_length - 1; i >= (d_cp_length + d_fft_length); i--)
       {
-        d_phi[i] = 0.0;
-        d_gamma[i] = 0.0;
+        int k = i - (d_cp_length + d_fft_length);
+
+        d_phi[k] = 0.0;
+        d_gamma[k] = 0.0;
 
         // Moving sum for calculating gamma and phi
-        for (int j = 0; j < d_cp_length; j++)
+        for (int j = d_cp_length - 1; j >= 0; j--)
         {
           // Calculate gamma and store it
-          d_gamma[i] += d_gm[i + j];
+          d_gamma[k] += d_gm[i - j - d_fft_length];
           // Calculate phi and store it
-          d_phi[i] += d_norm[i + j] + d_norm[i + j + d_fft_length];
+          d_phi[k] += d_norm[i - j] + d_norm[i - j - d_fft_length];
         }
       }
 
@@ -150,23 +152,22 @@ namespace gr {
       // Find peaks of lambda
       int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
 
-      // We found a CP starting at peak_pos[0]
+      // We found an end of symbol at peak_pos[0] + CP + FFT
       if (peak_length)
       {
-        *cp_pos = peak_pos[0];
+        int peak = peak_pos[0] + d_fft_length + d_cp_length;
+
+        *cp_pos = peak_pos[0] + 1;
 
         // Calculate frequency correction
         float peak_epsilon = std::arg(d_gamma[peak_pos[0]]);
 
-        // Increment phase for data before CP
-        d_phase += d_phaseinc * (float)peak_pos[0];
-        // Calculate new phase increment (it aplies for the cp and fft lengths)
-        // This emulates sample and hold
-        d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
-        // Increment phase for CP
-        d_phase += d_phaseinc * (float)d_cp_length;
-        // Keep phase for returning
-        float end_phase = (float)d_phase + (float)d_phaseinc * (float)(d_fft_length - peak_pos[0]);
+        // Keep the phase for returning
+        float end_phase = d_phase + d_phaseinc * (float) (d_cp_length + d_fft_length);
+
+        // Increment phase for all data to the begining of FFT
+        // using old phase increment
+        d_phase += d_phaseinc * (float)(peak - d_fft_length + 1);
 
         // Store phases for derotating the signal
         for (int i = 0; i < d_fft_length; i++)
@@ -181,6 +182,10 @@ namespace gr {
 
           derot[i] = gr_expj(d_phase);
         }
+
+
+        // The new phase increment takes place for the next symbol
+        d_phaseinc = (float)(1) * peak_epsilon / (float)d_fft_length;
 
         d_phase = 0; //end_phase - TODO - fix this
 
@@ -285,7 +290,7 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
-        if (!(d_index++ % 680))
+        if (1/*!(d_index++ % 680)*/)
           d_cp_found = cp_sync(in, &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
         // We return the position in the stream where CP starts
         // and a set of phases to derotate the actual data

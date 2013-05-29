@@ -36,9 +36,13 @@ namespace gr {
       float d_rho;
 
       int d_index;
+      int d_count;
 
       int d_search_max;
 
+      gr_complex * d_conj;
+      float * d_norm;
+      gr_complex * d_corr;
       gr_complex * d_gamma;
       float * d_lambda;
       float * d_arg;
@@ -49,7 +53,7 @@ namespace gr {
       float d_avg_alpha;
       float d_avg;
       float d_phase;
-      float d_phaseinc;
+      double d_phaseinc;
 
       int d_cp_found;
       int d_cp_start;

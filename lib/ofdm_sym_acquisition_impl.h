@@ -54,6 +54,8 @@ namespace gr {
       float d_avg;
       float d_phase;
       double d_phaseinc;
+      double d_nextphaseinc;
+      int d_nextpos;
 
       int d_cp_found;
       int d_cp_start;

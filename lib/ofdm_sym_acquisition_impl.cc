@@ -47,7 +47,10 @@ void print_double(float d)
 namespace gr {
   namespace dvbt {
 
-    int ofdm_sym_acquisition_impl::peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha)
+    
+
+    int 
+    ofdm_sym_acquisition_impl::peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha)
     {
       d_avg_alpha = alpha;
       d_threshold_factor_rise = threshold_factor_rise;
@@ -57,8 +60,27 @@ namespace gr {
       return (0);
     }
 
-    int ofdm_sym_acquisition_impl::peak_detect_process(const float * datain, const int datain_length, int * peak_pos)
+    int 
+    ofdm_sym_acquisition_impl::peak_detect_process(const float * datain, const int datain_length, int * peak_pos)
     {
+#if 0
+      int ret = 0;
+      float peak = datain[0];
+
+      for (int i = 0; i < datain_length; i++)
+        if (datain[i] > peak)
+        {
+          peak = datain[i];
+          *peak_pos = i;
+        }
+
+      if (*peak_pos == datain_length - 1)
+        ret = 0;
+      else
+        ret = 1;
+
+      return (ret);
+#endif
       int state = 0;
       float peak_val = -(float)INFINITY; int peak_index = 0; int peak_pos_length = 0;
 
@@ -111,8 +133,12 @@ namespace gr {
     }
 
     int
-    ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out)
+    ofdm_sym_acquisition_impl::ml_sync(const gr_complex * in, int lookup_start, int lookup_stop, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out)
     {
+
+      assert(lookup_start >= lookup_stop);
+      assert(lookup_stop >= (d_cp_length + d_fft_length - 1));
+
       // Array to store peak positions
       int peak_pos[d_fft_length];
       float d_phi[d_fft_length];
@@ -124,7 +150,7 @@ namespace gr {
       else
         volk_32fc_magnitude_squared_32f_a(d_norm, in, d_cp_length);
 #else
-      for (int i = 0; i < (2 * d_fft_length + d_cp_length); i++)
+      for (int i = lookup_start; i >= (lookup_stop - (d_cp_length + d_fft_length - 1)); i--)
         d_norm[i] = std::norm(in[i]);
 #endif
       
@@ -135,21 +161,21 @@ namespace gr {
       else
         volk_32fc_x2_multiply_conjugate_32fc_a(d_corr, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
 #else
-      for (int i = (2 * d_fft_length + d_cp_length - 1); i >= (d_fft_length); i--)
+      for (int i = lookup_start; i >= (lookup_stop - d_cp_length - 1); i--)
         d_corr[i - d_fft_length] = in[i] * std::conj(in[i - d_fft_length]);
 #endif
 
       // Calculate time delay and frequency correction
       // This looks like spagetti code but it is fast
-      for (int i = 2 * d_fft_length + d_cp_length - 2; i >= (d_cp_length + d_fft_length - 1); i--)
+      for (int i = lookup_start - 1; i >= lookup_stop; i--)
       {
-        int k = i - (d_cp_length + d_fft_length - 1);
+        int k = i - lookup_stop;
 
         d_phi[k] = 0.0;
         d_gamma[k] = 0.0;
 
         // Moving sum for calculating gamma and phi
-        for (int j = d_cp_length - 1; j >= 0; j--)
+        for (int j = 0; j < d_cp_length; j++)
         {
           // Calculate gamma and store it
           d_gamma[k] += d_corr[i - j - d_fft_length];
@@ -158,14 +184,14 @@ namespace gr {
         }
       }
 
-#ifdef USE_VOLK
       // Init lambda with gamma
+#ifdef USE_VOLK
       if (is_unaligned())  
         volk_32fc_magnitude_32f_a(d_lambda, d_gamma, d_fft_length);
       else
         volk_32fc_magnitude_32f_u(d_lambda, d_gamma, d_fft_length);
 #else
-      for (int i = 0; i < d_fft_length; i++)
+      for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] = std::abs(d_gamma[i]);
 #endif
 
@@ -173,7 +199,7 @@ namespace gr {
 #ifdef USE_VOLK
       //
 #else
-      for (int i = 0; i < d_fft_length; i++)
+      for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] -= (d_phi[i] * d_rho / 2.0);
 #endif
 
@@ -182,20 +208,19 @@ namespace gr {
       for (int i = 0; i < (2 * d_fft_length + d_cp_length); i++)
         printf("in[%i]: %.10f\n", i, d_lambda[i]);
 
-      // Print lambda
-      for (int i = 0; i < d_fft_length; i++)
-        printf("lambda[%i]: %.10f\n", i, d_lambda[i]);
 #endif
+      // Print lambda
+      for (int i = 0; i < (lookup_start - lookup_stop); i++)
+        printf("lambda[%i]: %.10f\n", i, d_lambda[i]);
 
       // Find peaks of lambda
-      int peak_length = peak_detect_process(&d_lambda[0], d_fft_length, &peak_pos[0]);
+      int peak_length = peak_detect_process(&d_lambda[0], (lookup_start - lookup_stop), &peak_pos[0]);
       int peak = 0;
-
       // We found an end of symbol at peak_pos[0] + CP + FFT
       if (peak_length)
       {
-        peak = peak_pos[0] + d_fft_length + d_cp_length - 1;
-        //printf("peak: %i\n",  peak);
+        peak = peak_pos[0] + lookup_stop;
+        printf("peak: %i, peak_pos[0]: %i\n",  peak, peak_pos[0]);
 
         *cp_pos = peak;
 
@@ -207,6 +232,7 @@ namespace gr {
         //printf("d_phaseinc before fft: %.10f\n", d_phaseinc);
 
         // Store phases for derotating the signal
+        // We always process CP len + FFT len
         for (int i = 0; i < (d_cp_length + d_fft_length); i++)
         {
           if (i == d_nextpos)
@@ -272,6 +298,11 @@ namespace gr {
       return (peak_length);
     }
 
+    int
+    ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out)
+    {
+    }
+
 
 
     ofdm_sym_acquisition::sptr
@@ -288,7 +319,9 @@ namespace gr {
           gr_make_io_signature(1, 1, sizeof (gr_complex) * blocks),
           gr_make_io_signature2(2, 2, sizeof (gr_complex) * blocks * fft_length, sizeof (char) * blocks * fft_length)),
       d_blocks(blocks), d_fft_length(fft_length), d_cp_length(cp_length), d_snr(snr),
-      d_index(0), d_phase(0.0), d_phaseinc(0.0), d_cp_found(0), d_count(0), d_nextphaseinc(0), d_nextpos(0)
+      d_index(0), d_phase(0.0), d_phaseinc(0.0), d_cp_found(0), d_count(0), d_nextphaseinc(0), d_nextpos(0), \
+        d_sym_acq_count(0),d_sym_acq_timeout(100), d_initial_aquisition(0), \
+        d_freq_correction_count(0), d_freq_correction_timeout(10)
     {
       set_relative_rate(1.0 / (double) (d_cp_length + d_fft_length));
 
@@ -324,7 +357,8 @@ namespace gr {
       if (d_corr == NULL)
         std::cout << "cannot allocate memory" << std::endl;
 
-      peak_detect_init(0.2, 0.25, 30, 0.0005);
+      //peak_detect_init(0.2, 0.25, 30, 0.0005);
+      peak_detect_init(0.8, 0.9, 30, 0.5);
     }
 
     /*
@@ -362,33 +396,50 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
-        //if (!(d_count++ % 100))
-        if (1)
-          d_cp_found = cp_sync(in, &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
-        // We return the position in the stream where CP starts
-        // and a set of phases to derotate the actual data
-        if (d_cp_found)
-        {
-          trigger[0] = 1;
-          // Derotate the signal and output
-#ifdef USE_VOLK
-          if (is_unaligned())
-            volk_32fc_x2_multiply_32fc_u(out, &d_derot[0], &in[d_cp_start + d_cp_length], d_fft_length);
-          else
-            volk_32fc_x2_multiply_32fc_a(out, &d_derot[0], &in[d_cp_start + d_cp_length], d_fft_length);
-#else
-          int j = 0;
-          for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)
-          {
-            out[j] = d_derot[j] * in[i];
-            j++;
-          }
-#endif
-        }
-        else
-          trigger[0] = 0;
+        int cp_start = 0;
 
-        //printf("******************* to_consume: %i, to_out: %i\n", d_to_consume, d_to_out);
+        // This is initial aquisition of symbol start
+        while (!d_initial_aquisition && (++d_sym_acq_count < d_sym_acq_timeout)){
+          d_initial_aquisition = ml_sync(in, 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, \
+              &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
+        }
+
+        // This is fractional frequency correction (pre FFT)
+        if (d_initial_aquisition)
+        {
+          cp_start = d_cp_start;
+
+          d_cp_found = ml_sync(in, d_cp_start + 4, d_cp_start - 4, \
+              &cp_start, &d_derot[0], &d_to_consume, &d_to_out);
+
+          if (d_cp_found)
+          {
+            trigger[0] = 1;
+
+            d_freq_correction_count = 0;
+
+            // Derotate the signal and output
+            int j = 0;
+            for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)
+            {
+              out[j] = d_derot[j] * in[i];
+              j++;
+            }
+          }
+          else
+          {
+            trigger[0] = 0;
+
+            // If we have a number of consecutive misses then we restart aquisition
+            if (++d_freq_correction_count > d_freq_correction_timeout)
+            {
+              d_initial_aquisition = 0;
+              d_freq_correction_count = 0;
+
+              printf("restart aquisition\n");
+            }
+          }
+        }
 
         // Tell runtime system how many input items we consumed on
         // each input stream.

@@ -57,12 +57,21 @@ namespace gr {
       double d_nextphaseinc;
       int d_nextpos;
 
+      int d_sym_acq_count;
+      int d_sym_acq_timeout;
+
+      int d_initial_aquisition;
+
+      int d_freq_correction_timeout;
+      int d_freq_correction_count;
+
       int d_cp_found;
       int d_cp_start;
       gr_complex * d_derot;
       int d_to_consume;
       int d_to_out;
 
+      int ml_sync(const gr_complex * in, int lookup_start, int lookup_stop, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out);
       int cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out);
       
       int peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha);

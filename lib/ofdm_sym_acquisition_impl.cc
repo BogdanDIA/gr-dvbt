@@ -358,7 +358,7 @@ namespace gr {
         std::cout << "cannot allocate memory" << std::endl;
 
       //peak_detect_init(0.2, 0.25, 30, 0.0005);
-      peak_detect_init(0.8, 0.9, 30, 0.5);
+      peak_detect_init(0.8, 0.9, 30, 0.9);
     }
 
     /*

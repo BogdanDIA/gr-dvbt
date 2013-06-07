@@ -41,6 +41,8 @@ class ofdm_sync_ml(gr.hier_block2):
         rho = SNR / (SNR + 1.0)
         symbol_length = fft_length + cp_length
 
+        print "SNR", SNR
+
         # ML Sync
 
         # Energy Detection from ML Sync
@@ -154,6 +156,9 @@ class ofdm_sync_ml(gr.hier_block2):
             self.connect(self.moving_sum_filter, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-energy_f.dat"))
             self.connect(self.diff, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-diff_f.dat"))
             self.connect(self.diff, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-theta_f.dat"))
+            self.connect(self.mixer, gr.file_sink(gr.sizeof_gr_complex, "ofdm_sync_ml-mixer_f.dat"))
+            self.connect(self.movingsum2, gr.file_sink(gr.sizeof_gr_complex, "ofdm_sync_ml-movingsum2_c.dat"))
+            self.connect(self.conjg, gr.file_sink(gr.sizeof_gr_complex, "ofdm_sync_ml-conj_c.dat"))
             self.connect(self.angle, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-epsilon_f.dat"))
             #self.connect(self.corrmag, gr.file_sink(gr.sizeof_float, "ofdm_sync_ml-corrmag_f.dat"))
             #self.connect(self.kscorr, gr.file_sink(gr.sizeof_gr_complex, "ofdm_sync_ml-kscorr_c.dat"))

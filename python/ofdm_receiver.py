@@ -113,37 +113,19 @@ class ofdm_receiver(gr.hier_block2):
         # Set up blocks
         #self.grnull = gr.null_sink(4);
 
-#        self.nco = gr.frequency_modulator_fc(nco_sensitivity)         # generate a signal proportional to frequency error of sync block
-#        self.sigmix = gr.multiply_cc()
-#        self.sampler = digital_swig.ofdm_sampler(fft_length, fft_length+cp_length)
-#        self.fft_demod = gr.fft_vcc(fft_length, True, win, True)
-
-#        self.connect(self, self.chan_filt)                            # filter the input channel
-#        self.connect(self.chan_filt, self.ofdm_sync)                  # into the synchronization alg.
-
-#        self.connect((self.ofdm_sync,0), self.nco, (self.sigmix,1))   # use sync freq. offset output to derotate input signal
-#        self.connect(self.chan_filt, (self.sigmix,0))                 # signal to be derotated
-
-#        self.connect(self.sigmix, (self.sampler,0))                   # sample off timing signal detected in sync alg
-#        #self.connect(self.chan_filt, (self.sampler,0))                   # sample off timing signal detected in sync alg
-
-#        self.connect((self.ofdm_sync,1), (self.sampler,1))            # timing signal to sample at
-#        self.connect((self.sampler,0), self.fft_demod)                # send derotated sampled signal to FFT
-#        self.connect(self.fft_demod, (self,0))                        # frequency domain signal sent to output 0
-#        self.connect((self.sampler,1), (self,1))                      # timing sent to output 1
-#        print "setup OK"
-
         self.nco = gr.frequency_modulator_fc(nco_sensitivity)         # generate a signal proportional to frequency error of sync block
         self.sigmix = gr.multiply_cc()
         self.sampler = digital_swig.ofdm_sampler(fft_length, fft_length+cp_length)
-        self.fft_demod = gr.fft_vcc(fft_length, True, win, True, 4)
+        self.fft_demod = gr.fft_vcc(fft_length, True, win, True)
 
-        self.connect(self, self.ofdm_sync)                            # into the synchronization alg.
+        self.connect(self, self.chan_filt)                            # filter the input channel
+        self.connect(self.chan_filt, self.ofdm_sync)                  # into the synchronization alg.
 
         self.connect((self.ofdm_sync,0), self.nco, (self.sigmix,1))   # use sync freq. offset output to derotate input signal
-        self.connect(self, (self.sigmix,0))                           # signal to be derotated
+        self.connect(self.chan_filt, (self.sigmix,0))                 # signal to be derotated
 
         self.connect(self.sigmix, (self.sampler,0))                   # sample off timing signal detected in sync alg
+        #self.connect(self.chan_filt, (self.sampler,0))                   # sample off timing signal detected in sync alg
 
         self.connect((self.ofdm_sync,1), (self.sampler,1))            # timing signal to sample at
         self.connect((self.sampler,0), self.fft_demod)                # send derotated sampled signal to FFT

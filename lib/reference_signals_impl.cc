@@ -736,6 +736,45 @@ namespace gr {
       if (d_freq_offset)
       	printf("d_freq_offset: %i\n", d_freq_offset);
     }
+
+    void
+    pilot_gen::compute_oneshot_csft(const gr_complex * in)
+    {
+	gr_complex left_corr_sum = 0.0; gr_complex right_corr_sum = 0.0;
+	int half_size = (d_cpilot_carriers_size - 1) / 2;
+
+	// TODO init this in constructor
+	float carrier_coeff = 1.0 / (2 * M_PI * (1 + float (d_cp_length) / float (d_fft_length)) * 2);
+	float sampling_coeff = 1.0 / (2 * M_PI * ((1 + float (d_cp_length) / float (d_fft_length)) * ((float)d_cpilot_carriers_size / 2.0)));
+
+	// Compute cpilots correlation between previous symbol and current symbol
+	// in both halves of the cpilots. The cpilots are distributed evenly
+	// on left and right sides of the center frequency.
+	
+        for (int j = 0; j < half_size; j++)
+	{
+	  left_corr_sum += in[d_freq_offset + d_zeros_on_left + d_cpilot_carriers[j]] * \
+		std::conj(in[d_freq_offset + d_fft_length + d_zeros_on_left + d_cpilot_carriers[j]]);
+	}
+
+        for (int j = half_size + 1; j < d_cpilot_carriers_size; j++)
+	{
+	  right_corr_sum += in[d_freq_offset + d_zeros_on_left + d_cpilot_carriers[j]] * \
+		std::conj(in[d_freq_offset + d_fft_length + d_zeros_on_left + d_cpilot_carriers[j]]);
+	}
+
+	float left_angle = std::arg(left_corr_sum);
+	float right_angle = std::arg(right_corr_sum);
+
+	d_carrier_freq_correction = (right_angle + left_angle) * carrier_coeff;
+	d_sampling_freq_correction = (right_angle - left_angle) * sampling_coeff;
+
+	printf("left_corr_sum: re: %f, img: %f\n", left_corr_sum.real(), left_corr_sum.imag());
+	printf("right_corr_sum: re: %f, img: %f\n", right_corr_sum.real(), right_corr_sum.imag());
+
+	printf("d_carrier_freq_correction: %.10f\n", d_carrier_freq_correction);
+	printf("d_sampling_freq_correction: %.10f\n", d_sampling_freq_correction);
+    }
     
     // TODO - return d_freq_offset and c
     gr_complex
@@ -1141,6 +1180,13 @@ namespace gr {
       // This is coarse frequency offset estimation
       // This is called before all other processing
       process_cpilot_data(in);
+
+      // Compute one shot Post-FFT Carrier and Sampling Frequency Tracking
+      // At this moment it is assumed to have corrected the:
+      // - symbol timing (pre-FFT)
+      // - symbol frequency correction (pre-FFT)
+      // - coarse frequency correction (post-FFT)
+      compute_oneshot_csft(in);
 
       // Process spilot data
       // This is channel estimation function

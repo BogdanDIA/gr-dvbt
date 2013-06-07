@@ -69,7 +69,10 @@ namespace gr {
     void
     demod_reference_signals_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = noutput_items;
+      int ninputs = ninput_items_required.size();
+
+      for (int i = 0; i < ninputs; i++)
+        ninput_items_required[i] =  2 * noutput_items;
     }
 
     int

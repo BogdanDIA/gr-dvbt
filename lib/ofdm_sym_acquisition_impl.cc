@@ -398,7 +398,7 @@ namespace gr {
 
         int cp_start = 0;
 
-        // This is initial aquisition of symbol start
+        // This is initial aquisition of symbol start (pre FFT)
         while (!d_initial_aquisition && (++d_sym_acq_count < d_sym_acq_timeout)){
           d_initial_aquisition = ml_sync(in, 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);

@@ -105,6 +105,8 @@ class pilot_gen {
     float * d_cpilot_phase_diff;
     int d_freq_offset_max;
     int d_freq_offset;
+    float d_carrier_freq_correction;
+    float d_sampling_freq_correction;
 
     int d_tps_carriers_size;
     const int * d_tps_carriers;
@@ -180,6 +182,7 @@ class pilot_gen {
     // Continual pilot data processing methods
     void process_cpilot_data(const gr_complex * in);
     gr_complex frequency_correction();
+    void compute_oneshot_csft(const gr_complex * in);
 
     // TPS generator methods
     int get_current_tpilot() const;

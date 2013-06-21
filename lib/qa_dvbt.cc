@@ -38,6 +38,7 @@
 #include "qa_reed_solomon.h"
 #include "qa_reed_solomon_dec.h"
 #include "qa_ofdm_sym_acquisition.h"
+#include "qa_viterbi_decoder.h"
 #include "qa_energy_dispersal.h"
 #include "qa_convolutional_interleaver.h"
 #include "qa_test2.h"
@@ -48,6 +49,7 @@
 #include "qa_reed_solomon.h"
 #include "qa_reed_solomon_dec.h"
 #include "qa_ofdm_sym_acquisition.h"
+#include "qa_viterbi_decoder.h"
 
 CppUnit::TestSuite *
 qa_dvbt::suite()
@@ -65,6 +67,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_reed_solomon::suite());
   s->addTest(gr::dvbt::qa_reed_solomon_dec::suite());
   s->addTest(gr::dvbt::qa_ofdm_sym_acquisition::suite());
+  s->addTest(gr::dvbt::qa_viterbi_decoder::suite());
   s->addTest(gr::dvbt::qa_energy_dispersal::suite());
   s->addTest(gr::dvbt::qa_convolutional_interleaver::suite());
   s->addTest(gr::dvbt::qa_test2::suite());
@@ -75,6 +78,7 @@ qa_dvbt::suite()
   s->addTest(gr::dvbt::qa_reed_solomon::suite());
   s->addTest(gr::dvbt::qa_reed_solomon_dec::suite());
   s->addTest(gr::dvbt::qa_ofdm_sym_acquisition::suite());
+  s->addTest(gr::dvbt::qa_viterbi_decoder::suite());
 
   return s;
 }

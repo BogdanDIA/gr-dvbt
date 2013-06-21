@@ -50,7 +50,7 @@
 	</param>
 	<sink>
 		<name>in</name>
-		<type>float</type>
+		<type>byte</type>
 	</sink>
 	<source>
 		<name>out</name>

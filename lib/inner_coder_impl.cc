@@ -134,7 +134,7 @@ namespace gr {
     inner_coder_impl::inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, \
         dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate)
       : gr_sync_decimator("inner_coder",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * ninput),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput),
           noutput),
       config(constellation, hierarchy, coderate, coderate),
@@ -153,9 +153,9 @@ namespace gr {
       //Corespondingly we process km input bits(km/8 Bytes)
       //We output one byte for a symbol of m bits
       //The out/in rate in bytes is: 8n/km (Bytes)
-      assert((d_noutput * d_k * d_m) % (8 * d_n));
+      assert((d_noutput * d_k * d_m) % (d_ninput * 8 * d_n));
 
-      set_decimation((d_noutput * d_k * d_m) / (8 * d_n));
+      set_decimation((d_noutput * d_k * d_m) / (d_ninput * 8 * d_n));
     }
 
     /*

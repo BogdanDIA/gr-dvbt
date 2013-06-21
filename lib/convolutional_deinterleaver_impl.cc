@@ -81,6 +81,9 @@ namespace gr {
           {
             int c = in[(d_I * i) + j];
 
+            //if (c == 0xb8)
+              //printf("NNSYNC: in[%i], i: %i, j: %i\n", d_I * i + j, i, j);
+
             // TODO
             // Look for a SYNC or a NSYNC
             // If we find a SYNC or a NSYNC

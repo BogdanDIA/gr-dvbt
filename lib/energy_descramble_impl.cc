@@ -85,7 +85,7 @@ namespace gr {
     void
     energy_descramble_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        ninput_items_required[0] = noutput_items / (d_nblocks * d_bsize);
+        ninput_items_required[0] = 1 + (noutput_items / (d_nblocks * d_bsize));
     }
 
     int
@@ -104,20 +104,25 @@ namespace gr {
         int is_sync = 0;
 
         // Search for NSYNC byte
-        while(is_sync == 0 && index < d_bsize)
+        while(is_sync == 0 && index < (d_nblocks * d_bsize))
           if (in[index] == d_NSYNC)
             is_sync = 1;
           else
+          {
+            printf("index: %i\n", index);
             index++;
+          }
 
         // Calculate the input items to consume
         // in order to produce noutput_items
-        // It is important to set_output_multiple first
+        // It is important to set_output_multiple() first
         int isize = noutput_items / (d_nblocks * d_bsize);
 
         // If we found a NSYNC byte
         if (is_sync)
         {
+          printf("NSYNC found on input[%i]\n", index);
+
           for (int i = 0; i < isize; i++)
           {
             init_prbs();
@@ -126,7 +131,9 @@ namespace gr {
             for (int j = 0; j < d_nblocks; j++)
             {
               if (in[index + count] != sync)
-                printf("error: Missing sync: %i on input!\n", sync);
+                printf("error: Missing sync: %x on input[%i] %x!\n", sync, index + count, in[index + count]);
+              else
+                printf("sync found: %x on input[%i] %x\n", sync, index + count, in[index + count]);
 
               out[count++] = d_SYNC;
 	            // PRBS clocking starts right after NSYNC

@@ -33,12 +33,24 @@ namespace gr {
       int d_K;
       int d_S0;
       int d_SK;
+      // Keep the state from the prev. block
+      int d_state;
 
     public:
       fsm FSM () const { return d_FSM; } 
       int K () const { return d_K; }
       int S0 () const { return d_S0; }
       int SK () const { return d_SK; }
+
+      void viterbi_algorithm (int I, int S, int O,
+	const std::vector<int> &NS,
+	const std::vector<int> &OS,
+	const std::vector< std::vector<int> > &PS,
+	const std::vector< std::vector<int> > &PI,
+	int K,
+	int S0, int SK,
+	const unsigned char *in, unsigned char *out
+	);
 
       viterbi_decoder_impl(const fsm &FSM, int K, int S0, int SK);
       ~viterbi_decoder_impl();

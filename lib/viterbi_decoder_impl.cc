@@ -143,12 +143,12 @@ namespace gr {
         st=SK;
     }
     d_state = st;
-    printf("st: %i\n", st);
 
     for(int k=K-1;k>=0;k--) { // traceback
         int i0=trace[k*S+st];
         out[k]= (unsigned char) PI[st][i0];
 #ifdef VITERBI_DEBUG
+        printf("st: %i\n", st);
         printf("trace[%i]: %i\n", k*S+st, trace[k*S+st]);
         printf("out[%i]: %i, PI[%i][%i]: %i\n", k, out[k], st, i0, out[k]);
 #endif
@@ -213,7 +213,6 @@ namespace gr {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
           for (int n=0;n<nblocks;n++) {
-            printf("n: %i\n", n);
             viterbi_algorithm(d_FSM.I(), d_FSM.S(), d_FSM.O(), d_FSM.NS(), d_FSM.OS(), \
                 d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in[n*d_K]), &(out[n*d_K]));
           }

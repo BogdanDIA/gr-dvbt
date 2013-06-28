@@ -36,10 +36,17 @@ namespace gr {
     class convolutional_deinterleaver_impl : public convolutional_deinterleaver
     {
     private:
+      static const int d_SYNC;
+      static const int d_NSYNC;
+      static const int d_MUX_PKT;
+
       int d_blocks;
       int d_I;
       int d_M;
       std::vector< std::deque<unsigned char> * > d_shift;
+
+      int d_index;
+      int d_offset;
 
     public:
       convolutional_deinterleaver_impl(int nsize, int I, int M);

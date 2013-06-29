@@ -26,6 +26,14 @@
 #include "energy_descramble_impl.h"
 #include <stdio.h>
 
+//#define DEBUG 1
+
+#ifdef DEBUG
+#define PRINTF(a...) printf(a)
+#else
+#define PRINTF(a...)
+#endif
+
 namespace gr {
   namespace dvbt {
 
@@ -33,6 +41,7 @@ namespace gr {
     const int energy_descramble_impl::d_bsize = 188;
     const int energy_descramble_impl::d_SYNC = 0x47;
     const int energy_descramble_impl::d_NSYNC = 0xB8;
+    const int energy_descramble_impl::d_MUX_PKT = 8;
 
     void
     energy_descramble_impl::init_prbs()
@@ -69,10 +78,13 @@ namespace gr {
     energy_descramble_impl::energy_descramble_impl(int nblocks)
       : gr_block("energy_descramble",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char) * d_nblocks * d_bsize),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char)))
+		      gr_make_io_signature(1, 1, sizeof (unsigned char))),
+      d_index (0)
     {
       set_relative_rate((double) (d_nblocks * d_bsize)); 
-      set_output_multiple(d_nblocks * d_bsize);
+      set_output_multiple(2 * d_nblocks * d_bsize);
+
+      PRINTF("d_nblocks: %i, d_bsize: %i\n", d_nblocks, d_bsize);
     }
 
     /*
@@ -85,7 +97,7 @@ namespace gr {
     void
     energy_descramble_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-        ninput_items_required[0] = 1 + (noutput_items / (d_nblocks * d_bsize));
+        ninput_items_required[0] = 10 + (noutput_items / (d_nblocks * d_bsize));
     }
 
     int
@@ -97,71 +109,80 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        int index = 0;
         int count = 0;
         int to_consume = 0;
         int to_out = 0;
-        int is_sync = 0;
 
-        // Search for NSYNC byte
-        while(is_sync == 0 && index < (d_nblocks * d_bsize))
-          if (in[index] == d_NSYNC)
-            is_sync = 1;
-          else
-          {
-            printf("index: %i\n", index);
-            index++;
-          }
+        PRINTF("ENERGY: d_offset: %i, d_index: %i, noutput_items: %i\n", d_offset, d_index, noutput_items);
 
         // Calculate the input items to consume
         // in order to produce noutput_items
         // It is important to set_output_multiple() first
-        int isize = noutput_items / (d_nblocks * d_bsize);
+        int isize = (noutput_items / (d_nblocks * d_bsize)) - 1;
 
-        // If we found a NSYNC byte
-        if (is_sync)
+        // Output only (noutput_items - 1) items in order to 
+        // have room for an initial offset
+        to_out = isize * d_nblocks * d_bsize;
+        to_consume = isize;
+
+        for (int i = 0; i < isize; i++)
         {
-          printf("NSYNC found on input[%i]\n", index);
+          int sync = d_NSYNC;
+          int mux_pkt = 0;
 
-          for (int i = 0; i < isize; i++)
+          init_prbs();
+
+          while (mux_pkt < d_MUX_PKT)
           {
-            init_prbs();
-	          int sync = d_NSYNC;
-
-            for (int j = 0; j < d_nblocks; j++)
+            if (in[d_index + count] != sync)
             {
-              if (in[index + count] != sync)
-                printf("error: Missing sync: %x on input[%i] %x!\n", sync, index + count, in[index + count]);
-              else
-                printf("sync found: %x on input[%i] %x\n", sync, index + count, in[index + count]);
+              PRINTF("ENERGY: error: Missing sync: %x on input[%i] %x!\n", sync, d_index + count, in[d_index + count]);
 
-              out[count++] = d_SYNC;
-	            // PRBS clocking starts right after NSYNC
+              // Go to the next input element
+              d_index++;
+              // Reset output counter
+              count = 0;
+              // Restart the search for NSYNC on the next index
+              sync = d_NSYNC;
+              // Reset MUX packet to 0
+              mux_pkt = 0;
 
-              for (int k = 1; k < d_bsize; k++)
-                out[count++] = in[index + count] ^ clock_prbs(d_nblocks);
+              if (d_index == d_nblocks * d_bsize)
+              {
+                d_index = 0;
+                break;
+              }
 
-              // For subsequent blocks PRBS is clocked also on SYNC
-              // but its output is not used
-              sync = d_SYNC;
-              clock_prbs(d_nblocks);
+              continue;
             }
-          }
+            else
+              PRINTF("ENERGY: sync found: %x on input[%i] %x, mux_pkt: %i\n", sync, d_index + count, in[d_index + count], mux_pkt);
 
-          to_consume = isize;
-          to_out = noutput_items;
+            out[count++] = d_SYNC;
+            // PRBS clocking starts right after NSYNC
+
+            for (int k = 1; k < d_bsize; k++)
+              out[count++] = in[d_index + count] ^ clock_prbs(d_nblocks);
+
+            // For subsequent blocks PRBS is clocked also on SYNC
+            // but its output is not used
+            sync = d_SYNC;
+            clock_prbs(d_nblocks);
+
+            mux_pkt++;
+          }
         }
-        else
-        {
-          to_consume = 1;
-          to_out = 0;
-        }
+
+        // For debug purposes
+        d_offset += to_consume * d_nblocks * d_bsize;
+
+        PRINTF("ENERGY: to_consume: %i, to_out: %i\n", to_consume, to_out);
 
         // Tell runtime how many input items we consumed
         consume_each(to_consume);
 
         // Tell runtime system how many output items we produced.
-        return to_out;
+        return (to_out);
     }
 
   } /* namespace dvbt */

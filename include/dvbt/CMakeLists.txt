@@ -41,5 +41,6 @@ install(FILES
     energy_descramble.h
     reed_solomon.h
     reed_solomon_dec.h
-    ofdm_sym_acquisition.h DESTINATION include/dvbt
+    ofdm_sym_acquisition.h
+    viterbi_decoder.h DESTINATION include/dvbt
 )

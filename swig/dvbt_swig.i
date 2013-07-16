@@ -27,6 +27,7 @@
 #include "dvbt/energy_descramble.h"
 #include "dvbt/reed_solomon_dec.h"
 #include "dvbt/ofdm_sym_acquisition.h"
+#include "dvbt/viterbi_decoder.h"
 %}
 
 %include "dvbt/test.h"
@@ -48,6 +49,7 @@
 %include "dvbt/reed_solomon_enc.h"
 %include "dvbt/reed_solomon_dec.h"
 %include "dvbt/ofdm_sym_acquisition.h"
+%include "dvbt/viterbi_decoder.h"
 GR_SWIG_BLOCK_MAGIC2(dvbt, test);
 GR_SWIG_BLOCK_MAGIC2(dvbt, vector_pad);
 GR_SWIG_BLOCK_MAGIC2(dvbt, reference_signals);
@@ -66,3 +68,4 @@ GR_SWIG_BLOCK_MAGIC2(dvbt, energy_descramble);
 GR_SWIG_BLOCK_MAGIC2(dvbt, reed_solomon_enc);
 GR_SWIG_BLOCK_MAGIC2(dvbt, reed_solomon_dec);
 GR_SWIG_BLOCK_MAGIC2(dvbt, ofdm_sym_acquisition);
+GR_SWIG_BLOCK_MAGIC2(dvbt, viterbi_decoder);

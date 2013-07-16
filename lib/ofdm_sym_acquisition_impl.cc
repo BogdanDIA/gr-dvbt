@@ -208,10 +208,10 @@ namespace gr {
       for (int i = 0; i < (2 * d_fft_length + d_cp_length); i++)
         printf("in[%i]: %.10f\n", i, d_lambda[i]);
 
-#endif
       // Print lambda
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         printf("lambda[%i]: %.10f\n", i, d_lambda[i]);
+#endif
 
       // Find peaks of lambda
       int peak_length = peak_detect_process(&d_lambda[0], (lookup_start - lookup_stop), &peak_pos[0]);
@@ -220,7 +220,9 @@ namespace gr {
       if (peak_length)
       {
         peak = peak_pos[0] + lookup_stop;
+#if 0
         printf("peak: %i, peak_pos[0]: %i\n",  peak, peak_pos[0]);
+#endif
 
         *cp_pos = peak;
 
@@ -270,7 +272,10 @@ namespace gr {
       }
       else
       {
+#if 0
         printf("miss, phaseinc: %.10f, phase: %.10f, \n", d_phaseinc, d_phase);
+#endif
+
 #if 0
         // Print input
         for (int i = 0; i < (2 * d_fft_length + d_cp_length); i++)

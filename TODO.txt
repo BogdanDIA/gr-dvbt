@@ -7,3 +7,8 @@ Move pilot_generator class in it's own file
 Write docs for demod_reference_signals
 Do not input block length directly in grc. Instead use transmission mode. Assert when data from xml differs from data from transmission mode.
 use std:conj, std::arg, std:: exp instead of C functions
+Implement Soft decision Viterbi decoder together with interleaver.
+Use fsm() from local implementation not from gnuradio.
+Use tags in order to sygnal NSYNC start from conv. deinterleaver to energy descramble.
+
+

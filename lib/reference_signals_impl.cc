@@ -769,11 +769,13 @@ namespace gr {
 	d_carrier_freq_correction = (right_angle + left_angle) * carrier_coeff;
 	d_sampling_freq_correction = (right_angle - left_angle) * sampling_coeff;
 
+#if 0
 	printf("left_corr_sum: re: %f, img: %f\n", left_corr_sum.real(), left_corr_sum.imag());
 	printf("right_corr_sum: re: %f, img: %f\n", right_corr_sum.real(), right_corr_sum.imag());
 
 	printf("d_carrier_freq_correction: %.10f\n", d_carrier_freq_correction);
 	printf("d_sampling_freq_correction: %.10f\n", d_sampling_freq_correction);
+#endif
     }
     
     // TODO - return d_freq_offset and c

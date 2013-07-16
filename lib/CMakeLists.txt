@@ -45,7 +45,10 @@ add_library(gnuradio-dvbt SHARED
     energy_descramble_impl.cc
     reed_solomon.cc
     reed_solomon_dec_impl.cc
-    ofdm_sym_acquisition_impl.cc )
+    ofdm_sym_acquisition_impl.cc
+    fsm.cc
+    base.cc
+    viterbi_decoder_impl.cc )
 target_link_libraries(gnuradio-dvbt ${Boost_LIBRARIES} ${GRUEL_LIBRARIES} ${GNURADIO_CORE_LIBRARIES})
 set_target_properties(gnuradio-dvbt PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt_EXPORTS")
 
@@ -67,6 +70,7 @@ include_directories(${CPPUNIT_INCLUDE_DIRS})
 list(APPEND test_dvbt_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/test_dvbt.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/qa_dvbt.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/qa_viterbi_decoder.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/qa_ofdm_sym_acquisition.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_dec.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_enc.cc

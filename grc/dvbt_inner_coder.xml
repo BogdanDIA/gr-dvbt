@@ -8,7 +8,7 @@
   <param>
     <name>Input length</name>
     <key>ninput</key>
-    <value>1512</value>
+    <value>1</value>
     <type>int</type>
   </param>
   <param>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Fri Jun 21 21:41:28 2013</timestamp>
+  <timestamp>Mon Aug  5 00:37:13 2013</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -77,45 +77,6 @@
     <param>
       <key>_coordinate</key>
       <value>(10, 170)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_viterbi_decoder</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_viterbi_decoder_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>b</value>
-    </param>
-    <param>
-      <key>fsm_args</key>
-      <value>1,3,[4,5,7]</value>
-    </param>
-    <param>
-      <key>block_size</key>
-      <value>34</value>
-    </param>
-    <param>
-      <key>init_state</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>final_state</key>
-      <value>-1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(565, 36)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -254,11 +215,46 @@
     <key>gr_file_source</key>
     <param>
       <key>id</key>
-      <value>gr_file_source_0</value>
+      <value>gr_file_source_0_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>False</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvbt-baruffa/test_pu.bin</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(14, 338)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_source</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_source_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
     </param>
     <param>
       <key>file</key>
@@ -293,7 +289,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
       <key>ninput</key>
@@ -325,30 +321,34 @@
     </param>
   </block>
   <block>
-    <key>gr_vector_to_stream</key>
+    <key>gr_file_sink</key>
     <param>
       <key>id</key>
-      <value>gr_vector_to_stream_0</value>
+      <value>gr_file_sink_0</value>
     </param>
     <param>
       <key>_enabled</key>
-      <value>False</value>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/viterbi_pack_out.bin</value>
     </param>
     <param>
       <key>type</key>
       <value>byte</value>
     </param>
     <param>
-      <key>num_items</key>
-      <value>1512</value>
-    </param>
-    <param>
       <key>vlen</key>
       <value>1</value>
     </param>
     <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>_coordinate</key>
-      <value>(447, 454)</value>
+      <value>(849, 251)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -379,76 +379,6 @@
     </param>
   </block>
   <block>
-    <key>gr_file_source</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_source_0_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvbt-baruffa/test_pu.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 243)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_sink</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_sink_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvbt/grc/viterbi_pack_out.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>unbuffered</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(849, 251)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>gr_pack_k_bits_bb</key>
     <param>
       <key>id</key>
@@ -456,7 +386,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>k</key>
@@ -472,6 +402,37 @@
     </param>
   </block>
   <block>
+    <key>gr_vector_to_stream</key>
+    <param>
+      <key>id</key>
+      <value>gr_vector_to_stream_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>num_items</key>
+      <value>1512</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(447, 454)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>dvbt_viterbi_decoder</key>
     <param>
       <key>id</key>
@@ -480,6 +441,18 @@
     <param>
       <key>_enabled</key>
       <value>True</value>
+    </param>
+    <param>
+      <key>constellation</key>
+      <value>qam16</value>
+    </param>
+    <param>
+      <key>hierarchy</key>
+      <value>nh</value>
+    </param>
+    <param>
+      <key>code_rate</key>
+      <value>C1_2</value>
     </param>
     <param>
       <key>type</key>
@@ -517,18 +490,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>dvbt_inner_coder_0</source_block_id>
-    <sink_block_id>gr_file_sink_0_1_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>gr_vector_to_stream_0</source_block_id>
-    <sink_block_id>gr_unpack_k_bits_bb_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>gr_file_source_0</source_block_id>
     <sink_block_id>dvbt_inner_coder_0</sink_block_id>
     <source_key>0</source_key>
@@ -559,13 +520,31 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
+    <source_block_id>gr_pack_k_bits_bb_1</source_block_id>
+    <sink_block_id>dvbt_viterbi_decoder_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>gr_vector_to_stream_0</source_block_id>
+    <sink_block_id>gr_unpack_k_bits_bb_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>dvbt_inner_coder_0</source_block_id>
+    <sink_block_id>gr_file_sink_0_1_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
     <source_block_id>gr_file_source_0_0</source_block_id>
     <sink_block_id>gr_pack_k_bits_bb_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>gr_pack_k_bits_bb_1</source_block_id>
+    <source_block_id>gr_vector_to_stream_0</source_block_id>
     <sink_block_id>dvbt_viterbi_decoder_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>

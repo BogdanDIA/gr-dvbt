@@ -202,13 +202,11 @@ namespace gr {
        * out/in rate is therefore km/8n in bytes
        */
 
-#if 0
       //assert((d_k * d_m) % (8 * d_n));
       assert((d_k * d_m) % (d_n));
 
       //set_relative_rate((d_k * d_m) / (8 * d_n));
       set_relative_rate((d_k * d_m) / (d_n));
-#endif
     }
 
     /*
@@ -222,7 +220,10 @@ namespace gr {
     viterbi_decoder_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
        assert (noutput_items % d_K == 0);
-       int input_required = noutput_items ;
+
+       int input_required = noutput_items * d_n / (d_k * d_m);
+       //int input_required = noutput_items;
+
        unsigned ninputs = ninput_items_required.size();
        for (unsigned int i = 0; i < ninputs; i++) {
          ninput_items_required[i] = input_required;
@@ -240,43 +241,48 @@ namespace gr {
         assert (noutput_items % d_K == 0);
         int nblocks = noutput_items / d_K;
 
-        // We need to convert from 1 byte of d_m bits input to
-        // to 1 byte of d_n bits input
-
-        // We need to make Viterbi algorithm aware of puncturing matrix
+        // TODO - Make Viterbi algorithm aware of puncturing matrix
 
         int no_bits = d_K * d_n;
+        int no_symbols = d_K * d_n / d_m;
 
-        unsigned char in_bits[no_bits];
+        unsigned char in_bits[no_bits * nblocks];
         unsigned char in_codewords[d_K];
 
         for (int m=0;m<nstreams;m++) {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
 
-#if 0
-          for (int count = 0, i = 0; i < (no_bits / d_m); i++)
-            for (int j = (d_m - 1); j >= 0; j--)
-              in_bits[count++] = (in[i] >> j) & 1;
-
-          for (int count = 0, i = 0; i < (d_n * d_K); i++)
-          {
-            in_codewords[i] = 0;
-
-            for (int j = 0; j < d_n; j++)
-              in_codewords[i] = (in_codewords[i] << 1) | in_bits[count++];
-          }
-#endif
-
           for (int n=0;n<nblocks;n++) {
+
+            for (int count = 0, i = 0; i < no_symbols; i++)
+            {
+              for (int j = (d_m - 1); j >= 0; j--)
+                in_bits[count++] = (in[(n * no_symbols) + i] >> j) & 1;
+
+              //printf("in[%i]: %x\n", (n * no_symbols) + i, in[(n * no_symbols) + i]);
+            }
+
+            for (int count = 0, i = 0; i < d_K; i++)
+            {
+              in_codewords[i] = in_bits[count++];
+
+              for (int j = 0; j < (d_n - 1); j++)
+                in_codewords[i] = (in_codewords[i] << 1) | in_bits[count++];
+
+              //printf("in_codewords[%i]: %x\n", i, in_codewords[i]);
+            }
+
             viterbi_algorithm(d_FSM.I(), d_FSM.S(), d_FSM.O(), d_FSM.NS(), d_FSM.OS(), \
-                d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in_codewords[n*d_K]), &(out[n*d_K]));
+                d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in_codewords[0]), &(out[n*d_K]));
+                //d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in[n*d_K]), &(out[n*d_K]));
           }
         }
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
-        consume_each (noutput_items);
+        consume_each (noutput_items * d_n / (d_k * d_m));
+        //consume_each (noutput_items);
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

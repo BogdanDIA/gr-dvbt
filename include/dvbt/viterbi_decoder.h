@@ -25,6 +25,7 @@
 #include <dvbt/api.h>
 #include <gr_block.h>
 #include <fsm.h>
+#include <dvbt/dvbt_config.h>
 
 namespace gr {
   namespace dvbt {
@@ -47,7 +48,8 @@ namespace gr {
         * class. dvbt::viterbi_decoder::make is the public interface for
         * creating new instances.
         */
-       static sptr make(const fsm &FSM, int K, int S0, int SK);
+       static sptr make(dvbt_constellation_t constellation, \
+                   dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK);
     };
 
   } // namespace dvbt

@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2013 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -158,26 +158,57 @@ namespace gr {
 
 
     viterbi_decoder::sptr
-    viterbi_decoder::make(const fsm &FSM, int K, int S0, int SK)
+    viterbi_decoder::make(dvbt_constellation_t constellation, \
+                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK)
     {
-      return gnuradio::get_initial_sptr (new viterbi_decoder_impl(FSM, K, S0, SK));
+      return gnuradio::get_initial_sptr (new viterbi_decoder_impl(constellation, hierarchy, coderate, FSM, K, S0, SK));
     }
 
     /*
      * The private constructor
      */
-    viterbi_decoder_impl::viterbi_decoder_impl(const fsm &FSM, int K, int S0, int SK)
+    viterbi_decoder_impl::viterbi_decoder_impl(dvbt_constellation_t constellation, \
+                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK)
       : gr_block("viterbi_decoder",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
 		      gr_make_io_signature(1, 1, sizeof (unsigned char))),
+      config(constellation, hierarchy, coderate, coderate),
       d_FSM (FSM),
       d_K (K),
       d_S0 (S0),
       d_SK (SK),
       d_state (S0)
     {
+      //Determine k - input of encoder
+      d_k = config.d_cr_k;
+      //Determine n - output of encoder
+      d_n = config.d_cr_n;
+      //Determine m - constellation symbol size
+      d_m = config.d_m;
+
+
       set_relative_rate (1.0);
       set_output_multiple (d_K);
+
+      printf("Viterbi: k: %i\n", d_k);
+      printf("Viterbi: n: %i\n", d_n);
+      printf("Viterbi: m: %i\n", d_m);
+      printf("Viterbi: K: %i\n", d_K);
+
+      /*
+       * We input n bytes, each carrying m bits => nm bits
+       * The result after decoding is km bits, therefore km/8 bytes.
+       *
+       * out/in rate is therefore km/8n in bytes
+       */
+
+#if 0
+      //assert((d_k * d_m) % (8 * d_n));
+      assert((d_k * d_m) % (d_n));
+
+      //set_relative_rate((d_k * d_m) / (8 * d_n));
+      set_relative_rate((d_k * d_m) / (d_n));
+#endif
     }
 
     /*
@@ -209,12 +240,37 @@ namespace gr {
         assert (noutput_items % d_K == 0);
         int nblocks = noutput_items / d_K;
 
+        // We need to convert from 1 byte of d_m bits input to
+        // to 1 byte of d_n bits input
+
+        // We need to make Viterbi algorithm aware of puncturing matrix
+
+        int no_bits = d_K * d_n;
+
+        unsigned char in_bits[no_bits];
+        unsigned char in_codewords[d_K];
+
         for (int m=0;m<nstreams;m++) {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
+
+#if 0
+          for (int count = 0, i = 0; i < (no_bits / d_m); i++)
+            for (int j = (d_m - 1); j >= 0; j--)
+              in_bits[count++] = (in[i] >> j) & 1;
+
+          for (int count = 0, i = 0; i < (d_n * d_K); i++)
+          {
+            in_codewords[i] = 0;
+
+            for (int j = 0; j < d_n; j++)
+              in_codewords[i] = (in_codewords[i] << 1) | in_bits[count++];
+          }
+#endif
+
           for (int n=0;n<nblocks;n++) {
             viterbi_algorithm(d_FSM.I(), d_FSM.S(), d_FSM.O(), d_FSM.NS(), d_FSM.OS(), \
-                d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in[n*d_K]), &(out[n*d_K]));
+                d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in_codewords[n*d_K]), &(out[n*d_K]));
           }
         }
 

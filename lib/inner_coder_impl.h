@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2013 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ namespace gr {
       // Code rate k/n
       int d_k;
       int d_n;
-      // Cosntellation with m
+      // Constellation with m
       int d_m;
 
       void generate_codeword(int in, int &x, int &y);

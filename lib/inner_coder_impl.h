@@ -52,7 +52,7 @@ namespace gr {
       // Code rate k/n
       int d_k;
       int d_n;
-      // Cosntellation with m
+      // Constellation with m
       int d_m;
 
       void generate_codeword(int in, int &x, int &y);

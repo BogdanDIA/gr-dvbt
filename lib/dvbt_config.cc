@@ -150,22 +150,22 @@ namespace gr {
       switch (d_code_rate_HP)
       {
         case gr::dvbt::C1_2:
-          d_cr_k = 1; d_cr_n = 2;
+          d_cr_k = 1; d_cr_n = 2; d_cr_p = 1;
           break;
         case gr::dvbt::C2_3:
-          d_cr_k = 2; d_cr_n = 3;
+          d_cr_k = 2; d_cr_n = 3; d_cr_p = 2;
           break;
         case gr::dvbt::C3_4:
-          d_cr_k = 3; d_cr_n = 4;
+          d_cr_k = 3; d_cr_n = 4; d_cr_p = 3;
           break;
         case gr::dvbt::C5_6:
-          d_cr_k = 5; d_cr_k = 6;
+          d_cr_k = 5; d_cr_k = 6; d_cr_p = 5;
         break;
         case gr::dvbt::C7_8:
-          d_cr_k = 7; d_cr_n = 8;
+          d_cr_k = 7; d_cr_n = 8; d_cr_p = 7;
           break;
         default:
-          d_cr_k = 1; d_cr_n = 2;
+          d_cr_k = 1; d_cr_n = 2; d_cr_p = 1;
           break;
       }
 

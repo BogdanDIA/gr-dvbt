@@ -22,6 +22,7 @@
 #define INCLUDED_DVBT_VITERBI_DECODER_IMPL_H
 
 #include <dvbt/viterbi_decoder.h>
+#include <dvbt/dvbt_config.h>
 
 namespace gr {
   namespace dvbt {
@@ -29,6 +30,15 @@ namespace gr {
     class viterbi_decoder_impl : public viterbi_decoder
     {
     private:
+      dvbt_config config;
+
+      // Code rate k/n
+      int d_k;
+      int d_n;
+      // Constellation with m
+      int d_m;
+
+
       fsm d_FSM;
       int d_K;
       int d_S0;
@@ -52,7 +62,8 @@ namespace gr {
 	const unsigned char *in, unsigned char *out
 	);
 
-      viterbi_decoder_impl(const fsm &FSM, int K, int S0, int SK);
+      viterbi_decoder_impl(dvbt_constellation_t constellation, \
+		              dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK);
       ~viterbi_decoder_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

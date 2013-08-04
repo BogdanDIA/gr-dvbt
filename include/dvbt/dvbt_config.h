@@ -121,6 +121,7 @@ namespace gr {
       dvbt_code_rate_t d_code_rate_LP;
       int d_cr_k;
       int d_cr_n;
+      int d_cr_p;
 
       //Hierarchy information
       dvbt_hierarchy_t d_hierarchy;

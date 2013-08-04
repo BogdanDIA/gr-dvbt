@@ -207,6 +207,9 @@ namespace gr {
 
       //set_relative_rate((d_k * d_m) / (8 * d_n));
       set_relative_rate((d_k * d_m) / (d_n));
+
+      assert ((d_K * d_n) % d_m == 0);
+      d_nsymbols = d_K * d_n / d_m;
     }
 
     /*
@@ -241,12 +244,8 @@ namespace gr {
         assert (noutput_items % d_K == 0);
         int nblocks = noutput_items / d_K;
 
-        // TODO - Make Viterbi algorithm aware of puncturing matrix
-
-        int no_bits = d_K * d_n;
-        int no_symbols = d_K * d_n / d_m;
-
-        unsigned char in_bits[no_bits * nblocks];
+        // TODO - Allocate dynamically these buffers
+        unsigned char in_bits[d_K * d_n * nblocks];
         unsigned char in_codewords[d_K];
 
         for (int m=0;m<nstreams;m++) {
@@ -255,10 +254,10 @@ namespace gr {
 
           for (int n=0;n<nblocks;n++) {
 
-            for (int count = 0, i = 0; i < no_symbols; i++)
+            for (int count = 0, i = 0; i < d_nsymbols; i++)
             {
               for (int j = (d_m - 1); j >= 0; j--)
-                in_bits[count++] = (in[(n * no_symbols) + i] >> j) & 1;
+                in_bits[count++] = (in[(n * d_nsymbols) + i] >> j) & 1;
 
               //printf("in[%i]: %x\n", (n * no_symbols) + i, in[(n * no_symbols) + i]);
             }
@@ -273,9 +272,12 @@ namespace gr {
               //printf("in_codewords[%i]: %x\n", i, in_codewords[i]);
             }
 
+            // TODO - Make Viterbi algorithm aware of puncturing matrix
             viterbi_algorithm(d_FSM.I(), d_FSM.S(), d_FSM.O(), d_FSM.NS(), d_FSM.OS(), \
                 d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in_codewords[0]), &(out[n*d_K]));
                 //d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in[n*d_K]), &(out[n*d_K]));
+
+            // TODO - Pack output bits into bytes
           }
         }
 

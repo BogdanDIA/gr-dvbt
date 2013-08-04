@@ -38,6 +38,8 @@ namespace gr {
       // Constellation with m
       int d_m;
 
+      // Symbols to consume on decoding
+      int d_nsymbols;
 
       fsm d_FSM;
       int d_K;

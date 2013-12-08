@@ -30,8 +30,9 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-struct timeval tvs, tve;
-struct timezone tzs, tze;
+// For timing debug
+static struct timeval tvs, tve;
+static struct timezone tzs, tze;
 
 #define USE_VOLK 1
 

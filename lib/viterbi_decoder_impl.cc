@@ -25,6 +25,11 @@
 #include <gr_io_signature.h>
 #include "viterbi_decoder_impl.h"
 #include <stdio.h>
+#include <sys/time.h>
+
+// For timing debug
+static struct timeval tvs, tve;
+static struct timezone tzs, tze;
 
 //#define VITERBI_DEBUG 1
 
@@ -252,6 +257,8 @@ namespace gr {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
 
+          //gettimeofday(&tvs, &tzs);
+
           for (int n=0;n<nblocks;n++) {
 
             for (int count = 0, i = 0; i < d_nsymbols; i++)
@@ -279,7 +286,11 @@ namespace gr {
 
             // TODO - Pack output bits into bytes
           }
+
+          //gettimeofday(&tve, &tze);
+          //printf("viterbi: nblocks: %i, us/block: %f\n", nblocks, (float)(tve.tv_usec - tvs.tv_usec) / (float) nblocks);
         }
+
 
         // Tell runtime system how many input items we consumed on
         // each input stream.

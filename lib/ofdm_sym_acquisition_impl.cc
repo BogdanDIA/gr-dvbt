@@ -31,6 +31,8 @@
 #include <volk/volk.h>
 #include <gr_fxpt.h>
 
+#define USE_VOLK 1
+
 void print_float(float f)
 {
   for (int j = 0; j < 4; j++)
@@ -139,16 +141,22 @@ namespace gr {
       assert(lookup_start >= lookup_stop);
       assert(lookup_stop >= (d_cp_length + d_fft_length - 1));
 
+      int low, size;
+
       // Array to store peak positions
       int peak_pos[d_fft_length];
       float d_phi[d_fft_length];
 
       // Calculate norm
 #ifdef USE_VOLK
-      if(is_unaligned())
-        volk_32fc_magnitude_squared_32f_u(d_norm, in, d_cp_length);
-      else
-        volk_32fc_magnitude_squared_32f_a(d_norm, in, d_cp_length);
+      low = lookup_stop - (d_cp_length + d_fft_length - 1);
+      size = lookup_start - (lookup_stop - (d_cp_length + d_fft_length - 1));
+      //printf("low: %i, size: %i\n", low, size);
+
+      //if(is_unaligned())
+        volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
+      //else
+        //volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
 #else
       for (int i = lookup_start; i >= (lookup_stop - (d_cp_length + d_fft_length - 1)); i--)
         d_norm[i] = std::norm(in[i]);
@@ -156,10 +164,13 @@ namespace gr {
       
       // Calculate gamma on each point
 #ifdef USE_VOLK
-      if (is_unaligned())
-        volk_32fc_x2_multiply_conjugate_32fc_u(d_corr, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
-      else
-        volk_32fc_x2_multiply_conjugate_32fc_a(d_corr, &in[0], &in[d_fft_length], d_cp_length + d_fft_length);
+      size = lookup_start - (lookup_stop - d_cp_length - 1);
+      low = lookup_stop - d_cp_length - 1;
+
+      //if (is_unaligned())
+        volk_32fc_x2_multiply_conjugate_32fc_u(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
+      //else
+        //volk_32fc_x2_multiply_conjugate_32fc_a(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
 #else
       for (int i = lookup_start; i >= (lookup_stop - d_cp_length - 1); i--)
         d_corr[i - d_fft_length] = in[i] * std::conj(in[i - d_fft_length]);
@@ -186,10 +197,13 @@ namespace gr {
 
       // Init lambda with gamma
 #ifdef USE_VOLK
-      if (is_unaligned())  
-        volk_32fc_magnitude_32f_a(d_lambda, d_gamma, d_fft_length);
-      else
-        volk_32fc_magnitude_32f_u(d_lambda, d_gamma, d_fft_length);
+      low = 0;
+      size = lookup_start - lookup_stop;
+
+      //if (is_unaligned())  
+        volk_32fc_magnitude_32f_a(&d_lambda[low], &d_gamma[low], size);
+      //else
+        //volk_32fc_magnitude_32f_a(&d_lambda[low], &d_gamma[low], size);
 #else
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] = std::abs(d_gamma[i]);
@@ -197,7 +211,11 @@ namespace gr {
 
       // Calculate lambda
 #ifdef USE_VOLK
-      //
+      low = 0;
+      size = lookup_start - lookup_stop;
+
+      volk_32f_s32f_multiply_32f_a(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
+      volk_32f_x2_subtract_32f_a(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
 #else
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] -= (d_phi[i] * d_rho / 2.0);
@@ -207,7 +225,9 @@ namespace gr {
       // Print input
       for (int i = 0; i < (2 * d_fft_length + d_cp_length); i++)
         printf("in[%i]: %.10f\n", i, d_lambda[i]);
+#endif
 
+#if 0
       // Print lambda
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         printf("lambda[%i]: %.10f\n", i, d_lambda[i]);
@@ -219,15 +239,17 @@ namespace gr {
       // We found an end of symbol at peak_pos[0] + CP + FFT
       if (peak_length)
       {
-        peak = peak_pos[0] + lookup_stop;
+        /* peak = peak_pos[0] + lookup_stop; */
+        peak = peak_pos[peak_length - 1] + lookup_stop;
 #if 0
-        printf("peak: %i, peak_pos[0]: %i\n",  peak, peak_pos[0]);
+        for (int i = 0; i < peak_length; i++)
+          printf("peak: %i, peak_pos[%i]: %i\n", peak, i, peak_pos[i]);
 #endif
-
         *cp_pos = peak;
 
         // Calculate frequency correction
-        float peak_epsilon = gr_fast_atan2f(d_gamma[peak_pos[0]]);
+        /*float peak_epsilon = gr_fast_atan2f(d_gamma[peak_pos[0]]);*/
+        float peak_epsilon = gr_fast_atan2f(d_gamma[peak_pos[peak_length - 1]]);
         double sensitivity = (double)(-1) / (double)d_fft_length;
 
         //printf("peak_epsilon: %.10f\n", peak_epsilon);
@@ -401,23 +423,20 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
-        int cp_start = 0;
-
         // This is initial aquisition of symbol start
         // TODO - make a FSM
-        if (!d_initial_aquisition && (++d_sym_acq_count < d_sym_acq_timeout))
+        if (!d_initial_aquisition)
         {
           d_initial_aquisition = ml_sync(in, 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
         }
 
         // This is fractional frequency correction (pre FFT)
+        // It is also calle coarse frequency correction
         if (d_initial_aquisition)
         {
-          cp_start = d_cp_start;
-
           d_cp_found = ml_sync(in, d_cp_start + 4, d_cp_start - 4, \
-              &cp_start, &d_derot[0], &d_to_consume, &d_to_out);
+              &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
 
           if (d_cp_found)
           {
@@ -425,7 +444,7 @@ namespace gr {
 
             d_freq_correction_count = 0;
 
-            // Derotate the signal and output
+            // Derotate the signal and out
             int j = 0;
             for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)
             {

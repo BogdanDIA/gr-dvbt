@@ -195,13 +195,12 @@ namespace gr {
 
         //gettimeofday(&tvs, &tzs);
 
-#ifdef USE_VOLk
+#ifdef USE_VOLK
         // TODO - allocate this on heap
         gr_complex ff[noutput_items * d_nsize];
         gr_complex gg(d_gain, 0.0);
 
         volk_32fc_s32fc_multiply_32fc_a(&ff[0], &in[0], gg, noutput_items * d_nsize);
-
 
         for (int i = 0; i < (noutput_items * d_nsize); i++)
           out[i] = find_constellation_value(ff[i]);
@@ -210,7 +209,7 @@ namespace gr {
           out[i] = find_constellation_value(in[i] * d_gain);
 #endif
         //gettimeofday(&tve, &tze);
-        //printf("us: %f\n", (float) (tve.tv_usec - tvs.tv_usec) / (float) (noutput_items * d_nsize));
+        //printf("dvbt demap: us: %f\n", (float) (tve.tv_usec - tvs.tv_usec) / (float) (noutput_items * d_nsize));
 
         consume_each (noutput_items);
 

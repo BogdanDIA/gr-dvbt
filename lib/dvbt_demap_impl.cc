@@ -21,13 +21,19 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <volk/volk.h>
 
 #include <gr_io_signature.h>
-#include "dvbt_demap_impl.h"
 #include <dvbt/dvbt_config.h>
-#include <complex.h>
+#include "dvbt_demap_impl.h"
 #include <gr_math.h>
 #include <stdio.h>
+#include <sys/time.h>
+
+struct timeval tvs, tve;
+struct timezone tzs, tze;
+
+#define USE_VOLK 1
 
 namespace gr {
   namespace dvbt {
@@ -128,19 +134,38 @@ namespace gr {
     int
     dvbt_demap_impl::find_constellation_value(gr_complex val)
     {
-      float min_dist = norm(val - d_constellation_points[0]);
+      float min_dist = std::norm(val - d_constellation_points[0]);
       int min_index = 0;
+
+
+#ifdef USE_VOLK
+      float ff[d_constellation_size];
+
+      volk_32fc_x2_square_dist_32f_a(&ff[0], &val, &d_constellation_points[0], d_constellation_size * 8);
 
       for (int i = 0; i < d_constellation_size; i++)
       {
-        float dist = norm(val - d_constellation_points[i]);
+        //printf("ff: %f\n", ff[i]);
+        if (ff[i] < min_dist)
+        {
+          min_dist = ff[i];
+          min_index = i;
+        }
+      }
+#else
+      for (int i = 0; i < d_constellation_size; i++)
+      {
+        float dist = std::norm(val - d_constellation_points[i]);
+        //printf("dist: %f\n", dist);
+
         if (dist < min_dist)
         {
           min_dist = dist;
           min_index = i;
         }
       }
- 
+#endif
+
       return d_constellation_bits[min_index];
     }
 
@@ -167,8 +192,24 @@ namespace gr {
 
         // TODO - use DFE (Decission Feedback Equalizer)
 
+        //gettimeofday(&tvs, &tzs);
+
+#ifdef USE_VOLk
+        // TODO - allocate this on heap
+        gr_complex ff[noutput_items * d_nsize];
+        gr_complex gg(d_gain, 0.0);
+
+        volk_32fc_s32fc_multiply_32fc_a(&ff[0], &in[0], gg, noutput_items * d_nsize);
+
+
+        for (int i = 0; i < (noutput_items * d_nsize); i++)
+          out[i] = find_constellation_value(ff[i]);
+#else
         for (int i = 0; i < (noutput_items * d_nsize); i++)
           out[i] = find_constellation_value(in[i] * d_gain);
+#endif
+        //gettimeofday(&tve, &tze);
+        //printf("us: %f\n", (float) (tve.tv_usec - tvs.tv_usec) / (float) (noutput_items * d_nsize));
 
         consume_each (noutput_items);
 

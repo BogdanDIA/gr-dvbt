@@ -25,6 +25,10 @@
 #include <gr_io_signature.h>
 #include "reed_solomon_dec_impl.h"
 #include <stdio.h>
+#include <sys/time.h>
+
+static struct timeval tvs, tve;
+static struct timezone tzs, tze;
 
 namespace gr {
   namespace dvbt {
@@ -81,6 +85,8 @@ namespace gr {
       int in_bsize = d_n - d_s;
       int out_bsize = d_k - d_s;
 
+      //gettimeofday(&tvs, &tzs);
+
       for (int i = 0; i < (d_blocks * noutput_items); i++)
       {
         //TODO - zero copy?
@@ -93,6 +99,11 @@ namespace gr {
 
         memcpy(&out[i * out_bsize], &d_in[d_s], out_bsize);
       }
+
+      //gettimeofday(&tve, &tze);
+
+      //printf("reed_solomon: blocks: %i, us: %f\n", d_blocks * noutput_items, \
+          (float) (tve.tv_usec - tvs.tv_usec) / (float) (d_blocks * noutput_items));
 
       // Tell runtime system how many input items we consumed on
       // each input stream.

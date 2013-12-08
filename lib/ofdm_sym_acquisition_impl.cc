@@ -423,6 +423,8 @@ namespace gr {
         gr_complex *out = (gr_complex *) output_items[0];
         unsigned char *trigger = (unsigned char *) output_items[1];
 
+        int low, size;
+
         // This is initial aquisition of symbol start
         // TODO - make a FSM
         if (!d_initial_aquisition)
@@ -445,12 +447,19 @@ namespace gr {
             d_freq_correction_count = 0;
 
             // Derotate the signal and out
+#ifdef USE_VOLK
+            low = d_cp_start - d_fft_length + 1;
+            size = d_cp_start - (d_cp_start - d_fft_length + 1);
+
+            volk_32fc_x2_multiply_32fc_u(&out[0], &d_derot[0], &in[low], size);
+#else
             int j = 0;
             for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)
             {
               out[j] = d_derot[j] * in[i];
               j++;
             }
+#endif
           }
           else
           {

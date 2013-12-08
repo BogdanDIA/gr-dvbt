@@ -150,7 +150,7 @@ namespace gr {
       // Calculate norm
 #ifdef USE_VOLK
       low = lookup_stop - (d_cp_length + d_fft_length - 1);
-      size = lookup_start - (lookup_stop - (d_cp_length + d_fft_length - 1));
+      size = lookup_start - (lookup_stop - (d_cp_length + d_fft_length - 1)) + 1;
       //printf("low: %i, size: %i\n", low, size);
 
       //if(is_unaligned())
@@ -164,8 +164,8 @@ namespace gr {
       
       // Calculate gamma on each point
 #ifdef USE_VOLK
-      size = lookup_start - (lookup_stop - d_cp_length - 1);
       low = lookup_stop - d_cp_length - 1;
+      size = lookup_start - (lookup_stop - d_cp_length - 1) + 1;
 
       //if (is_unaligned())
         volk_32fc_x2_multiply_conjugate_32fc_u(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
@@ -449,7 +449,7 @@ namespace gr {
             // Derotate the signal and out
 #ifdef USE_VOLK
             low = d_cp_start - d_fft_length + 1;
-            size = d_cp_start - (d_cp_start - d_fft_length + 1);
+            size = d_cp_start - (d_cp_start - d_fft_length + 1) + 1;
 
             volk_32fc_x2_multiply_32fc_u(&out[0], &d_derot[0], &in[low], size);
 #else

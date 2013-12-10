@@ -253,14 +253,18 @@ namespace gr {
         unsigned char in_bits[d_K * d_n * nblocks];
         unsigned char in_codewords[d_K];
 
+        gettimeofday(&tvs, &tzs);
+
         for (int m=0;m<nstreams;m++) {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
 
-          //gettimeofday(&tvs, &tzs);
+          for (int n = 0; n < nblocks; n++) {
 
-          for (int n=0;n<nblocks;n++) {
-
+            /*
+             * We receive the symbol (d_m bits/byte) in one byte (e.g. for QAM16 00001111).
+             * Create a buffer of bytes containing just one bint/byte.
+             */
             for (int count = 0, i = 0; i < d_nsymbols; i++)
             {
               for (int j = (d_m - 1); j >= 0; j--)
@@ -269,6 +273,9 @@ namespace gr {
               //printf("in[%i]: %x\n", (n * no_symbols) + i, in[(n * no_symbols) + i]);
             }
 
+            /*
+             * Transform the stream of one bit/byte into codewords of d_n bits/byte
+             */
             for (int count = 0, i = 0; i < d_K; i++)
             {
               in_codewords[i] = in_bits[count++];
@@ -287,10 +294,11 @@ namespace gr {
             // TODO - Pack output bits into bytes
           }
 
-          //gettimeofday(&tve, &tze);
-          //printf("viterbi: nblocks: %i, us/block: %f\n", nblocks, (float)(tve.tv_usec - tvs.tv_usec) / (float) nblocks);
         }
 
+        gettimeofday(&tve, &tze);
+        printf("viterbi: nblocks: %i, us/bit out: %f\n", \
+            nblocks, (float)(tve.tv_usec - tvs.tv_usec) / (float) (nblocks * d_K));
 
         // Tell runtime system how many input items we consumed on
         // each input stream.

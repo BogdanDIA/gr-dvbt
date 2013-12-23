@@ -20,6 +20,14 @@
  * Boston, MA 02110-1301, USA.
  */
 
+/*
+ * There are two implementatios of Viterbi algorithms:
+ * - one based on gnuradio
+ * - one based on Karn's implementation
+ * For now Karn's implementation is used. 
+ * Note: the output is padded with 4 bytes of 0 value
+ */
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

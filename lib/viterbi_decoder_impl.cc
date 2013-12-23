@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+
 // For timing debug
 static struct timeval tvs, tve;
 static struct timezone tzs, tze;
@@ -93,6 +94,7 @@ namespace gr {
     alphai=0;
     for(int k=0;k<K;k++) {
         norm=INF;
+
         for(int j=0;j<S;j++) { // for each next state do ACS
             minm=INF;
             minmi=0;
@@ -105,13 +107,17 @@ namespace gr {
               // and output symbol
               int metric = OS[PS[j][i]*I+PI[j][i]] ^ (int)in[k];
               int distance = 0;
+#if 0
               while (metric)
               {
                 if (metric & 1)
                   distance++;
 
-                metric >>= 1;
+                metric &= metric - 1;
               }
+#else
+              distance = __builtin_popcount(metric);
+#endif
 
               if((mm=(int)alpha[alphai*S+PS[j][i]]+distance)<minm)
                         minm=mm,minmi=i;
@@ -131,10 +137,12 @@ namespace gr {
             printf("******* alpha[%i]: %i\n", ((alphai+1)%2)*S+j, minm);
 #endif
             if(minm<norm) norm=minm;
+
         }
         for(int j=0;j<S;j++)
             alpha[((alphai+1)%2)*S+j]-=norm; // normalize total metrics so they do not explode
         alphai=(alphai+1)%2;
+
     }
 
     if(SK<0) { // final state not specified
@@ -193,7 +201,7 @@ namespace gr {
 
 
       set_relative_rate (1.0);
-      set_output_multiple (d_K);
+      set_output_multiple (d_K/8);
 
       printf("Viterbi: k: %i\n", d_k);
       printf("Viterbi: n: %i\n", d_n);
@@ -207,14 +215,21 @@ namespace gr {
        * out/in rate is therefore km/8n in bytes
        */
 
-      //assert((d_k * d_m) % (8 * d_n));
-      assert((d_k * d_m) % (d_n));
+      assert((d_k * d_m) % (8 * d_n));
+      //assert((d_k * d_m) % (d_n));
 
-      //set_relative_rate((d_k * d_m) / (8 * d_n));
-      set_relative_rate((d_k * d_m) / (d_n));
+      set_relative_rate((d_k * d_m) / (8 * d_n));
+      //set_relative_rate((d_k * d_m) / (d_n));
 
       assert ((d_K * d_n) % d_m == 0);
       d_nsymbols = d_K * d_n / d_m;
+
+      int amp = 100;
+      float RATE=0.5;
+      float ebn0 = 12.0;
+      float esn0 = RATE*pow(10.0, ebn0/10);
+      d_gen_met(mettab, amp, esn0, 0.0, 4);
+      d_viterbi_chunks_init(state0);
     }
 
     /*
@@ -229,8 +244,7 @@ namespace gr {
     {
        assert (noutput_items % d_K == 0);
 
-       int input_required = noutput_items * d_n / (d_k * d_m);
-       //int input_required = noutput_items;
+       int input_required = noutput_items * 8 * d_n / (d_k * d_m);
 
        unsigned ninputs = ninput_items_required.size();
        for (unsigned int i = 0; i < ninputs; i++) {
@@ -247,11 +261,10 @@ namespace gr {
         assert (input_items.size() == output_items.size());
         int nstreams = input_items.size();
         assert (noutput_items % d_K == 0);
-        int nblocks = noutput_items / d_K;
+        int nblocks = 8*noutput_items / d_K;
 
         // TODO - Allocate dynamically these buffers
         unsigned char in_bits[d_K * d_n * nblocks];
-        unsigned char in_codewords[d_K];
 
         gettimeofday(&tvs, &tzs);
 
@@ -263,38 +276,45 @@ namespace gr {
 
             /*
              * We receive the symbol (d_m bits/byte) in one byte (e.g. for QAM16 00001111).
-             * Create a buffer of bytes containing just one bint/byte.
+             * Create a buffer of bytes containing just one bit/byte.
              */
             for (int count = 0, i = 0; i < d_nsymbols; i++)
             {
               for (int j = (d_m - 1); j >= 0; j--)
                 in_bits[count++] = (in[(n * d_nsymbols) + i] >> j) & 1;
 
-              //printf("in[%i]: %x\n", (n * no_symbols) + i, in[(n * no_symbols) + i]);
+              //printf("in[%i]: %x\n", \
+                //(n * d_nsymbols) + i, in[(n * d_nsymbols) + i]);
             }
 
             /*
-             * Transform the stream of one bit/byte into codewords of d_n bits/byte
+             * Decode a block.
              */
-            for (int count = 0, i = 0; i < d_K; i++)
+
+            int out_count = 0;
+            unsigned char viterbi_in[16];
+
+            for (int count = 0, i = 0; i < (d_K * 2); i++)
             {
-              in_codewords[i] = in_bits[count++];
+              // TODO optimize w/o memory copy
+              viterbi_in[count % 4] = in_bits[i];
 
-              for (int j = 0; j < (d_n - 1); j++)
-                in_codewords[i] = (in_codewords[i] << 1) | in_bits[count++];
+              if ((count % 4) == 3) {
+                d_viterbi_butterfly2(viterbi_in, mettab, state0, state1);
 
-              //printf("in_codewords[%i]: %x\n", i, in_codewords[i]);
+                if ((count > 0) && (count % 16) == 11) {
+                  //d_viterbi_get_output(state0, &data[out_count++]);
+                  d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
+                }
+              }
+
+              count++;
             }
 
             // TODO - Make Viterbi algorithm aware of puncturing matrix
-            viterbi_algorithm(d_FSM.I(), d_FSM.S(), d_FSM.O(), d_FSM.NS(), d_FSM.OS(), \
-                d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in_codewords[0]), &(out[n*d_K]));
-                //d_FSM.PS(), d_FSM.PI(), d_K, d_S0, d_SK, &(in[n*d_K]), &(out[n*d_K]));
-
-            // TODO - Pack output bits into bytes
           }
-
         }
+
 
         gettimeofday(&tve, &tze);
         printf("viterbi: nblocks: %i, us/bit out: %f\n", \
@@ -302,8 +322,8 @@ namespace gr {
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
-        consume_each (noutput_items * d_n / (d_k * d_m));
-        //consume_each (noutput_items);
+        consume_each (noutput_items * 8 * d_n / (d_k * d_m));
+        //consume_each (noutput_items * d_n / (d_k * d_m));
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

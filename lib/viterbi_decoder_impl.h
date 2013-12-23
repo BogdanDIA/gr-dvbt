@@ -24,6 +24,11 @@
 #include <dvbt/viterbi_decoder.h>
 #include <dvbt/dvbt_config.h>
 
+extern "C" {
+#include "d_viterbi.h"
+}
+
+
 namespace gr {
   namespace dvbt {
 
@@ -47,6 +52,15 @@ namespace gr {
       int d_SK;
       // Keep the state from the prev. block
       int d_state;
+      int d_st;
+
+      // Viterbi decoder pointer
+      void *d_vp;
+
+      // Viterbi tables
+      struct viterbi_state state0[64];
+      struct viterbi_state state1[64];
+      int mettab[2][256];
 
     public:
       fsm FSM () const { return d_FSM; } 

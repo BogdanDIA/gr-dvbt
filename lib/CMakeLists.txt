@@ -48,9 +48,15 @@ add_library(gnuradio-dvbt SHARED
     ofdm_sym_acquisition_impl.cc
     fsm.cc
     base.cc
-    viterbi_decoder_impl.cc )
+    viterbi_decoder_impl.cc
+    d_viterbi.c
+    d_metrics.c
+    d_tab.c)
 target_link_libraries(gnuradio-dvbt ${Boost_LIBRARIES} ${GRUEL_LIBRARIES} ${GNURADIO_CORE_LIBRARIES})
 set_target_properties(gnuradio-dvbt PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt_EXPORTS")
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -mavx")
 
 ########################################################################
 # Install built library files

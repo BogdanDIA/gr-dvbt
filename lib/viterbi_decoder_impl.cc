@@ -1,6 +1,8 @@
 /* -*- c++ -*- */
-/* 
- * Copyright 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
+/*
+ * Based on gnuradio implementation of fsm and Viterbi decoder
+ * Based on Phil Karn, KA9Q impl of Viterbi decoder
+ * 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -299,13 +301,12 @@ namespace gr {
               // TODO optimize w/o memory copy
               viterbi_in[count % 4] = in_bits[i];
 
-              if ((count % 4) == 3) {
+              if ((count % 4) == 3)
+              {
                 d_viterbi_butterfly2(viterbi_in, mettab, state0, state1);
 
-                if ((count > 0) && (count % 16) == 11) {
-                  //d_viterbi_get_output(state0, &data[out_count++]);
+                if ((count > 0) && (count % 16) == 11)
                   d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
-                }
               }
 
               count++;

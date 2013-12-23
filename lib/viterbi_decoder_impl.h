@@ -1,6 +1,8 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
+ * Based on gnuradio implementation of fsm and Viterbi decoder
+ * Based on Phil Karn, KA9Q impl of Viterbi decoder
+ * 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

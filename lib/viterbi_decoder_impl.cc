@@ -21,11 +21,12 @@
  */
 
 /*
- * There are two implementatios of Viterbi algorithms:
+ * There are three implementatios of Viterbi algorithms:
  * - one based on gnuradio
  * - one based on Karn's implementation
- * For now Karn's implementation is used. 
- * Note: the output is padded with 4 bytes of 0 value
+ * - one based on Karn's with SSE2 vectorization
+ * Note: for general implementation the output is padded with 4 bytes of 0 value
+ * Note2: for SSE2 implementation the output is padded with 4 bytes of 0 value
  */
 
 #ifdef HAVE_CONFIG_H
@@ -240,6 +241,9 @@ namespace gr {
       float esn0 = RATE*pow(10.0, ebn0/10);
       d_gen_met(mettab, amp, esn0, 0.0, 4);
       d_viterbi_chunks_init(state0);
+
+
+      d_viterbi_chunks_init_sse2(metric0, path0);
     }
 
     /*
@@ -311,10 +315,12 @@ namespace gr {
 
               if ((count % 4) == 3)
               {
-                d_viterbi_butterfly2(viterbi_in, mettab, state0, state1);
+                d_viterbi_butterfly2_sse2(viterbi_in, metric0, metric1, path0, path1);
+                //d_viterbi_butterfly2(viterbi_in, mettab, state0, state1);
 
                 if ((count > 0) && (count % 16) == 11)
-                  d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
+                  d_viterbi_get_output_sse2(metric0, path0, &out[n*(d_K/8) + out_count++]);
+                  //d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
               }
 
               count++;
@@ -326,8 +332,8 @@ namespace gr {
 
 
         gettimeofday(&tve, &tze);
-        printf("viterbi: nblocks: %i, us/bit out: %f\n", \
-            nblocks, (float)(tve.tv_usec - tvs.tv_usec) / (float) (nblocks * d_K));
+        printf("viterbi: nblocks: %i, Mbit/s out: %f\n", \
+            nblocks, (float) (nblocks * d_K) / (float)(tve.tv_usec - tvs.tv_usec));
 
         // Tell runtime system how many input items we consumed on
         // each input stream.

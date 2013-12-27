@@ -56,6 +56,7 @@ target_link_libraries(gnuradio-dvbt ${Boost_LIBRARIES} ${GRUEL_LIBRARIES} ${GNUR
 set_target_properties(gnuradio-dvbt PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt_EXPORTS")
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
+#set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -mavx")
 
 ########################################################################

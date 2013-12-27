@@ -24,9 +24,15 @@
  * But it fits so nicely into a 32-bit machine word...
  */
 
+#include <xmmintrin.h>
+
 struct viterbi_state {
   unsigned long path;	/* Decoded path to this state */
   long metric;		/* Cumulative metric to this state */
+
+  /* vector implementation */
+  __m128i pp;		/* Decoded path to this state */
+  __m128i mm;		/* Cumulative metric to this state */
 };
 
 int d_gen_met(int mettab[2][256],	/* Metric table */
@@ -43,8 +49,25 @@ void
 d_viterbi_chunks_init(struct viterbi_state* state);
 
 void
-d_viterbi_butterfly2(unsigned char *symbols, int mettab[2][256],
-		   struct viterbi_state *state0, struct viterbi_state *state1);
+d_viterbi_chunks_init_sse2(__m128i *mm0, __m128i *pp0);
+
+void
+d_viterbi_butterfly2(unsigned char *symbols, int mettab[2][256], struct viterbi_state *state0, struct viterbi_state *state1);
+
+void
+d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i m0[], __m128i m1[], __m128i p0[], __m128i p1[]);
 
 unsigned char
 d_viterbi_get_output(struct viterbi_state *state, unsigned char *outbuf);
+
+unsigned char
+d_viterbi_get_output_sse2(__m128i *mm0, __m128i *pp0, unsigned char *outbuf);
+
+
+int 
+d_viterbi(unsigned long *metric,	/* Final path metric (returned value) */
+	unsigned char *data,	/* Decoded output data */
+	unsigned char *symbols,	/* Raw deinterleaved input symbols */
+	unsigned int nbits,	/* Number of output bits */
+	int mettab[2][256]	/* Metric table, [sent sym][rx symbol] */
+);

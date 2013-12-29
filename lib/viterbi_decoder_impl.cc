@@ -227,10 +227,8 @@ namespace gr {
        */
 
       assert((d_k * d_m) % (8 * d_n));
-      //assert((d_k * d_m) % (d_n));
 
       set_relative_rate((d_k * d_m) / (8 * d_n));
-      //set_relative_rate((d_k * d_m) / (d_n));
 
       assert ((d_K * d_n) % d_m == 0);
       d_nsymbols = d_K * d_n / d_m;
@@ -306,6 +304,7 @@ namespace gr {
              */
 
             int out_count = 0;
+            unsigned char c;
             unsigned char viterbi_in[16];
 
             for (int count = 0, i = 0; i < (d_K * 2); i++)
@@ -320,6 +319,7 @@ namespace gr {
 
                 if ((count > 0) && (count % 16) == 11)
                   d_viterbi_get_output_sse2(metric0, path0, &out[n*(d_K/8) + out_count++]);
+                  //d_viterbi_get_output(state0, &c);
                   //d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
               }
 
@@ -338,7 +338,6 @@ namespace gr {
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (noutput_items * 8 * d_n / (d_k * d_m));
-        //consume_each (noutput_items * d_n / (d_k * d_m));
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

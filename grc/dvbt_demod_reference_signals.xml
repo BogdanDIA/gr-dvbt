@@ -274,20 +274,9 @@
     <type>complex</type>
     <vlen>$transmission_mode.fft_length</vlen>
   </sink>
-  <sink>
-    <name>trigger_in</name>
-    <type>byte</type>
-    <vlen>$transmission_mode.fft_length</vlen>
-  </sink>
   <source>
     <name>out</name>
     <type>complex</type>
     <vlen>$transmission_mode.payload_length</vlen>
   </source>
-  <source>
-    <name>trigger_out</name>
-    <type>byte</type>
-    <vlen>$transmission_mode.payload_length</vlen>
-  </source>
-
 </block>

@@ -49,8 +49,8 @@ namespace gr {
           dvbt_code_rate_t code_rate_LP, dvbt_guard_interval_t guard_interval,\
           dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id)
       : gr_block("demod_reference_signals",
-          gr_make_io_signature2(2, 2, itemsize * ninput, ninput),
-		      gr_make_io_signature2(2, 2, itemsize * noutput, noutput)), // TODO trigger is char based stream!
+          gr_make_io_signature(1, 1, itemsize * ninput),
+		      gr_make_io_signature(1, 1, itemsize * noutput)),
 		      config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
             guard_interval, transmission_mode, include_cell_id, cell_id),
           d_ninput(ninput), d_noutput(noutput),
@@ -82,14 +82,12 @@ namespace gr {
                        gr_vector_void_star &output_items)
     {
       const gr_complex *in = (const gr_complex *) input_items[0];
-      const unsigned char *trigger_in = (const unsigned char *) input_items[1];
       gr_complex *out = (gr_complex *) output_items[0];
-      unsigned char *trigger_out = (unsigned char *) output_items[1];
 
       int to_out = 0;
 
       for (int i = 0; i < noutput_items; i++)
-        to_out += d_pg.parse_input(&in[i * d_ninput], &trigger_in[i * d_ninput], &out[i * d_noutput], &trigger_out[i * d_noutput]);
+        to_out += d_pg.parse_input(&in[i * d_ninput], &out[i * d_noutput]);
 
       consume_each (noutput_items);
 

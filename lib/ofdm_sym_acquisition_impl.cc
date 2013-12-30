@@ -344,7 +344,7 @@ namespace gr {
     ofdm_sym_acquisition_impl::ofdm_sym_acquisition_impl(int blocks, int fft_length, int occupied_tones, int cp_length, float snr)
       : gr_block("ofdm_sym_acquisition",
           gr_make_io_signature(1, 1, sizeof (gr_complex) * blocks),
-          gr_make_io_signature2(2, 2, sizeof (gr_complex) * blocks * fft_length, sizeof (char) * blocks * fft_length)),
+          gr_make_io_signature(1, 1, sizeof (gr_complex) * blocks * fft_length)),
       d_blocks(blocks), d_fft_length(fft_length), d_cp_length(cp_length), d_snr(snr),
       d_index(0), d_phase(0.0), d_phaseinc(0.0), d_cp_found(0), d_count(0), d_nextphaseinc(0), d_nextpos(0), \
         d_sym_acq_count(0),d_sym_acq_timeout(100), d_initial_aquisition(0), \
@@ -421,7 +421,6 @@ namespace gr {
     {
         const gr_complex *in = (const gr_complex *) input_items[0];
         gr_complex *out = (gr_complex *) output_items[0];
-        unsigned char *trigger = (unsigned char *) output_items[1];
 
         int low, size;
 
@@ -442,8 +441,6 @@ namespace gr {
 
           if (d_cp_found)
           {
-            trigger[0] = 1;
-
             d_freq_correction_count = 0;
 
             // Derotate the signal and out
@@ -463,8 +460,6 @@ namespace gr {
           }
           else
           {
-            trigger[0] = 0;
-
             // If we have a number of consecutive misses then we restart aquisition
             if (++d_freq_correction_count > d_freq_correction_timeout)
             {

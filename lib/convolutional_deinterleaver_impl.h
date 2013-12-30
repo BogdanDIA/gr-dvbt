@@ -47,10 +47,14 @@ namespace gr {
 
       int d_index;
       int d_offset;
+      int d_continue;
 
     public:
       convolutional_deinterleaver_impl(int nsize, int I, int M);
       ~convolutional_deinterleaver_impl();
+
+     void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+
 
       /*!
        * ETSI EN 300 744 Clause 4.3.1. \n
@@ -59,7 +63,8 @@ namespace gr {
        * Data output: Stream of 1 byte elements. \n
        */
 
-      int work(int noutput_items,
+      int general_work(int noutput_items,
+               gr_vector_int &ninput_items,
 	       gr_vector_const_void_star &input_items,
 	       gr_vector_void_star &output_items);
     };

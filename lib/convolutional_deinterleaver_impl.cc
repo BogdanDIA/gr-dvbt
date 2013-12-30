@@ -26,6 +26,8 @@
 #include "convolutional_deinterleaver_impl.h"
 #include <stdio.h>
 
+#define DEBUG 1
+
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
 #else
@@ -50,11 +52,12 @@ namespace gr {
      * The private constructor
      */
     convolutional_deinterleaver_impl::convolutional_deinterleaver_impl(int blocks, int I, int M)
-      : gr_sync_decimator("convolutional_deinterleaver",
+      : gr_block("convolutional_deinterleaver",
 		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks), I * blocks),
+		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks)),
       d_blocks(blocks), d_I(I), d_M(M), d_index(0), d_offset(0)
     {
+      set_relative_rate(1.0 / I * d_blocks);
       set_output_multiple(2);
       //The positions are shift registers (FIFOs)
       //of lenght i*M
@@ -77,24 +80,34 @@ namespace gr {
       }
     }
 
+    void
+    convolutional_deinterleaver_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    {
+      int ninputs = ninput_items_required.size ();
+
+      for (int i = 0; i < ninputs; i++)
+        ninput_items_required[i] = noutput_items * d_I * d_blocks;
+    }
+
+
     int
-    convolutional_deinterleaver_impl::work(int noutput_items,
-			  gr_vector_const_void_star &input_items,
-			  gr_vector_void_star &output_items)
+    convolutional_deinterleaver_impl::general_work(int noutput_items,
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items)
     {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
         int count = 0;
-        int to_out = 0;
-
-        PRINTF("INTERLEAVER: d_offset: %i, d_index: %i, noutput_items: %i\n", d_offset, d_index, noutput_items);
 
         // Output only (noutput_items - 1) items in order to 
         // have room for an initial offset
-        to_out = noutput_items - 1;
+        int to_out = noutput_items - 1;
 
-        for (int i = 0; i < to_out; i++)
+        PRINTF("INTERLEAVER: d_offset: %i, d_index: %i, noutput_items: %i\n", d_offset, d_index, noutput_items);
+
+        for (int i = 0; i < (noutput_items - 1); i++)
         {
           int sync = d_NSYNC;
           int mux_pkt = 0;
@@ -116,7 +129,9 @@ namespace gr {
 
               if (d_index == d_blocks * d_I)
               {
+                // No valid frame found. Output 0 items.
                 d_index = 0;
+                to_out = 0;
                 break;
               }
 
@@ -125,7 +140,7 @@ namespace gr {
             else
               PRINTF("INTERLEAVER: sync found: %x on input[%i] %x, mux_pkt: %i\n", sync, d_index + count, in[d_index + count], mux_pkt);
 
-            // This is actually the actual interleaver
+            // This is actually the interleaver
             for (int k = 0; k < (d_M * d_I); k++)
             {
               d_shift[k % d_I]->push_back(in[d_index + count]);
@@ -142,6 +157,10 @@ namespace gr {
         d_offset += to_out * d_blocks * d_I;
 
         PRINTF("INTERLEAVER: to_out: %i\n", to_out);
+
+        // Tell runtime system how many input items we consumed on
+        // each input stream.
+        consume_each(d_I * d_blocks * (noutput_items - 1));
 
         // Tell runtime system how many output items we produced.
         return (to_out);

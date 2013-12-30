@@ -69,10 +69,5 @@
 		<type>$type</type>
     <vlen>$fft_length</vlen>
 	</source>
-  <source>
-		<name>sync</name>
-		<type>byte</type>
-    <vlen>$fft_length</vlen>
-	</source>
 	<doc>Payload Length: 0 for automatic.</doc>
 </block>

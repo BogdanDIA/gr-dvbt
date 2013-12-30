@@ -1158,17 +1158,9 @@ namespace gr {
     }
 
     int
-    pilot_gen::parse_input(const gr_complex *in, const unsigned char *trigger_in, gr_complex *out, unsigned char *trigger_out)
+    pilot_gen::parse_input(const gr_complex *in, gr_complex *out)
     {
-      // If this block does not have a trigger then we just exit
-      if (trigger_in[0] != 1)
-      {
-        trigger_out[0] = 0;
-	// noutput_items would be 0 in this case
-        return 0;
-      }
-      else
-        d_trigger_index++;
+      d_trigger_index++;
 
       // Obtain frequency correction based on cpilots.
       // Obtain channel estimation based on both
@@ -1197,9 +1189,6 @@ namespace gr {
       // Correct symbol index so that all subsequent processing
       // use correct symbol index
       d_symbol_index = (d_symbol_index + diff_symbol_index) % d_symbols_per_frame;
-      // Trigger for the beginning of a frame
-      if (d_symbol_index == 0)
-	      trigger_out[0] = 1;
 
       // Process TPS data
       // If a frame is recognized then signal end of frame

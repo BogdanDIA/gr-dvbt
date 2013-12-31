@@ -38,6 +38,11 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+#ifdef DEBUG
+#define PRINTF(a...) printf(a)
+#else
+#define PRINTF(a...)
+#endif
 
 // For timing debug
 static struct timeval tvs, tve;
@@ -332,7 +337,7 @@ namespace gr {
 
 
         gettimeofday(&tve, &tze);
-        printf("viterbi: nblocks: %i, Mbit/s out: %f\n", \
+        PRINTF("VITERBI: nblocks: %i, Mbit/s out: %f\n", \
             nblocks, (float) (nblocks * d_K) / (float)(tve.tv_usec - tvs.tv_usec));
 
         // Tell runtime system how many input items we consumed on

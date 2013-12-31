@@ -442,7 +442,7 @@ namespace gr {
         // It is also calle coarse frequency correction
         if (d_initial_aquisition)
         {
-          d_cp_found = ml_sync(in, d_cp_start + 4, d_cp_start - 4, \
+          d_cp_found = ml_sync(in, d_cp_start + 8, d_cp_start - 8, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
 
           PRINTF("d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_cp_start, d_to_consume, d_to_out);

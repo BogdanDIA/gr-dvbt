@@ -31,6 +31,12 @@
 #include <volk/volk.h>
 #include <gr_fxpt.h>
 
+#ifdef DEBUG
+#define PRINTF(a...) printf(a)
+#else
+#define PRINTF(a...)
+#endif
+
 #define USE_VOLK 1
 
 void print_float(float f)
@@ -348,7 +354,7 @@ namespace gr {
       d_blocks(blocks), d_fft_length(fft_length), d_cp_length(cp_length), d_snr(snr),
       d_index(0), d_phase(0.0), d_phaseinc(0.0), d_cp_found(0), d_count(0), d_nextphaseinc(0), d_nextpos(0), \
         d_sym_acq_count(0),d_sym_acq_timeout(100), d_initial_aquisition(0), \
-        d_freq_correction_count(0), d_freq_correction_timeout(10)
+        d_freq_correction_count(0), d_freq_correction_timeout(0)
     {
       set_relative_rate(1.0 / (double) (d_cp_length + d_fft_length));
 
@@ -438,6 +444,8 @@ namespace gr {
         {
           d_cp_found = ml_sync(in, d_cp_start + 4, d_cp_start - 4, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
+
+          PRINTF("d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_cp_start, d_to_consume, d_to_out);
 
           if (d_cp_found)
           {

@@ -26,7 +26,7 @@
 #include "convolutional_deinterleaver_impl.h"
 #include <stdio.h>
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
@@ -138,7 +138,8 @@ namespace gr {
               continue;
             }
             else
-              PRINTF("INTERLEAVER: sync found: %x on input[%i] %x, mux_pkt: %i\n", sync, d_index + count, in[d_index + count], mux_pkt);
+              PRINTF("INTERLEAVER: sync found: %x on input[%i] %x, d_index: %i, mux_pkt: %i\n", \
+                  sync, d_index + count, in[d_index + count], d_index, mux_pkt);
 
             // This is actually the interleaver
             for (int k = 0; k < (d_M * d_I); k++)

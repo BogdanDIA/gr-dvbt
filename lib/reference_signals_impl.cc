@@ -779,11 +779,18 @@ namespace gr {
     }
     
     // TODO - return d_freq_offset and c
+    // TODO - recalculate this formula
+    // TODO - use d_sampling_freq_correction (it is dependent of carrier no)
     gr_complex
     pilot_gen::frequency_correction()
     {
       int symbol_count = 1;
-      return gr_expj(-2*M_PI*d_freq_offset * d_cp_length / d_fft_length * symbol_count);
+      gr_complex c = gr_expj(-2*M_PI*(d_freq_offset + d_carrier_freq_correction) * \
+		      (d_fft_length + d_cp_length) / d_fft_length * symbol_count);
+
+      //gr_complex c = gr_expj(-2*M_PI*d_freq_offset * d_cp_length / d_fft_length);
+
+      return (c);
     }
 
     /*
@@ -1196,7 +1203,7 @@ namespace gr {
 
       // We are just at the end of a frame
       if (frame_end)
-	      d_symbol_index = d_symbols_per_frame - 1;
+        d_symbol_index = d_symbols_per_frame - 1;
  
       // Process payload data with correct symbol index
       process_payload_data(in, out);

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Tue Dec 31 17:45:24 2013</timestamp>
+  <timestamp>Fri Jan  3 23:01:05 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -276,6 +276,197 @@
     <param>
       <key>_coordinate</key>
       <value>(1008, 13)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>dvbt_energy_descramble</key>
+    <param>
+      <key>id</key>
+      <value>dvbt_energy_descramble_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>nsize</key>
+      <value>8</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(761, 875)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_sink</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_sink_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test_out.ts</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1037, 867)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>dvbt_reed_solomon_dec</key>
+    <param>
+      <key>id</key>
+      <value>dvbt_reed_solomon_dec_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>p</key>
+      <value>2</value>
+    </param>
+    <param>
+      <key>m</key>
+      <value>8</value>
+    </param>
+    <param>
+      <key>gfpoly</key>
+      <value>0x11d</value>
+    </param>
+    <param>
+      <key>n</key>
+      <value>255</value>
+    </param>
+    <param>
+      <key>k</key>
+      <value>239</value>
+    </param>
+    <param>
+      <key>t</key>
+      <value>8</value>
+    </param>
+    <param>
+      <key>s</key>
+      <value>51</value>
+    </param>
+    <param>
+      <key>blocks</key>
+      <value>8</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(751, 666)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+  </block>
+  <block>
+    <key>blocks_vector_to_stream</key>
+    <param>
+      <key>id</key>
+      <value>blocks_vector_to_stream_1</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>num_items</key>
+      <value>1512</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(475, 541)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>dvbt_viterbi_decoder</key>
+    <param>
+      <key>id</key>
+      <value>dvbt_viterbi_decoder_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>constellation</key>
+      <value>qam16</value>
+    </param>
+    <param>
+      <key>hierarchy</key>
+      <value>nh</value>
+    </param>
+    <param>
+      <key>code_rate</key>
+      <value>C1_2</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>b</value>
+    </param>
+    <param>
+      <key>fsm_args</key>
+      <value>1,2,[0x79,0x5b]</value>
+    </param>
+    <param>
+      <key>block_size</key>
+      <value>512</value>
+    </param>
+    <param>
+      <key>init_state</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>final_state</key>
+      <value>-1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(758, 493)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -946,6 +1137,97 @@
     </param>
   </block>
   <block>
+    <key>wxgui_fftsink2</key>
+    <param>
+      <key>id</key>
+      <value>wxgui_fftsink2_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>title</key>
+      <value>FFT Plot</value>
+    </param>
+    <param>
+      <key>samp_rate</key>
+      <value>10e6</value>
+    </param>
+    <param>
+      <key>baseband_freq</key>
+      <value>570e6</value>
+    </param>
+    <param>
+      <key>y_per_div</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>y_divs</key>
+      <value>10</value>
+    </param>
+    <param>
+      <key>ref_level</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>ref_scale</key>
+      <value>2.0</value>
+    </param>
+    <param>
+      <key>fft_size</key>
+      <value>1024</value>
+    </param>
+    <param>
+      <key>fft_rate</key>
+      <value>15</value>
+    </param>
+    <param>
+      <key>peak_hold</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>average</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>avg_alpha</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>win</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>win_size</key>
+      <value></value>
+    </param>
+    <param>
+      <key>grid_pos</key>
+      <value></value>
+    </param>
+    <param>
+      <key>notebook</key>
+      <value></value>
+    </param>
+    <param>
+      <key>freqvar</key>
+      <value>None</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(467, 18)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>fft_vxx</key>
     <param>
       <key>id</key>
@@ -982,6 +1264,76 @@
     <param>
       <key>_coordinate</key>
       <value>(704, 235)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_source</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_source_0_0_1</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test.bin</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>2048</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(13, 357)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>analog_noise_source_x</key>
+    <param>
+      <key>id</key>
+      <value>analog_noise_source_x_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>noise_type</key>
+      <value>analog.GR_GAUSSIAN</value>
+    </param>
+    <param>
+      <key>amp</key>
+      <value>0.000</value>
+    </param>
+    <param>
+      <key>seed</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(22, 871)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1078,7 +1430,7 @@
     <key>gr_file_source</key>
     <param>
       <key>id</key>
-      <value>gr_file_source_0_0_1</value>
+      <value>gr_file_source_0_0</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1086,7 +1438,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test.bin</value>
+      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test914.bin</value>
     </param>
     <param>
       <key>type</key>
@@ -1098,11 +1450,11 @@
     </param>
     <param>
       <key>vlen</key>
-      <value>2048</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(13, 357)</value>
+      <value>(20, 696)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1110,10 +1462,10 @@
     </param>
   </block>
   <block>
-    <key>gr_multiply_const_vxx</key>
+    <key>blocks_add_xx</key>
     <param>
       <key>id</key>
-      <value>gr_multiply_const_vxx_0</value>
+      <value>blocks_add_xx_0</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1124,207 +1476,16 @@
       <value>complex</value>
     </param>
     <param>
-      <key>const</key>
-      <value>0.00220971</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(56, 132)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_energy_descramble</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_energy_descramble_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>nsize</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(761, 875)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_sink</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_sink_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test_out.ts</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>unbuffered</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1037, 867)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_reed_solomon_dec</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_reed_solomon_dec_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>p</key>
+      <key>num_inputs</key>
       <value>2</value>
     </param>
     <param>
-      <key>m</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>gfpoly</key>
-      <value>0x11d</value>
-    </param>
-    <param>
-      <key>n</key>
-      <value>255</value>
-    </param>
-    <param>
-      <key>k</key>
-      <value>239</value>
-    </param>
-    <param>
-      <key>t</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>s</key>
-      <value>51</value>
-    </param>
-    <param>
-      <key>blocks</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(751, 666)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>180</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_vector_to_stream</key>
-    <param>
-      <key>id</key>
-      <value>blocks_vector_to_stream_1</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>num_items</key>
-      <value>1512</value>
-    </param>
-    <param>
       <key>vlen</key>
       <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(475, 541)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_viterbi_decoder</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_viterbi_decoder_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>constellation</key>
-      <value>qam16</value>
-    </param>
-    <param>
-      <key>hierarchy</key>
-      <value>nh</value>
-    </param>
-    <param>
-      <key>code_rate</key>
-      <value>C1_2</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>b</value>
-    </param>
-    <param>
-      <key>fsm_args</key>
-      <value>1,2,[0x79,0x5b]</value>
-    </param>
-    <param>
-      <key>block_size</key>
-      <value>512</value>
-    </param>
-    <param>
-      <key>init_state</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>final_state</key>
-      <value>-1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(758, 493)</value>
+      <value>(310, 857)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1390,7 +1551,7 @@
     </param>
     <param>
       <key>occupied_tones</key>
-      <value>1704</value>
+      <value>1705</value>
     </param>
     <param>
       <key>cp_length</key>
@@ -1410,26 +1571,22 @@
     </param>
   </block>
   <block>
-    <key>gr_file_source</key>
+    <key>gr_multiply_const_vxx</key>
     <param>
       <key>id</key>
-      <value>gr_file_source_0</value>
+      <value>gr_multiply_const_vxx_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/captureBB.bin</value>
-    </param>
-    <param>
       <key>type</key>
       <value>complex</value>
     </param>
     <param>
-      <key>repeat</key>
-      <value>False</value>
+      <key>const</key>
+      <value>0.00220971</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1437,42 +1594,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(19, 608)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_source</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_source_0_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test914.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(20, 696)</value>
+      <value>(56, 132)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1515,148 +1637,26 @@
     </param>
   </block>
   <block>
-    <key>analog_noise_source_x</key>
+    <key>gr_file_source</key>
     <param>
       <key>id</key>
-      <value>analog_noise_source_x_0</value>
+      <value>gr_file_source_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>noise_type</key>
-      <value>analog.GR_GAUSSIAN</value>
-    </param>
-    <param>
-      <key>amp</key>
-      <value>0.0</value>
-    </param>
-    <param>
-      <key>seed</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(21, 872)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>wxgui_fftsink2</key>
-    <param>
-      <key>id</key>
-      <value>wxgui_fftsink2_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/captureBB_2.bin</value>
     </param>
     <param>
       <key>type</key>
       <value>complex</value>
     </param>
     <param>
-      <key>title</key>
-      <value>FFT Plot</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>10e6</value>
-    </param>
-    <param>
-      <key>baseband_freq</key>
-      <value>570e6</value>
-    </param>
-    <param>
-      <key>y_per_div</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>y_divs</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>ref_level</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>ref_scale</key>
-      <value>2.0</value>
-    </param>
-    <param>
-      <key>fft_size</key>
-      <value>1024</value>
-    </param>
-    <param>
-      <key>fft_rate</key>
-      <value>15</value>
-    </param>
-    <param>
-      <key>peak_hold</key>
+      <key>repeat</key>
       <value>False</value>
-    </param>
-    <param>
-      <key>average</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>avg_alpha</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>win</key>
-      <value>None</value>
-    </param>
-    <param>
-      <key>win_size</key>
-      <value></value>
-    </param>
-    <param>
-      <key>grid_pos</key>
-      <value></value>
-    </param>
-    <param>
-      <key>notebook</key>
-      <value></value>
-    </param>
-    <param>
-      <key>freqvar</key>
-      <value>None</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(467, 18)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_add_xx</key>
-    <param>
-      <key>id</key>
-      <value>blocks_add_xx_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>num_inputs</key>
-      <value>2</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1664,7 +1664,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(311, 858)</value>
+      <value>(20, 607)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1756,43 +1756,25 @@
     <sink_key>1</sink_key>
   </connection>
   <connection>
-    <source_block_id>uhd_usrp_source_0</source_block_id>
-    <sink_block_id>gr_multiply_const_vxx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>uhd_usrp_source_0</source_block_id>
-    <sink_block_id>dvbt_ofdm_sym_acquisition_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
-    <sink_block_id>gr_multiply_const_vxx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>gr_file_source_0_0_1</source_block_id>
-    <sink_block_id>fft_vxx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>gr_file_source_0_0</source_block_id>
     <sink_block_id>blocks_add_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>dvbt_demod_reference_signals_0</source_block_id>
-    <sink_block_id>blocks_vector_to_stream_0</sink_block_id>
+    <source_block_id>gr_file_source_0</source_block_id>
+    <sink_block_id>blocks_add_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>gr_file_source_0</source_block_id>
+    <source_block_id>gr_file_source_0_2</source_block_id>
+    <sink_block_id>blocks_add_xx_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>uhd_usrp_source_0</source_block_id>
     <sink_block_id>blocks_add_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -1804,14 +1786,26 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>gr_file_source_0_2</source_block_id>
-    <sink_block_id>blocks_add_xx_0</sink_block_id>
+    <source_block_id>gr_file_source_0_0_1</source_block_id>
+    <sink_block_id>fft_vxx_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>dvbt_demod_reference_signals_0</source_block_id>
+    <sink_block_id>blocks_vector_to_stream_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_add_xx_0</source_block_id>
     <sink_block_id>blks2_rational_resampler_xxx_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
+    <sink_block_id>gr_multiply_const_vxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Fri Jun 21 15:21:18 2013</timestamp>
+  <timestamp>Fri Jan  3 23:03:32 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -84,41 +84,6 @@
     </param>
   </block>
   <block>
-    <key>gr_file_source</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_source_0_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvbt-baruffa/test_ci_test.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(52, 593)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>dvbt_inner_coder</key>
     <param>
       <key>id</key>
@@ -155,33 +120,6 @@
     <param>
       <key>_rotation</key>
       <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_symbol_inner_interleaver</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_symbol_inner_interleaver_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>transmission_mode</key>
-      <value>T2k</value>
-    </param>
-    <param>
-      <key>direction</key>
-      <value>Interleave</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(673, 245)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>180</value>
     </param>
   </block>
   <block>
@@ -361,92 +299,6 @@
     </param>
   </block>
   <block>
-    <key>dvbt_reed_solomon_enc</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_reed_solomon_enc_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>p</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>m</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>gfpoly</key>
-      <value>0x11d</value>
-    </param>
-    <param>
-      <key>n</key>
-      <value>255</value>
-    </param>
-    <param>
-      <key>k</key>
-      <value>239</value>
-    </param>
-    <param>
-      <key>t</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>s</key>
-      <value>51</value>
-    </param>
-    <param>
-      <key>blocks</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(469, 67)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_dvbt_map</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_dvbt_map_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>constellation</key>
-      <value>qam16</value>
-    </param>
-    <param>
-      <key>hierarchy</key>
-      <value>nh</value>
-    </param>
-    <param>
-      <key>transmission_mode</key>
-      <value>T2k</value>
-    </param>
-    <param>
-      <key>gain</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(375, 229)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>180</value>
-    </param>
-  </block>
-  <block>
     <key>blks2_rational_resampler_xxx</key>
     <param>
       <key>id</key>
@@ -486,224 +338,6 @@
     </param>
   </block>
   <block>
-    <key>digital_ofdm_cyclic_prefixer</key>
-    <param>
-      <key>id</key>
-      <value>digital_ofdm_cyclic_prefixer_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>input_size</key>
-      <value>2048</value>
-    </param>
-    <param>
-      <key>output_size</key>
-      <value>2112</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(648, 416)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_reference_signals</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_reference_signals_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>constellation</key>
-      <value>qam16</value>
-    </param>
-    <param>
-      <key>hierarchy</key>
-      <value>nh</value>
-    </param>
-    <param>
-      <key>code_rate_hp</key>
-      <value>C1_2</value>
-    </param>
-    <param>
-      <key>code_rate_lp</key>
-      <value>C1_2</value>
-    </param>
-    <param>
-      <key>guard_interval</key>
-      <value>G1_32</value>
-    </param>
-    <param>
-      <key>transmission_mode</key>
-      <value>T2k</value>
-    </param>
-    <param>
-      <key>include_cell_id</key>
-      <value>cell_ide_no</value>
-    </param>
-    <param>
-      <key>cell_id</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(55, 360)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_sink</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_sink_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvbt/grc/test.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>unbuffered</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(893, 316)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_sink</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_sink_1</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvbt/grc/test_fd.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>2048</value>
-    </param>
-    <param>
-      <key>unbuffered</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(586, 322)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_multiply_const_vxx</key>
-    <param>
-      <key>id</key>
-      <value>gr_multiply_const_vxx_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>const</key>
-      <value>0.0022097087</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(893, 424)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_sink</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_sink_0_1</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>testBB.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>unbuffered</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(863, 805)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>uhd_usrp_sink</key>
     <param>
       <key>id</key>
@@ -711,7 +345,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>type</key>
@@ -727,7 +361,7 @@
     </param>
     <param>
       <key>dev_addr</key>
-      <value>addr=192.168.10.2</value>
+      <value>addr=192.168.20.2</value>
     </param>
     <param>
       <key>sync</key>
@@ -847,7 +481,7 @@
     </param>
     <param>
       <key>center_freq0</key>
-      <value>570e6</value>
+      <value>1280e6</value>
     </param>
     <param>
       <key>gain0</key>
@@ -1367,34 +1001,50 @@
     </param>
   </block>
   <block>
-    <key>gr_file_sink</key>
+    <key>dvbt_reed_solomon_enc</key>
     <param>
       <key>id</key>
-      <value>gr_file_sink_0_1_0</value>
+      <value>dvbt_reed_solomon_enc_0</value>
     </param>
     <param>
       <key>_enabled</key>
-      <value>False</value>
+      <value>True</value>
     </param>
     <param>
-      <key>file</key>
-      <value>test914.bin</value>
+      <key>p</key>
+      <value>2</value>
     </param>
     <param>
-      <key>type</key>
-      <value>complex</value>
+      <key>m</key>
+      <value>8</value>
     </param>
     <param>
-      <key>vlen</key>
-      <value>1</value>
+      <key>gfpoly</key>
+      <value>0x11d</value>
     </param>
     <param>
-      <key>unbuffered</key>
-      <value>False</value>
+      <key>n</key>
+      <value>255</value>
+    </param>
+    <param>
+      <key>k</key>
+      <value>239</value>
+    </param>
+    <param>
+      <key>t</key>
+      <value>8</value>
+    </param>
+    <param>
+      <key>s</key>
+      <value>51</value>
+    </param>
+    <param>
+      <key>blocks</key>
+      <value>8</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1038, 794)</value>
+      <value>(469, 67)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1402,34 +1052,116 @@
     </param>
   </block>
   <block>
-    <key>gr_file_source</key>
+    <key>dvbt_symbol_inner_interleaver</key>
     <param>
       <key>id</key>
-      <value>gr_file_source_0</value>
+      <value>dvbt_symbol_inner_interleaver_0</value>
     </param>
     <param>
       <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvbt-baruffa/test.ts</value>
+      <key>transmission_mode</key>
+      <value>T2k</value>
     </param>
     <param>
-      <key>type</key>
-      <value>byte</value>
+      <key>direction</key>
+      <value>Interleave</value>
     </param>
     <param>
-      <key>repeat</key>
+      <key>_coordinate</key>
+      <value>(673, 245)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+  </block>
+  <block>
+    <key>dvbt_dvbt_map</key>
+    <param>
+      <key>id</key>
+      <value>dvbt_dvbt_map_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
       <value>True</value>
     </param>
     <param>
-      <key>vlen</key>
+      <key>constellation</key>
+      <value>qam16</value>
+    </param>
+    <param>
+      <key>hierarchy</key>
+      <value>nh</value>
+    </param>
+    <param>
+      <key>transmission_mode</key>
+      <value>T2k</value>
+    </param>
+    <param>
+      <key>gain</key>
       <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(16, 107)</value>
+      <value>(375, 229)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>180</value>
+    </param>
+  </block>
+  <block>
+    <key>dvbt_reference_signals</key>
+    <param>
+      <key>id</key>
+      <value>dvbt_reference_signals_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>constellation</key>
+      <value>qam16</value>
+    </param>
+    <param>
+      <key>hierarchy</key>
+      <value>nh</value>
+    </param>
+    <param>
+      <key>code_rate_hp</key>
+      <value>C1_2</value>
+    </param>
+    <param>
+      <key>code_rate_lp</key>
+      <value>C1_2</value>
+    </param>
+    <param>
+      <key>guard_interval</key>
+      <value>G1_32</value>
+    </param>
+    <param>
+      <key>transmission_mode</key>
+      <value>T2k</value>
+    </param>
+    <param>
+      <key>include_cell_id</key>
+      <value>cell_ide_no</value>
+    </param>
+    <param>
+      <key>cell_id</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(55, 360)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1473,6 +1205,204 @@
     <param>
       <key>_coordinate</key>
       <value>(345, 392)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_sink</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_sink_0_1</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>testBB.bin</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(863, 805)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_multiply_const_vxx</key>
+    <param>
+      <key>id</key>
+      <value>gr_multiply_const_vxx_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>const</key>
+      <value>0.0022097087</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(893, 424)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_source</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_source_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvbt-baruffa/hbo_dtc_sd.ts</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(16, 107)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_ofdm_cyclic_prefixer</key>
+    <param>
+      <key>id</key>
+      <value>digital_ofdm_cyclic_prefixer_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>input_size</key>
+      <value>2048</value>
+    </param>
+    <param>
+      <key>output_size</key>
+      <value>2112</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(648, 416)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_sink</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_sink_0_1_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>test914.bin</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1038, 794)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_sink</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_sink_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test.bin</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>2048</value>
+    </param>
+    <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(631, 786)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1534,12 +1464,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
-    <sink_block_id>uhd_usrp_sink_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>dvbt_energy_dispersal_0</source_block_id>
     <sink_block_id>dvbt_reed_solomon_enc_0</sink_block_id>
     <source_key>0</source_key>
@@ -1558,32 +1482,32 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>digital_ofdm_cyclic_prefixer_0</source_block_id>
-    <sink_block_id>gr_file_sink_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>dvbt_reference_signals_0</source_block_id>
-    <sink_block_id>gr_file_sink_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>fft_vxx_0</source_block_id>
     <sink_block_id>digital_ofdm_cyclic_prefixer_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
-    <sink_block_id>gr_file_sink_0_1</sink_block_id>
+    <source_block_id>fft_vxx_0</source_block_id>
+    <sink_block_id>gr_file_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>gr_multiply_const_vxx_0</source_block_id>
+    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
+    <sink_block_id>uhd_usrp_sink_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_ofdm_cyclic_prefixer_0</source_block_id>
     <sink_block_id>gr_file_sink_0_1_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blks2_rational_resampler_xxx_0</source_block_id>
+    <sink_block_id>gr_file_sink_0_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

@@ -108,6 +108,9 @@ class pilot_gen {
     float d_carrier_freq_correction;
     float d_sampling_freq_correction;
 
+    // Variable to keep corrected OFDM symbol
+    gr_complex * d_derot_in;
+
     int d_tps_carriers_size;
     const int * d_tps_carriers;
     gr_complex * d_tps_carriers_val;
@@ -181,8 +184,8 @@ class pilot_gen {
     void advance_cpilot();
     // Continual pilot data processing methods
     void process_cpilot_data(const gr_complex * in);
-    gr_complex frequency_correction();
     void compute_oneshot_csft(const gr_complex * in);
+    gr_complex * frequency_correction(const gr_complex * in, gr_complex * out);
 
     // TPS generator methods
     int get_current_tpilot() const;

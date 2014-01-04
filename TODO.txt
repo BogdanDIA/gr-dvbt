@@ -1,14 +1,43 @@
-Use set_output_multiple() when necessary
+Notes:
 Enable Doxygen: cmake ../ -DENABLE_DOXYGEN=ON
-Write comments for Doxygen.
-Add copyright
-Document enum types.
-Move pilot_generator class in it's own file
-Write docs for demod_reference_signals
-Do not input block length directly in grc. Instead use transmission mode. Assert when data from xml differs from data from transmission mode.
-use std:conj, std::arg, std:: exp instead of C functions
-Implement Soft decision Viterbi decoder together with interleaver.
-Use fsm() from local implementation not from gnuradio.
-Use tags in order to sygnal NSYNC start from conv. deinterleaver to energy descramble.
+Use AWGN generator to add noise to signals with hue SNR. Otherwise the signal is not decoded correctly.
+
+Various TODOs beside what can be found in the sourcecode:
+
+Fixes:
+ - Peak detector does not find peaks for small search window (+/-4)
+ - Fix the problem with huge SNR input files not being played correctly.
+ - Write docs for demod_reference_signals
+ - Fix sampling freq correction calculation.
+
+Rework:
+ - Move pilot_generator class in its own file
+
+Features: 
+ - Support 8k mode.
+ - Include puncturing matrix on convolutional encoder/decoder.
+ - Support the other rates beside 1/2 on convolutional encoder/decoder.
+ - Implement Soft decision Viterbi decoder together with interleaver.
+ - Implement BICM.
+ - Implement DFE on equalizer.
+ - Autodetect transmission params.
+
+Optimization:
+ - Use VOLK on vector operations (on each module).
+ - Calculate tables for pilot generator (spilot, cpilot, tps).
+ - Use PI control loop for post-FFT carrier and sampling frequency correction.
+ - Use tags in order to signal NSYNC start from conv. deinterleaver to energy descramble.
+ - use std:conj, std::arg, std:: exp instead of C functions
+ - Do not input block length directly in grc. Instead use transmission mode. Assert when data from xml differs from data from transmission mode.
+
+Documentation:
+ - Document enum types.
+
+QA:
+ - Add tests for each block.
+ - Check Viterbi-SSE2 implementation.
+ - check the situation when only noise is received. There is a crash there.
+ - Use ETR290 to measure DVB-T parameters.
+
 
 

@@ -68,8 +68,8 @@ namespace gr {
      */
     energy_dispersal_impl::energy_dispersal_impl(int nblocks)
       : gr_block("energy_dispersal",
-		      gr_make_io_signature(1, 1, sizeof(unsigned char)),
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * d_nblocks * d_bsize))
+          gr_make_io_signature(1, 1, sizeof(unsigned char)),
+          gr_make_io_signature(1, 1, sizeof(unsigned char) * d_nblocks * d_bsize))
     {
       set_relative_rate(1.0/(double) (d_nblocks * d_bsize)); 
     }

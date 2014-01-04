@@ -71,8 +71,8 @@ namespace gr {
     bit_inner_deinterleaver_impl::bit_inner_deinterleaver_impl(int nsize, dvbt_constellation_t constellation, \
         dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission)
       : gr_block("bit_inner_deinterleaver",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
-		      gr_make_io_signature(1, 2, sizeof (unsigned char) * nsize)),
+          gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
+          gr_make_io_signature(1, 2, sizeof (unsigned char) * nsize)),
       config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize),
       d_hierarchy(hierarchy)

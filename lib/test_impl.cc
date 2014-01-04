@@ -42,8 +42,8 @@ namespace gr {
      */
     test_impl::test_impl(int itemsize, int ninput, int noutput)
       : gr_block("test",
-		      gr_make_io_signature(1, 1, itemsize * ninput),
-		      gr_make_io_signature(1, 1, itemsize)),
+          gr_make_io_signature(1, 1, itemsize * ninput),
+          gr_make_io_signature(1, 1, itemsize)),
       d_ninput(ninput)
     {
       printf("in_bsize: %i\n", input_signature()->sizeof_stream_item (0));

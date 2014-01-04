@@ -199,8 +199,8 @@ namespace gr {
     viterbi_decoder_impl::viterbi_decoder_impl(dvbt_constellation_t constellation, \
                 dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK)
       : gr_block("viterbi_decoder",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char))),
+          gr_make_io_signature(1, 1, sizeof (unsigned char)),
+          gr_make_io_signature(1, 1, sizeof (unsigned char))),
       config(constellation, hierarchy, coderate, coderate),
       d_FSM (FSM),
       d_K (K),

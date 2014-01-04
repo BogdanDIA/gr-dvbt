@@ -42,8 +42,8 @@ namespace gr {
      */
     dvbt_map_impl::dvbt_map_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_transmission_mode_t transmission, float gain)
       : gr_block("dvbt_map",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
-		      gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize)),
+          gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize),
+          gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize)),
       config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize),
       d_constellation_size(0),

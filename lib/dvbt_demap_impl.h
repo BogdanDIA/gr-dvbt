@@ -74,8 +74,8 @@ namespace gr {
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
-    	/*!
-	     * ETSI EN 300 744 Clause 4.3.5. \n
+      /*!
+       * ETSI EN 300 744 Clause 4.3.5. \n
        * Data input format: \n
        * complex(real(float), imag(float)) \n
        *
@@ -85,9 +85,9 @@ namespace gr {
        * 00Y0Y1Y2Y3Y4Y5 - QAM64 \n
        */
       int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

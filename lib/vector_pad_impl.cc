@@ -39,8 +39,8 @@ namespace gr {
      */
     vector_pad_impl::vector_pad_impl(int itemsize, int ninput, int noutput)
       : gr_block("vector_pad",
-		      gr_make_io_signature(1, 1, itemsize * ninput),
-		      gr_make_io_signature(1, 1, itemsize * noutput)),
+          gr_make_io_signature(1, 1, itemsize * ninput),
+          gr_make_io_signature(1, 1, itemsize * noutput)),
       d_itemsize(itemsize), d_ninput(ninput), d_noutput(noutput)
     {
       d_prefix_len = d_itemsize * (1 + (int)((d_noutput - d_ninput) / 2));

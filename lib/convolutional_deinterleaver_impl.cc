@@ -53,8 +53,8 @@ namespace gr {
      */
     convolutional_deinterleaver_impl::convolutional_deinterleaver_impl(int blocks, int I, int M)
       : gr_block("convolutional_deinterleaver",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks)),
+          gr_make_io_signature(1, 1, sizeof (unsigned char)),
+          gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks)),
       d_blocks(blocks), d_I(I), d_M(M), d_index(0), d_offset(0)
     {
       set_relative_rate(1.0 / I * d_blocks);

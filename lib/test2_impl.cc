@@ -40,8 +40,8 @@ namespace gr {
      */
     test2_impl::test2_impl(int itemsize, int ninput, int noutput)
       : gr_sync_interpolator("test2",
-		      gr_make_io_signature(1, 1, itemsize * ninput),
-		      gr_make_io_signature(1, 1, itemsize),
+          gr_make_io_signature(1, 1, itemsize * ninput),
+          gr_make_io_signature(1, 1, itemsize),
           ninput)
     {}
 
@@ -54,8 +54,8 @@ namespace gr {
 
     int
     test2_impl::work(int noutput_items,
-			  gr_vector_const_void_star &input_items,
-			  gr_vector_void_star &output_items)
+        gr_vector_const_void_star &input_items,
+        gr_vector_void_star &output_items)
     {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];

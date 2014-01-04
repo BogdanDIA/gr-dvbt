@@ -73,26 +73,26 @@ namespace gr {
       int SK () const { return d_SK; }
 
       void viterbi_algorithm (int I, int S, int O,
-	const std::vector<int> &NS,
-	const std::vector<int> &OS,
-	const std::vector< std::vector<int> > &PS,
-	const std::vector< std::vector<int> > &PI,
-	int K,
-	int S0, int SK,
-	const unsigned char *in, unsigned char *out
-	);
+        const std::vector<int> &NS,
+        const std::vector<int> &OS,
+        const std::vector< std::vector<int> > &PS,
+        const std::vector< std::vector<int> > &PI,
+        int K,
+        int S0, int SK,
+        const unsigned char *in, unsigned char *out
+      );
 
       viterbi_decoder_impl(dvbt_constellation_t constellation, \
-		              dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK);
+                  dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK);
       ~viterbi_decoder_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
       // Where all the action really happens
       int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

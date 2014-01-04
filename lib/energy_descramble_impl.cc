@@ -77,8 +77,8 @@ namespace gr {
      */
     energy_descramble_impl::energy_descramble_impl(int nblocks)
       : gr_block("energy_descramble",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * d_nblocks * d_bsize),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char))),
+          gr_make_io_signature(1, 1, sizeof (unsigned char) * d_nblocks * d_bsize),
+          gr_make_io_signature(1, 1, sizeof (unsigned char))),
       d_index (0)
     {
       set_relative_rate((double) (d_nblocks * d_bsize)); 

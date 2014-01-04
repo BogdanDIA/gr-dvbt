@@ -30,7 +30,7 @@ namespace gr {
      * \ingroup dvbt
      * Randomizes MPEG-2 packets using a PRBS generator. \n
      * Each block has 188 bytes. \n
-     * \param nsize	number of blocks \n
+     * \param nsize number of blocks \n
      */
     class energy_dispersal_impl : public energy_dispersal
     {
@@ -43,7 +43,7 @@ namespace gr {
       // Register for PRBS
       int d_reg;
 
-      void init_prbs();	
+      void init_prbs(); 
       int clock_prbs(int clocks);
 
     public:
@@ -61,9 +61,9 @@ namespace gr {
        * Block size is 188bytes. \n
        */
       int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

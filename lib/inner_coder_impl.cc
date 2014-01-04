@@ -134,8 +134,8 @@ namespace gr {
     inner_coder_impl::inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, \
         dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate)
       : gr_sync_decimator("inner_coder",
-		      gr_make_io_signature(1, 1, sizeof (unsigned char)),
-		      gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput),
+          gr_make_io_signature(1, 1, sizeof (unsigned char)),
+          gr_make_io_signature(1, 1, sizeof (unsigned char) * noutput),
           noutput),
       config(constellation, hierarchy, coderate, coderate),
       d_ninput(ninput), d_noutput(noutput),

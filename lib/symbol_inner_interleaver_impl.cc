@@ -101,7 +101,7 @@ namespace gr {
         dvbt_transmission_mode_t transmission, int direction)
     {
       return gnuradio::get_initial_sptr (new symbol_inner_interleaver_impl(nsize, \
-		    transmission, direction));
+                        transmission, direction));
     }
 
     /*
@@ -110,8 +110,8 @@ namespace gr {
     symbol_inner_interleaver_impl::symbol_inner_interleaver_impl(int nsize, \
         dvbt_transmission_mode_t transmission, int direction)
       : gr_block("symbol_inner_interleaver",
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize),
-		      gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize)),
+                          gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize),
+                          gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize)),
       config(gr::dvbt::QAM16, gr::dvbt::NH, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize), d_direction(direction),
       d_fft_length(0), d_payload_length(0),

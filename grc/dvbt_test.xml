@@ -6,35 +6,35 @@
   <import>import dvbt</import>
   <make>dvbt.test($type.size, $ninput, $noutput)</make>
   <param>
-		<name>IO Type</name>
-		<key>type</key>
-		<type>enum</type>
-		<option>
-			<name>Complex</name>
-			<key>complex</key>
-			<opt>size:gr.sizeof_gr_complex</opt>
-		</option>
-		<option>
-			<name>Float</name>
-			<key>float</key>
-			<opt>size:gr.sizeof_float</opt>
-		</option>
-		<option>
-			<name>Int</name>
-			<key>int</key>
-			<opt>size:gr.sizeof_int</opt>
-		</option>
-		<option>
-			<name>Short</name>
-			<key>short</key>
-			<opt>size:gr.sizeof_short</opt>
-		</option>
-		<option>
-			<name>Byte</name>
-			<key>byte</key>
-			<opt>size:gr.sizeof_char</opt>
-		</option>
-	</param>
+    <name>IO Type</name>
+    <key>type</key>
+    <type>enum</type>
+    <option>
+      <name>Complex</name>
+      <key>complex</key>
+      <opt>size:gr.sizeof_gr_complex</opt>
+    </option>
+    <option>
+      <name>Float</name>
+      <key>float</key>
+      <opt>size:gr.sizeof_float</opt>
+    </option>
+    <option>
+      <name>Int</name>
+      <key>int</key>
+      <opt>size:gr.sizeof_int</opt>
+    </option>
+    <option>
+      <name>Short</name>
+      <key>short</key>
+      <opt>size:gr.sizeof_short</opt>
+    </option>
+    <option>
+      <name>Byte</name>
+      <key>byte</key>
+      <opt>size:gr.sizeof_char</opt>
+    </option>
+  </param>
   <param>
     <name>Input length</name>
     <key>ninput</key>

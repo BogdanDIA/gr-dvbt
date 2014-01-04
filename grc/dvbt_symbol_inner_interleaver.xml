@@ -7,51 +7,51 @@
   <make>dvbt.symbol_inner_interleaver($transmission_mode.payload_length, $transmission_mode.val, $direction.val)</make>
   <param>
     <name>Transmission Mode</name>
-		<key>transmission_mode</key>
-		<type>enum</type>
-		<option>
+    <key>transmission_mode</key>
+    <type>enum</type>
+    <option>
       <name>2K</name>
-			<key>T2k</key>
-			<opt>val:dvbt.T2k</opt>
+      <key>T2k</key>
+      <opt>val:dvbt.T2k</opt>
       <opt>fft_length:2048</opt>
       <opt>payload_length:1512</opt>
-		</option>
-		<option>
+    </option>
+    <option>
       <name>8K</name>
-			<key>T8k</key>
-			<opt>val:dvbt.T8k</opt>
+      <key>T8k</key>
+      <opt>val:dvbt.T8k</opt>
       <opt>fft_length:8192</opt>
       <opt>payload_length:6048</opt>
-		</option>
-		<option>
+    </option>
+    <option>
       <name>TRES1</name>
-			<key>TRES1</key>
-			<opt>val:dvbt.TRES1</opt>
+      <key>TRES1</key>
+      <opt>val:dvbt.TRES1</opt>
       <opt>fft_length:2048</opt>
       <opt>payload_length:1512</opt>
-		</option>
-		<option>
+    </option>
+    <option>
       <name>TRES2</name>
-			<key>TRES2</key>
-			<opt>val:dvbt.TRES2</opt>
+      <key>TRES2</key>
+      <opt>val:dvbt.TRES2</opt>
       <opt>fft_length:2048</opt>
       <opt>payload_length:1512</opt>
-		</option>
+    </option>
   </param>
   <param>
     <name>Direction</name>
-		<key>direction</key>
-		<type>enum</type>
-		<option>
+    <key>direction</key>
+    <type>enum</type>
+    <option>
       <name>Interleave</name>
-			<key>Interleave</key>
-			<opt>val:1</opt>
-		</option>
+      <key>Interleave</key>
+      <opt>val:1</opt>
+    </option>
     <option>
       <name>Deinterleave</name>
-			<key>Deinterleave</key>
-			<opt>val:0</opt>
-		</option>
+      <key>Deinterleave</key>
+      <opt>val:0</opt>
+    </option>
   </param>
   <sink>
     <name>in</name>

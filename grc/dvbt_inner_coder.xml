@@ -19,113 +19,113 @@
   </param>
   <param>
     <name>Constellation Type</name>
-		<key>constellation</key>
+    <key>constellation</key>
     <type>enum</type>
     <option>
-			<name>QPSK</name>
-			<key>qpsk</key>
-			<opt>val:dvbt.QPSK</opt>
-		</option>
+      <name>QPSK</name>
+      <key>qpsk</key>
+      <opt>val:dvbt.QPSK</opt>
+    </option>
     <option>
-			<name>16QAM</name>
-			<key>qam16</key>
-			<opt>val:dvbt.QAM16</opt>
-		</option>
-		<option>
-			<name>64QAM</name>
-			<key>qam64</key>
+      <name>16QAM</name>
+      <key>qam16</key>
+      <opt>val:dvbt.QAM16</opt>
+    </option>
+    <option>
+      <name>64QAM</name>
+      <key>qam64</key>
       <opt>val:dvbt.QAM64</opt>
-		</option>
+    </option>
   </param>
   <param>
     <name>Hierarchy Type</name>
-		<key>hierarchy</key>
-		<type>enum</type>
-		<option>
-			<name>Non Hierarchical</name>
-			<key>nh</key>
-			<opt>val:dvbt.NH</opt>
-		</option>
+    <key>hierarchy</key>
+    <type>enum</type>
     <option>
-			<name>Alpha 1</name>
-			<key>alpha1</key>
-			<opt>val:dvbt.ALPHA1</opt>
-		</option>
+      <name>Non Hierarchical</name>
+      <key>nh</key>
+      <opt>val:dvbt.NH</opt>
+    </option>
+    <option>
+      <name>Alpha 1</name>
+      <key>alpha1</key>
+      <opt>val:dvbt.ALPHA1</opt>
+    </option>
     <option>
       <name>Alpha 2</name>
-			<key>alpha2</key>
-			<opt>val:dvbt.ALPHA2</opt>
-		</option>
+      <key>alpha2</key>
+      <opt>val:dvbt.ALPHA2</opt>
+    </option>
     <option>
       <name>Alpha 4</name>
-			<key>alpha4</key>
-			<opt>val:dvbt.ALPHA4</opt>
-		</option>
+      <key>alpha4</key>
+      <opt>val:dvbt.ALPHA4</opt>
+    </option>
     <option>
       <name>HRES1</name>
       <key>HRES1</key>
-			<opt>val:dvbt.HRES1</opt>
-		</option>
+      <opt>val:dvbt.HRES1</opt>
+    </option>
     <option>
       <name>HRES2</name>
       <key>HRES2</key>
-			<opt>val:dvbt.HRES2</opt>
-		</option>
+      <opt>val:dvbt.HRES2</opt>
+    </option>
     <option>
       <name>HRES3</name>
       <key>HRES3</key>
-			<opt>val:dvbt.HRES3</opt>
-		</option>
+      <opt>val:dvbt.HRES3</opt>
+    </option>
     <option>
       <name>HRES4</name>
       <key>HRES4</key>
-			<opt>val:dvbt.HRES4</opt>
-		</option>
+      <opt>val:dvbt.HRES4</opt>
+    </option>
   </param>
   <param>
     <name>Code rate</name>
-		<key>code_rate</key>
-		<type>enum</type>
-		<option>
+    <key>code_rate</key>
+    <type>enum</type>
+    <option>
       <name>1/2</name>
       <key>C1_2</key>
-			<opt>val:dvbt.C1_2</opt>
-		</option>
+      <opt>val:dvbt.C1_2</opt>
+    </option>
     <option>
       <name>2/3</name>
       <key>C2_3</key>
-			<opt>val:dvbt.C2_3</opt>
-		</option>
+      <opt>val:dvbt.C2_3</opt>
+    </option>
     <option>
       <name>3/4</name>
       <key>C3_4</key>
-			<opt>val:dvbt.C3_4</opt>
-		</option>
+      <opt>val:dvbt.C3_4</opt>
+    </option>
     <option>
       <name>5/6</name>
       <key>C5_6</key>
-			<opt>val:dvbt.C5_6</opt>
-		</option>
+      <opt>val:dvbt.C5_6</opt>
+    </option>
     <option>
       <name>7/8</name>
       <key>C7_8</key>
-			<opt>val:dvbt.C7_8</opt>
-		</option>
+      <opt>val:dvbt.C7_8</opt>
+    </option>
     <option>
       <name>CRES1</name>
       <key>CRES1</key>
-			<opt>val:dvbt.CRES1</opt>
-		</option>
+      <opt>val:dvbt.CRES1</opt>
+    </option>
     <option>
       <name>CRES2</name>
       <key>CRES2</key>
-			<opt>val:dvbt.CRES2</opt>
-		</option>
+      <opt>val:dvbt.CRES2</opt>
+    </option>
     <option>
       <name>CRES3</name>
       <key>CRES3</key>
-			<opt>val:dvbt.CRES3</opt>
-		</option>
+      <opt>val:dvbt.CRES3</opt>
+    </option>
   </param>
   <check>$ninput &gt; 0</check>
   <check>$noutput &gt; 0</check>

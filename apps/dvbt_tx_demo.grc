@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Sat Jan  4 20:19:59 2014</timestamp>
+  <timestamp>Sat Jan  4 21:04:19 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -1316,7 +1316,7 @@
     </param>
     <param>
       <key>file</key>
-      <value>/home/bogdan/ettus/dvbt-baruffa/hbo_trailer_6ksd.ts</value>
+      <value>test.ts</value>
     </param>
     <param>
       <key>type</key>

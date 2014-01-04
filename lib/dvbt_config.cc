@@ -92,59 +92,59 @@ namespace gr {
     }
 
     dvbt_config::dvbt_config(dvbt_constellation_t constellation, \
-	dvbt_hierarchy_t hierarchy, dvbt_code_rate_t code_rate_HP, \
-	dvbt_code_rate_t code_rate_LP, dvbt_guard_interval_t guard_interval, \
-	dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id) :
-	    d_constellation(constellation), d_hierarchy(hierarchy), d_code_rate_HP(code_rate_HP),
-	    d_code_rate_LP(code_rate_LP), d_guard_interval(guard_interval), d_transmission_mode(transmission_mode),
-	    d_include_cell_id(include_cell_id), d_cell_id(cell_id)
+      dvbt_hierarchy_t hierarchy, dvbt_code_rate_t code_rate_HP, \
+      dvbt_code_rate_t code_rate_LP, dvbt_guard_interval_t guard_interval, \
+      dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id) :
+            d_constellation(constellation), d_hierarchy(hierarchy), d_code_rate_HP(code_rate_HP),
+            d_code_rate_LP(code_rate_LP), d_guard_interval(guard_interval), d_transmission_mode(transmission_mode),
+            d_include_cell_id(include_cell_id), d_cell_id(cell_id)
     {
       d_symbols_per_frame = 68;
       d_frames_per_superframe = 4;
 
       switch (d_transmission_mode)
       {
-	case gr::dvbt::T2k:
-	  d_Kmin = 0; d_Kmax = 1704;
-	  d_fft_length = 2048;
-	  d_payload_length = 1512;
-	  break;
-	case gr::dvbt::T8k:
-	  d_Kmin = 0; d_Kmax = 6816;
-	  d_fft_length = 8192;
-	  d_payload_length = 6048;
-	  break;
-	default:
-	  d_Kmin = 0; d_Kmax = 1704;
-	  d_fft_length = 2048;
-	  d_payload_length = 1512;
-	  break;
+        case gr::dvbt::T2k:
+          d_Kmin = 0; d_Kmax = 1704;
+          d_fft_length = 2048;
+          d_payload_length = 1512;
+          break;
+        case gr::dvbt::T8k:
+          d_Kmin = 0; d_Kmax = 6816;
+          d_fft_length = 8192;
+          d_payload_length = 6048;
+          break;
+        default:
+          d_Kmin = 0; d_Kmax = 1704;
+          d_fft_length = 2048;
+          d_payload_length = 1512;
+          break;
       }
       d_zeros_on_left = int(ceil((d_fft_length - (d_Kmax - d_Kmin + 1)) / 2.0));
       d_zeros_on_right = d_fft_length - d_zeros_on_left - (d_Kmax - d_Kmin + 1);
 
       switch (d_constellation)
       {
-	case gr::dvbt::QPSK:
-	  d_constellation_size = 2;
-	  d_step = 2;
-	  d_m = 2;
-	  break;
-	case gr::dvbt::QAM16:
-	  d_constellation_size = 16;
-	  d_step = 2;
-	  d_m = 4;
-	  break;
-	case gr::dvbt::QAM64:
-	  d_constellation_size = 64;
-	  d_step = 2;
-	  d_m = 6;
-	  break;
-	default:
-	  d_constellation_size = 16;
-	  d_step = 2;
-	  d_m = 4;
-	  break;
+        case gr::dvbt::QPSK:
+          d_constellation_size = 2;
+          d_step = 2;
+          d_m = 2;
+          break;
+        case gr::dvbt::QAM16:
+          d_constellation_size = 16;
+          d_step = 2;
+          d_m = 4;
+          break;
+        case gr::dvbt::QAM64:
+          d_constellation_size = 64;
+          d_step = 2;
+          d_m = 6;
+          break;
+        default:
+          d_constellation_size = 16;
+          d_step = 2;
+          d_m = 4;
+          break;
       }
 
       switch (d_code_rate_HP)
@@ -228,24 +228,24 @@ namespace gr {
       // Normalization factor
       switch (d_m)
       {
-	case 2:
-	  d_norm = 1.0 / sqrt(2);
-	  break;
-	case 16:
-	  if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
-	  if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
-	  if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
-	  break;
-	case 64:
-	  if (d_alpha == 1) d_norm = 1.0 / sqrt(42);
-	  if (d_alpha == 2) d_norm = 1.0 / sqrt(60);
-	  if (d_alpha == 4) d_norm = 1.0 / sqrt(108);
-	  break;
-	default:
-	  if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
-	  if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
-	  if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
-	  break;
+        case 2:
+          d_norm = 1.0 / sqrt(2);
+          break;
+        case 16:
+          if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
+          if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
+          if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
+          break;
+        case 64:
+          if (d_alpha == 1) d_norm = 1.0 / sqrt(42);
+          if (d_alpha == 2) d_norm = 1.0 / sqrt(60);
+          if (d_alpha == 4) d_norm = 1.0 / sqrt(108);
+          break;
+        default:
+          if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
+          if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
+          if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
+          break;
       }
     }
 

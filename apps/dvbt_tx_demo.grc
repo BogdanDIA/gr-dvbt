@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Sat Jan  4 19:22:09 2014</timestamp>
+  <timestamp>Sat Jan  4 20:05:13 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -1152,41 +1152,6 @@
     </param>
   </block>
   <block>
-    <key>gr_file_source</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_source_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvbt-baruffa/hbo_dtc_sd.ts</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 107)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>digital_ofdm_cyclic_prefixer</key>
     <param>
       <key>id</key>
@@ -1333,6 +1298,41 @@
     <param>
       <key>_coordinate</key>
       <value>(1016, 795)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_source</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_source_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>test.ts</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(15, 107)</value>
     </param>
     <param>
       <key>_rotation</key>

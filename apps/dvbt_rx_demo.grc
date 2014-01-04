@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Sat Jan  4 19:12:31 2014</timestamp>
+  <timestamp>Sat Jan  4 20:04:02 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -268,41 +268,6 @@
     <param>
       <key>_coordinate</key>
       <value>(761, 875)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>gr_file_sink</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_sink_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/test_out.ts</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>unbuffered</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1037, 867)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1466,41 +1431,6 @@
     </param>
   </block>
   <block>
-    <key>gr_file_source</key>
-    <param>
-      <key>id</key>
-      <value>gr_file_source_0_2</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/home/bogdan/ettus/dvb-t/gr-dvb-t/grc/testBB.bin</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>complex</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(19, 588)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_add_xx</key>
     <param>
       <key>id</key>
@@ -1532,6 +1462,41 @@
     </param>
   </block>
   <block>
+    <key>gr_file_sink</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_sink_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>test_out.ts</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>byte</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>unbuffered</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1037, 867)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
     <key>analog_noise_source_x</key>
     <param>
       <key>id</key>
@@ -1551,7 +1516,7 @@
     </param>
     <param>
       <key>amp</key>
-      <value>0.005</value>
+      <value>0.009</value>
     </param>
     <param>
       <key>seed</key>
@@ -1560,6 +1525,41 @@
     <param>
       <key>_coordinate</key>
       <value>(32, 674)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>gr_file_source</key>
+    <param>
+      <key>id</key>
+      <value>gr_file_source_0_2</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>testBB.bin</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>complex</value>
+    </param>
+    <param>
+      <key>repeat</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(53, 586)</value>
     </param>
     <param>
       <key>_rotation</key>

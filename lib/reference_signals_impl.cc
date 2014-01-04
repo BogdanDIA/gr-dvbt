@@ -129,19 +129,19 @@ namespace gr {
      * Constructor of class
      */
     pilot_gen::pilot_gen(const dvbt_config &c) : config(c),
-                                        d_spilot_index(0),
-                                        d_cpilot_index(0),
-                                        d_tpilot_index(0),
-                                        d_symbol_index(0),
-                                        d_symbol_index_known(0),
-                                        d_frame_index(0),
-                                        d_superframe_index(0),
-                                        d_freq_offset_max(8),
-                                        d_trigger_index(0),
-                                        d_payload_index(0),
-                                        d_chanestim_index(0),
-					d_prev_mod_symbol_index(0),
-					d_mod_symbol_index(0)
+          d_spilot_index(0),
+          d_cpilot_index(0),
+          d_tpilot_index(0),
+          d_symbol_index(0),
+          d_symbol_index_known(0),
+          d_frame_index(0),
+          d_superframe_index(0),
+          d_freq_offset_max(8),
+          d_trigger_index(0),
+          d_payload_index(0),
+          d_chanestim_index(0),
+          d_prev_mod_symbol_index(0),
+          d_mod_symbol_index(0)
     {
       //Determine parameters from config file
       d_Kmin = config.d_Kmin;
@@ -549,7 +549,7 @@ namespace gr {
       for (int scount = 0; scount < 4; scount++)
       {
         d_spilot_index = 0; d_cpilot_index = 0;
-				d_chanestim_index = 0;
+        d_chanestim_index = 0;
 
       for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
       {
@@ -561,10 +561,10 @@ namespace gr {
           advance_chanestim();
         }
       }
-			//printf("d_chanestim_index: %i\n", d_chanestim_index);
+      //printf("d_chanestim_index: %i\n", d_chanestim_index);
 
-			sum = 0;
-			float s = 0;
+      sum = 0;
+      float s = 0;
       for (int j = 0; j < (d_chanestim_index - 1); j++)
       {
         known_phase = norm(get_spilot_value(d_chanestim_carriers[j + 1]) - get_spilot_value(d_chanestim_carriers[j]));
@@ -598,20 +598,20 @@ namespace gr {
     for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
     {
       // Keep data for channel estimation
-			if (k == get_current_spilot(d_mod_symbol_index))
-			{
-				set_chanestim_carrier(k);
-				advance_spilot(d_mod_symbol_index); 
-				advance_chanestim();
-			}
+      if (k == get_current_spilot(d_mod_symbol_index))
+      {
+        set_chanestim_carrier(k);
+        advance_spilot(d_mod_symbol_index); 
+        advance_chanestim();
+      }
 
-			// Keep data for channel estimation
-			if (k == get_current_cpilot())
-			{
-				set_chanestim_carrier(k);
-				advance_cpilot();
-				advance_chanestim();
-			}
+      // Keep data for channel estimation
+      if (k == get_current_cpilot())
+      {
+        set_chanestim_carrier(k);
+        advance_cpilot();
+        advance_chanestim();
+      }
     }
  
     // We use both scattered pilots and continual pilots
@@ -646,40 +646,40 @@ namespace gr {
     d_equalizer_ready = 1;
 
 #else
-      /*************************************************************/
-      // This methigs waits for 4 symbols to have a valid spilot measurement
-      // in each fourth carrier (uses history)
-      // Suppose we have g[k] and g[k+3] then
-      // g[k+1]=(2/3)v[k]+(1/3)v[k+3]
-      // g[k+2]=(1/3)v[k]+(2/3)v[k+3]
-      /*************************************************************/
+    /*************************************************************/
+    // This waits for 4 symbols to have a valid spilot measurement
+    // in each fourth carrier (uses history)
+    // Suppose we have g[k] and g[k+3] then
+    // g[k+1]=(2/3)v[k]+(1/3)v[k+3]
+    // g[k+2]=(1/3)v[k]+(2/3)v[k+3]
+    /*************************************************************/
 
-      d_spilot_index = 0;
+    d_spilot_index = 0;
 
-      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+    for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
+    {
+      if (k == get_current_spilot(d_mod_symbol_index))
       {
-        if (k == get_current_spilot(d_mod_symbol_index))
-        {
-          set_channel_gain(k, in[k + d_zeros_on_left]);
-          advance_spilot(d_mod_symbol_index);
-        }
+        set_channel_gain(k, in[k + d_zeros_on_left]);
+        advance_spilot(d_mod_symbol_index);
       }
+    }
 
-      // Wait for at least 4 symbols to have an estimation on each third carrier
-      if (d_symbol_index < 4)
-				return 1;
-      
-      // Suppose we have a pilot each third carrier.
-      for (int i = 0; i < (d_Kmax - d_Kmin + 1 - 3); i += 3)
-      {
-        d_channel_gain[i + 1] = 
-					(gr_complex(2.0, 0.0) * d_channel_gain[i] + d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
-				d_channel_gain[i + 2] = 
-					(d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
-      }
+    // Wait for at least 4 symbols to have an estimation on each third carrier
+    if (d_symbol_index < 4)
+      return 1;
+    
+    // Suppose we have a pilot each third carrier.
+    for (int i = 0; i < (d_Kmax - d_Kmin + 1 - 3); i += 3)
+    {
+      d_channel_gain[i + 1] = 
+        (gr_complex(2.0, 0.0) * d_channel_gain[i] + d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
+      d_channel_gain[i + 2] = 
+        (d_channel_gain[i] + gr_complex(2.0, 0.0) * d_channel_gain[i + 3]) / gr_complex(3.0, 0.0);
+    }
 
-      // Signal that equalizer is ready
-      d_equalizer_ready = 1;
+    // Signal that equalizer is ready
+    d_equalizer_ready = 1;
 #endif
 
       int diff_sindex = (d_mod_symbol_index - d_prev_mod_symbol_index + 4) % 4;
@@ -740,7 +740,7 @@ namespace gr {
       d_freq_offset = start - d_zeros_on_left;
 
       if (d_freq_offset)
-				printf("d_freq_offset: %i\n", d_freq_offset);
+        printf("d_freq_offset: %i\n", d_freq_offset);
     }
 
     void
@@ -953,19 +953,19 @@ namespace gr {
 
       for (int i = 0; i < diff_symbol_index; i++)
       {
-				// Take out the front entry first
-				d_rcv_tps_data.pop_front();
+        // Take out the front entry first
+        d_rcv_tps_data.pop_front();
 
         // Add data at tail
         if (!d_symbol_index_known || (d_symbol_index != 0))
         {
-		      if (tps_majority_zero >= 0)
-			      d_rcv_tps_data.push_back(0);
-		      else
-			      d_rcv_tps_data.push_back(1);
-	      }
-	      else
-		      d_rcv_tps_data.push_back(0);
+          if (tps_majority_zero >= 0)
+            d_rcv_tps_data.push_back(0);
+          else
+            d_rcv_tps_data.push_back(1);
+        }
+        else
+          d_rcv_tps_data.push_back(0);
       }
 
       // Match synchronization signatures
@@ -1072,7 +1072,7 @@ namespace gr {
         is_payload = 1;
 
         // Keep data for channel estimation
-				// This depends on the symbol index
+        // This depends on the symbol index
         if (k == get_current_spilot(d_mod_symbol_index))
         {
           advance_spilot(d_mod_symbol_index); 
@@ -1094,7 +1094,7 @@ namespace gr {
         } 
 
         // Keep payload carrier number
-	// This depends on the symbol index
+  // This depends on the symbol index
         if (is_payload)
         {
           set_payload_carrier(k);
@@ -1251,18 +1251,18 @@ namespace gr {
       if (smaller > 0)
       {
         printf("smaller: %i, d_trigger_index: %i, d_symbol_index: %i, diff_symbol_index: %i\n", \
-		smaller, d_trigger_index, d_symbol_index, diff_symbol_index);
+    smaller, d_trigger_index, d_symbol_index, diff_symbol_index);
 
-				for (int i = 0; i < d_fft_length; i++)
+        for (int i = 0; i < d_fft_length; i++)
           printf("d_trigger_index: %i, d_symbol_index: %i, in[%i]: angle:%f, abs:%f, %f, %f\n", \
             d_trigger_index, d_symbol_index, i, 360 * arg(in[i]) / 6.28, abs(in[i]), in[i].real(), in[i].imag());
 
         for (int i = 0; i < d_fft_length; i++)
           printf("d_trigger_index: %i, d_symbol_index: %i, d_channel_gain[%i]: re: %f, img: %f, in[%i]: angle:%f, abs:%f, %f, %f\n", \
             d_trigger_index, d_symbol_index, i - d_zeros_on_left, \
-			d_channel_gain[i - d_zeros_on_left].real(), d_channel_gain[i - d_zeros_on_left].imag(), \
+      d_channel_gain[i - d_zeros_on_left].real(), d_channel_gain[i - d_zeros_on_left].imag(), \
             i, 360 * arg(in[i]) / 6.28, abs(in[i]), in[i].real(), in[i].imag());
-	
+  
         for (int i = 0; i < d_payload_length; i++)
           printf("d_symbol_index: %i, out[%i]: abs:%f, re: %f, img:%f\n", d_symbol_index, i, abs(out[i]), out[i].real(), out[i].imag());
       }
@@ -1292,12 +1292,12 @@ namespace gr {
           dvbt_code_rate_t code_rate_LP, dvbt_guard_interval_t guard_interval,\
           dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id)
       : gr_block("reference_signals",
-					gr_make_io_signature(1, 1, itemsize * ninput),
-					gr_make_io_signature(1, 1, itemsize * noutput)),
-					config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
+          gr_make_io_signature(1, 1, itemsize * ninput),
+          gr_make_io_signature(1, 1, itemsize * noutput)),
+          config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
               guard_interval, transmission_mode, include_cell_id, cell_id),
           d_ninput(ninput), d_noutput(noutput),
-		d_pg(config)
+    d_pg(config)
     {
       //
     }

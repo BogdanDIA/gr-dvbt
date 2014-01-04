@@ -69,21 +69,21 @@ namespace gr {
         /*!
          * ETSI EN 300 744 Clause 4.3.4.2 \n
          * One block is 12groupsx126datawords=1512datawords \n
-	 *
+         *
          * Input format: \n
          * 000000I0I1 - QPSK \n
          * 0000I0I1I2I3 - 16QAM \n
          * 00I0I1I2I3I4I5 - 64QAM \n
-	 *
+         * 
          * Output format: \n
          * 000000Y0Y1 - QPSK \n
          * 0000Y0Y1Y2Y3 - 16QAM \n
          * 00Y0Y1Y2Y3Y4Y5 - 64QAM \n
          */
       int general_work(int noutput_items,
-		       gr_vector_int &ninput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items);
+           gr_vector_int &ninput_items,
+           gr_vector_const_void_star &input_items,
+           gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

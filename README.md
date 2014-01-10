@@ -24,7 +24,7 @@ mplayer test_out.ts
 **Notes**  
 The baseband samples can be sent to USRP N210 on TX and received with another USRP N210 on RX. The decoder/encoder consumes a lot of processing power and therefore the realtime functionality will depend on the available computing power. On my computer - Sandybridge 2600K - it is possible to send and receive in realtime the stream.  
 
-The encoder/decoder currently works with gnuradio 3.7.2.x and 3.6 (if taken from Gnuradio_v_3_6 tag) but it is not dependent heavily on it. Next step will be to port it to the latest version. There is also a list of todo tasks in TODO.txt.  
+The encoder/decoder currently works with gnuradio 3.7.2.x and 3.6 (if taken from Gnuradio_v_3_6 tag) but it is not dependent heavily on it. There is also a list of todo tasks in TODO.txt.  
 
 
 

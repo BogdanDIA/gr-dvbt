@@ -23,6 +23,7 @@
 #ifndef INCLUDED_DVBT_VITERBI_DECODER_IMPL_H
 #define INCLUDED_DVBT_VITERBI_DECODER_IMPL_H
 
+#include <dvbt/fsm.h>
 #include <dvbt/viterbi_decoder.h>
 #include <dvbt/dvbt_config.h>
 
@@ -34,7 +35,9 @@ extern "C" {
 namespace gr {
   namespace dvbt {
 
-    class viterbi_decoder_impl : public viterbi_decoder
+    using namespace gr::trellis;
+
+    class viterbi_decoder_impl : public gr::dvbt::viterbi_decoder
     {
     private:
       dvbt_config config;

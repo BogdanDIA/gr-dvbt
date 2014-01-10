@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "test2_impl.h"
 #include <stdio.h>
 
@@ -39,9 +39,9 @@ namespace gr {
      * The private constructor
      */
     test2_impl::test2_impl(int itemsize, int ninput, int noutput)
-      : gr_sync_interpolator("test2",
-          gr_make_io_signature(1, 1, itemsize * ninput),
-          gr_make_io_signature(1, 1, itemsize),
+      : sync_interpolator("test2",
+          io_signature::make(1, 1, itemsize * ninput),
+          io_signature::make(1, 1, itemsize),
           ninput)
     {}
 

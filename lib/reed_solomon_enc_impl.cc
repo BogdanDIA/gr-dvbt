@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "reed_solomon_enc_impl.h"
 #include <stdio.h>
 
@@ -39,9 +39,9 @@ namespace gr {
      * The private constructor
      */
     reed_solomon_enc_impl::reed_solomon_enc_impl(int p, int m, int gfpoly, int n, int k, int t, int s, int blocks)
-      : gr_block("reed_solomon",
-          gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (k - s)),
-          gr_make_io_signature(1, 1, sizeof(unsigned char) * blocks * (n - s))),
+      : block("reed_solomon",
+          io_signature::make(1, 1, sizeof(unsigned char) * blocks * (k - s)),
+          io_signature::make(1, 1, sizeof(unsigned char) * blocks * (n - s))),
       d_p(p), d_m(m), d_gfpoly(gfpoly), d_n(n), d_k(k), d_t(t), d_s(s), d_blocks(blocks),
       d_rs(p, m, gfpoly, n, k, t, s, blocks)
     {

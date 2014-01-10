@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "energy_dispersal_impl.h"
 #include <stdio.h>
 
@@ -67,9 +67,9 @@ namespace gr {
      * The private constructor
      */
     energy_dispersal_impl::energy_dispersal_impl(int nblocks)
-      : gr_block("energy_dispersal",
-          gr_make_io_signature(1, 1, sizeof(unsigned char)),
-          gr_make_io_signature(1, 1, sizeof(unsigned char) * d_nblocks * d_bsize))
+      : gr::block("energy_dispersal",
+          gr::io_signature::make(1, 1, sizeof(unsigned char)),
+          gr::io_signature::make(1, 1, sizeof(unsigned char) * d_nblocks * d_bsize))
     {
       set_relative_rate(1.0/(double) (d_nblocks * d_bsize)); 
     }

@@ -23,19 +23,22 @@
 #define INCLUDED_DVBT_VITERBI_DECODER_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
-#include <fsm.h>
+#include <gnuradio/block.h>
+#include "fsm.h"
 #include <dvbt/dvbt_config.h>
+
 
 namespace gr {
   namespace dvbt {
+
+    //using namespace gr::trellis;
 
     /*!
      * \brief <+description of block+>
      * \ingroup dvbt
      *
      */
-    class DVBT_API viterbi_decoder : virtual public gr_block
+    class DVBT_API viterbi_decoder : virtual public block
     {
     public:
        typedef boost::shared_ptr<viterbi_decoder> sptr;
@@ -49,7 +52,7 @@ namespace gr {
         * creating new instances.
         */
        static sptr make(dvbt_constellation_t constellation, \
-                   dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK);
+                   dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const gr::trellis::fsm &FSM, int K, int S0, int SK);
     };
 
   } // namespace dvbt

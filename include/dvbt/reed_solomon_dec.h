@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_REED_SOLOMON_DEC_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace dvbt {
@@ -33,7 +33,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API reed_solomon_dec : virtual public gr_block
+    class DVBT_API reed_solomon_dec : virtual public block
     {
     public:
        typedef boost::shared_ptr<reed_solomon_dec> sptr;

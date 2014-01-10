@@ -22,7 +22,7 @@
 #ifndef INCLUDED_DVBT_API_H
 #define INCLUDED_DVBT_API_H
 
-#include <gruel/attributes.h>
+#include <gnuradio/attributes.h>
 
 #ifdef gnuradio_dvbt_EXPORTS
 #  define DVBT_API __GR_ATTR_EXPORT

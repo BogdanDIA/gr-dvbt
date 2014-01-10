@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_BIT_INNER_INTERLEAVER_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include <dvbt/dvbt_config.h>
 
 namespace gr {
@@ -34,7 +34,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API bit_inner_interleaver : virtual public gr_block
+    class DVBT_API bit_inner_interleaver : virtual public block
     {
     public:
        typedef boost::shared_ptr<bit_inner_interleaver> sptr;

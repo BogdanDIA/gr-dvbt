@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "convolutional_deinterleaver_impl.h"
 #include <stdio.h>
 
@@ -52,9 +52,9 @@ namespace gr {
      * The private constructor
      */
     convolutional_deinterleaver_impl::convolutional_deinterleaver_impl(int blocks, int I, int M)
-      : gr_block("convolutional_deinterleaver",
-          gr_make_io_signature(1, 1, sizeof (unsigned char)),
-          gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks)),
+      : block("convolutional_deinterleaver",
+          io_signature::make(1, 1, sizeof (unsigned char)),
+          io_signature::make(1, 1, sizeof (unsigned char) * I * blocks)),
       d_blocks(blocks), d_I(I), d_M(M), d_index(0), d_offset(0)
     {
       set_relative_rate(1.0 / I * d_blocks);

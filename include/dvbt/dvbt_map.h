@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_DVBT_MAP_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 #include <dvbt/dvbt_config.h>
 
 namespace gr {
@@ -34,7 +34,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API dvbt_map : virtual public gr_block
+    class DVBT_API dvbt_map : virtual public block
     {
     public:
        typedef boost::shared_ptr<dvbt_map> sptr;

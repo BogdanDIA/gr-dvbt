@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "vector_pad_impl.h"
 
 namespace gr {
@@ -38,9 +38,9 @@ namespace gr {
      * The private constructor
      */
     vector_pad_impl::vector_pad_impl(int itemsize, int ninput, int noutput)
-      : gr_block("vector_pad",
-          gr_make_io_signature(1, 1, itemsize * ninput),
-          gr_make_io_signature(1, 1, itemsize * noutput)),
+      : block("vector_pad",
+          io_signature::make(1, 1, itemsize * ninput),
+          io_signature::make(1, 1, itemsize * noutput)),
       d_itemsize(itemsize), d_ninput(ninput), d_noutput(noutput)
     {
       d_prefix_len = d_itemsize * (1 + (int)((d_noutput - d_ninput) / 2));

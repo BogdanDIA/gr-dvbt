@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "energy_descramble_impl.h"
 #include <stdio.h>
 
@@ -76,9 +76,9 @@ namespace gr {
      * The private constructor
      */
     energy_descramble_impl::energy_descramble_impl(int nblocks)
-      : gr_block("energy_descramble",
-          gr_make_io_signature(1, 1, sizeof (unsigned char) * d_nblocks * d_bsize),
-          gr_make_io_signature(1, 1, sizeof (unsigned char))),
+      : block("energy_descramble",
+          io_signature::make(1, 1, sizeof (unsigned char) * d_nblocks * d_bsize),
+          io_signature::make(1, 1, sizeof (unsigned char))),
       d_index (0)
     {
       set_relative_rate((double) (d_nblocks * d_bsize)); 

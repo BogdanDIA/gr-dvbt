@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_OFDM_SYM_ACQUISITION_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace dvbt {
@@ -33,7 +33,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API ofdm_sym_acquisition : virtual public gr_block
+    class DVBT_API ofdm_sym_acquisition : virtual public block
     {
     public:
        typedef boost::shared_ptr<ofdm_sym_acquisition> sptr;

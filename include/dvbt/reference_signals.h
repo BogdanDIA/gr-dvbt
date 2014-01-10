@@ -24,7 +24,7 @@
 
 #include <dvbt/api.h>
 #include <dvbt/dvbt_config.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace dvbt {
@@ -34,7 +34,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API reference_signals : virtual public gr_block
+    class DVBT_API reference_signals : virtual public block
     {
     public:
        typedef boost::shared_ptr<reference_signals> sptr;

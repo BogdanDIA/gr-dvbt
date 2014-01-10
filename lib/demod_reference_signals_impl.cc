@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "demod_reference_signals_impl.h"
 #include <stdio.h>
 
@@ -48,9 +48,9 @@ namespace gr {
         dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_code_rate_t code_rate_HP,\
           dvbt_code_rate_t code_rate_LP, dvbt_guard_interval_t guard_interval,\
           dvbt_transmission_mode_t transmission_mode, int include_cell_id, int cell_id)
-      : gr_block("demod_reference_signals",
-          gr_make_io_signature(1, 1, itemsize * ninput),
-          gr_make_io_signature(1, 1, itemsize * noutput)),
+      : block("demod_reference_signals",
+          io_signature::make(1, 1, itemsize * ninput),
+          io_signature::make(1, 1, itemsize * noutput)),
           config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
             guard_interval, transmission_mode, include_cell_id, cell_id),
           d_ninput(ninput), d_noutput(noutput),

@@ -33,7 +33,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "viterbi_decoder_impl.h"
 #include <stdio.h>
 #include <sys/time.h>
@@ -54,6 +54,8 @@ static const float INF = 1.0e9;
 
 namespace gr {
   namespace dvbt {
+
+  using namespace gr::trellis;
 
   void viterbi_decoder_impl::viterbi_algorithm(int I, int S, int O,
               const std::vector<int> &NS,
@@ -198,9 +200,9 @@ namespace gr {
      */
     viterbi_decoder_impl::viterbi_decoder_impl(dvbt_constellation_t constellation, \
                 dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK)
-      : gr_block("viterbi_decoder",
-          gr_make_io_signature(1, 1, sizeof (unsigned char)),
-          gr_make_io_signature(1, 1, sizeof (unsigned char))),
+      : block("viterbi_decoder",
+          io_signature::make(1, 1, sizeof (unsigned char)),
+          io_signature::make(1, 1, sizeof (unsigned char))),
       config(constellation, hierarchy, coderate, coderate),
       d_FSM (FSM),
       d_K (K),

@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_REED_SOLOMON_ENC_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace dvbt {
@@ -32,7 +32,7 @@ namespace gr {
      * \brief Reed Solomon encoder
      * \ingroup dvbt
      */
-    class DVBT_API reed_solomon_enc : virtual public gr_block
+    class DVBT_API reed_solomon_enc : virtual public block
     {
     public:
        typedef boost::shared_ptr<reed_solomon_enc> sptr;

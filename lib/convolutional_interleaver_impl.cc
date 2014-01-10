@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "convolutional_interleaver_impl.h"
 #include <deque>
 
@@ -39,9 +39,9 @@ namespace gr {
      * The private constructor
      */
     convolutional_interleaver_impl::convolutional_interleaver_impl(int blocks, int I, int M)
-      : gr_sync_interpolator("convolutional_interleaver",
-          gr_make_io_signature(1, 1, sizeof (unsigned char) * I * blocks),
-          gr_make_io_signature(1, 1, sizeof (unsigned char)), I * blocks),
+      : sync_interpolator("convolutional_interleaver",
+          io_signature::make(1, 1, sizeof (unsigned char) * I * blocks),
+          io_signature::make(1, 1, sizeof (unsigned char)), I * blocks),
       d_blocks(blocks), d_I(I), d_M(M)
     {
       //Positions are shift registers (FIFOs)

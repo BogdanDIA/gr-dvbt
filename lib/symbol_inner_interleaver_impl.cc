@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "symbol_inner_interleaver_impl.h"
 #include <stdio.h>
 
@@ -109,9 +109,9 @@ namespace gr {
      */
     symbol_inner_interleaver_impl::symbol_inner_interleaver_impl(int nsize, \
         dvbt_transmission_mode_t transmission, int direction)
-      : gr_block("symbol_inner_interleaver",
-                          gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize),
-                          gr_make_io_signature(1, 1, sizeof(unsigned char) * nsize)),
+      : block("symbol_inner_interleaver",
+                          io_signature::make(1, 1, sizeof(unsigned char) * nsize),
+                          io_signature::make(1, 1, sizeof(unsigned char) * nsize)),
       config(gr::dvbt::QAM16, gr::dvbt::NH, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize), d_direction(direction),
       d_fft_length(0), d_payload_length(0),

@@ -23,10 +23,10 @@
 #endif
 #include <volk/volk.h>
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include <dvbt/dvbt_config.h>
 #include "dvbt_demap_impl.h"
-#include <gr_math.h>
+#include <gnuradio/math.h>
 #include <stdio.h>
 #include <sys/time.h>
 
@@ -51,9 +51,9 @@ namespace gr {
      */
     dvbt_demap_impl::dvbt_demap_impl(int nsize, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, \
         dvbt_transmission_mode_t transmission, float gain)
-      : gr_block("dvbt_demap",
-          gr_make_io_signature(1, 1, sizeof (gr_complex) * nsize),
-          gr_make_io_signature(1, 1, sizeof (unsigned char) * nsize)),
+      : block("dvbt_demap",
+          io_signature::make(1, 1, sizeof (gr_complex) * nsize),
+          io_signature::make(1, 1, sizeof (unsigned char) * nsize)),
       config(constellation, hierarchy, gr::dvbt::C1_2, gr::dvbt::C1_2, gr::dvbt::G1_32, transmission),
       d_nsize(nsize),
       d_constellation_size(0),
@@ -138,11 +138,13 @@ namespace gr {
       float min_dist = std::norm(val - d_constellation_points[0]);
       int min_index = 0;
 
-
 #ifdef USE_VOLK
       float ff[d_constellation_size];
 
-      volk_32fc_x2_square_dist_32f_a(&ff[0], &val, &d_constellation_points[0], d_constellation_size * 8);
+      if (is_unaligned())
+        volk_32fc_x2_square_dist_32f_u(&ff[0], &val, &d_constellation_points[0], d_constellation_size);
+      else
+        volk_32fc_x2_square_dist_32f_a(&ff[0], &val, &d_constellation_points[0], d_constellation_size);
 
       for (int i = 0; i < d_constellation_size; i++)
       {
@@ -200,7 +202,10 @@ namespace gr {
         gr_complex ff[noutput_items * d_nsize];
         gr_complex gg(d_gain, 0.0);
 
-        volk_32fc_s32fc_multiply_32fc_a(&ff[0], &in[0], gg, noutput_items * d_nsize);
+        if (is_unaligned())
+          volk_32fc_s32fc_multiply_32fc_u(&ff[0], &in[0], gg, noutput_items * d_nsize);
+        else
+          volk_32fc_s32fc_multiply_32fc_a(&ff[0], &in[0], gg, noutput_items * d_nsize);
 
         for (int i = 0; i < (noutput_items * d_nsize); i++)
           out[i] = find_constellation_value(ff[i]);

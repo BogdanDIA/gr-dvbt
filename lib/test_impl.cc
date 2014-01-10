@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "test_impl.h"
 
 #include <iostream>
@@ -41,9 +41,9 @@ namespace gr {
      * The private constructor
      */
     test_impl::test_impl(int itemsize, int ninput, int noutput)
-      : gr_block("test",
-          gr_make_io_signature(1, 1, itemsize * ninput),
-          gr_make_io_signature(1, 1, itemsize)),
+      : block("test",
+          io_signature::make(1, 1, itemsize * ninput),
+          io_signature::make(1, 1, itemsize)),
       d_ninput(ninput)
     {
       printf("in_bsize: %i\n", input_signature()->sizeof_stream_item (0));

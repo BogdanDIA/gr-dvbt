@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_CONVOLUTIONAL_DEINTERLEAVER_H
 
 #include <dvbt/api.h>
-#include <gr_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace dvbt {
@@ -33,7 +33,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API convolutional_deinterleaver : virtual public gr_block
+    class DVBT_API convolutional_deinterleaver : virtual public block
     {
     public:
        typedef boost::shared_ptr<convolutional_deinterleaver> sptr;

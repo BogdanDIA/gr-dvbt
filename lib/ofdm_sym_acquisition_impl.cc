@@ -22,14 +22,14 @@
 #include "config.h"
 #endif
 
-#include <gr_io_signature.h>
+#include <gnuradio/io_signature.h>
 #include "ofdm_sym_acquisition_impl.h"
 #include <complex>
-#include <gr_math.h>
-#include <gr_expj.h>
+#include <gnuradio/math.h>
+#include <gnuradio/expj.h>
 #include <stdio.h>
 #include <volk/volk.h>
-#include <gr_fxpt.h>
+#include <gnuradio/fxpt.h>
 
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
@@ -159,10 +159,10 @@ namespace gr {
       size = lookup_start - (lookup_stop - (d_cp_length + d_fft_length - 1)) + 1;
       //printf("low: %i, size: %i\n", low, size);
 
-      //if(is_unaligned())
+      if(is_unaligned())
         volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
-      //else
-        //volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
+      else
+        volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
 #else
       for (int i = lookup_start; i >= (lookup_stop - (d_cp_length + d_fft_length - 1)); i--)
         d_norm[i] = std::norm(in[i]);
@@ -173,10 +173,10 @@ namespace gr {
       low = lookup_stop - d_cp_length - 1;
       size = lookup_start - (lookup_stop - d_cp_length - 1) + 1;
 
-      //if (is_unaligned())
+      if (is_unaligned())
         volk_32fc_x2_multiply_conjugate_32fc_u(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
-      //else
-        //volk_32fc_x2_multiply_conjugate_32fc_a(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
+      else
+        volk_32fc_x2_multiply_conjugate_32fc_a(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
 #else
       for (int i = lookup_start; i >= (lookup_stop - d_cp_length - 1); i--)
         d_corr[i - d_fft_length] = in[i] * std::conj(in[i - d_fft_length]);
@@ -206,10 +206,10 @@ namespace gr {
       low = 0;
       size = lookup_start - lookup_stop;
 
-      //if (is_unaligned())  
+      if (is_unaligned())  
+        volk_32fc_magnitude_32f_u(&d_lambda[low], &d_gamma[low], size);
+      else
         volk_32fc_magnitude_32f_a(&d_lambda[low], &d_gamma[low], size);
-      //else
-        //volk_32fc_magnitude_32f_a(&d_lambda[low], &d_gamma[low], size);
 #else
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] = std::abs(d_gamma[i]);
@@ -220,8 +220,16 @@ namespace gr {
       low = 0;
       size = lookup_start - lookup_stop;
 
-      volk_32f_s32f_multiply_32f_a(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
-      volk_32f_x2_subtract_32f_a(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
+      if (is_unaligned())  
+      {
+        volk_32f_s32f_multiply_32f_u(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
+        volk_32f_x2_subtract_32f_u(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
+      }
+      else
+      {
+        volk_32f_s32f_multiply_32f_a(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
+        volk_32f_x2_subtract_32f_a(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
+      }
 #else
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] -= (d_phi[i] * d_rho / 2.0);
@@ -255,7 +263,7 @@ namespace gr {
 
         // Calculate frequency correction
         /*float peak_epsilon = gr_fast_atan2f(d_gamma[peak_pos[0]]);*/
-        float peak_epsilon = gr_fast_atan2f(d_gamma[peak_pos[peak_length - 1]]);
+        float peak_epsilon = fast_atan2f(d_gamma[peak_pos[peak_length - 1]]);
         double sensitivity = (double)(-1) / (double)d_fft_length;
 
         //printf("peak_epsilon: %.10f\n", peak_epsilon);
@@ -348,9 +356,9 @@ namespace gr {
      * The private constructor
      */
     ofdm_sym_acquisition_impl::ofdm_sym_acquisition_impl(int blocks, int fft_length, int occupied_tones, int cp_length, float snr)
-      : gr_block("ofdm_sym_acquisition",
-          gr_make_io_signature(1, 1, sizeof (gr_complex) * blocks),
-          gr_make_io_signature(1, 1, sizeof (gr_complex) * blocks * fft_length)),
+      : block("ofdm_sym_acquisition",
+          io_signature::make(1, 1, sizeof (gr_complex) * blocks),
+          io_signature::make(1, 1, sizeof (gr_complex) * blocks * fft_length)),
       d_blocks(blocks), d_fft_length(fft_length), d_cp_length(cp_length), d_snr(snr),
       d_index(0), d_phase(0.0), d_phaseinc(0.0), d_cp_found(0), d_count(0), d_nextphaseinc(0), d_nextpos(0), \
         d_sym_acq_count(0),d_sym_acq_timeout(100), d_initial_aquisition(0), \
@@ -456,7 +464,10 @@ namespace gr {
             low = d_cp_start - d_fft_length + 1;
             size = d_cp_start - (d_cp_start - d_fft_length + 1) + 1;
 
-            volk_32fc_x2_multiply_32fc_u(&out[0], &d_derot[0], &in[low], size);
+            if(is_unaligned())
+              volk_32fc_x2_multiply_32fc_u(&out[0], &d_derot[0], &in[low], size);
+            else
+              volk_32fc_x2_multiply_32fc_a(&out[0], &d_derot[0], &in[low], size);
 #else
             int j = 0;
             for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)

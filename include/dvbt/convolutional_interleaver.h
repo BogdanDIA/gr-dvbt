@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_CONVOLUTIONAL_INTERLEAVER_H
 
 #include <dvbt/api.h>
-#include <gr_sync_interpolator.h>
+#include <gnuradio/sync_interpolator.h>
 
 namespace gr {
   namespace dvbt {
@@ -33,7 +33,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API convolutional_interleaver : virtual public gr_sync_interpolator
+    class DVBT_API convolutional_interleaver : virtual public sync_interpolator
     {
     public:
        typedef boost::shared_ptr<convolutional_interleaver> sptr;

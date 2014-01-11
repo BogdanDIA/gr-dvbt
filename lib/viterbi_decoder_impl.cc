@@ -38,6 +38,8 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+//#define DEBUG 1
+
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
 #else
@@ -311,22 +313,16 @@ namespace gr {
              */
 
             int out_count = 0;
-            unsigned char c;
-            unsigned char viterbi_in[16];
 
             for (int count = 0, i = 0; i < (d_K * 2); i++)
             {
-              // TODO optimize w/o memory copy
-              viterbi_in[count % 4] = in_bits[i];
-
               if ((count % 4) == 3)
               {
-                d_viterbi_butterfly2_sse2(viterbi_in, metric0, metric1, path0, path1);
-                //d_viterbi_butterfly2(viterbi_in, mettab, state0, state1);
+                d_viterbi_butterfly2_sse2(&in_bits[i & 0xfffffffc], metric0, metric1, path0, path1);
+                //d_viterbi_butterfly2(&in_bits[i & 0xfffffffc], mettab, state0, state1);
 
                 if ((count > 0) && (count % 16) == 11)
                   d_viterbi_get_output_sse2(metric0, path0, &out[n*(d_K/8) + out_count++]);
-                  //d_viterbi_get_output(state0, &c);
                   //d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
               }
 

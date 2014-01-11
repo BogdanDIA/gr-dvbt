@@ -503,12 +503,12 @@ d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __
     m2 = _mm_add_epi8(metric0[i], metsvm);
     m3 = _mm_add_epi8(metric0[i+2], metsv);
 
+#if 0
     _mm_store_si128((__m128i *) &mr0, m0);
     _mm_store_si128((__m128i *) &mr1, m1);
     _mm_store_si128((__m128i *) &mr2, m2);
     _mm_store_si128((__m128i *) &mr3, m3);
 
-#if 0
     if (count > OFFSET)
     {
     for (j = 0; j < 16; j++)
@@ -570,12 +570,12 @@ d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __
     m2 = _mm_add_epi8(metric0[i], metsvm);
     m3 = _mm_add_epi8(metric0[i+2], metsv);
 
+#if 0
     _mm_store_si128((__m128i *) &mr0, m0);
     _mm_store_si128((__m128i *) &mr1, m1);
     _mm_store_si128((__m128i *) &mr2, m2);
     _mm_store_si128((__m128i *) &mr3, m3);
 
-#if 0
     if (count > OFFSET)
     {
     for (j = 0; j < 16; j++)

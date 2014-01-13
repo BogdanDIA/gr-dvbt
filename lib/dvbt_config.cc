@@ -181,7 +181,7 @@ namespace gr {
           d_cr_k = 3; d_cr_n = 4;
           break;
         case gr::dvbt::C5_6:
-          d_cr_k = 5; d_cr_k = 6;
+          d_cr_k = 5; d_cr_n = 6;
         break;
         case gr::dvbt::C7_8:
           d_cr_k = 7; d_cr_n = 8;

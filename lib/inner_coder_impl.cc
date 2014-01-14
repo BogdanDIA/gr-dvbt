@@ -197,6 +197,8 @@ namespace gr {
      */
     inner_coder_impl::~inner_coder_impl()
     {
+      delete [] d_out_buff;
+      delete [] d_in_buff;
     }
 
     void

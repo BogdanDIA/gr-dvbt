@@ -23,7 +23,7 @@
 #define INCLUDED_DVBT_INNER_CODER_H
 
 #include <dvbt/api.h>
-#include <gnuradio/sync_decimator.h>
+#include <gnuradio/block.h>
 #include <dvbt/dvbt_config.h>
 
 namespace gr {
@@ -34,7 +34,7 @@ namespace gr {
      * \ingroup dvbt
      *
      */
-    class DVBT_API inner_coder : virtual public sync_decimator
+    class DVBT_API inner_coder : virtual public block
     {
     public:
        typedef boost::shared_ptr<inner_coder> sptr;

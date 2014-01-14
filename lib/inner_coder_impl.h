@@ -55,12 +55,23 @@ namespace gr {
       // Constellation with m
       int d_m;
 
-      void generate_codeword(int in, int &x, int &y);
-      int generate_punctured_code(dvbt_code_rate_t coderate, int c);
+      // input block size in bytes
+      int d_in_bs;
+      // bit input buffer
+      unsigned char * d_in_buff;
+
+      // output block size in bytes
+      int d_out_bs;
+      // bit output buffer
+      unsigned char * d_out_buff;
+
+      void generate_codeword(unsigned char in, int &x, int &y);
+      void generate_punctured_code(dvbt_code_rate_t coderate, unsigned char * in, unsigned char * out);
 
     public:
       inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate);
       ~inner_coder_impl();
+      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
       /*!
        * ETSI EN 300 744 Clause 4.3.3. \n
        * Mother convolutional code with rate 1/2. \n
@@ -83,9 +94,10 @@ namespace gr {
        *
        * TODO - Format output for hierarchical \n
        */
-      int work(int noutput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+      int general_work (int noutput_items,
+           gr_vector_int &ninput_items,
+	   gr_vector_const_void_star &input_items,
+	   gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt

@@ -31,12 +31,13 @@ namespace gr {
   namespace dvbt {
 
     void
-    inner_coder_impl::generate_codeword(int in, int &x, int &y)
+    inner_coder_impl::generate_codeword(unsigned char in, int &x, int &y)
     {
       //insert input bit
       d_reg |= ((in & 0x1) << 7);
       d_reg  = d_reg >> 1;
 
+      // TODO - do this with polynoms and bitcnt
       //generate output G1=171(OCT)
       x = ((d_reg >> 6) ^ (d_reg >> 5) ^ (d_reg >> 4) ^ \
                         (d_reg >> 3) ^ d_reg) & 0x1;
@@ -52,72 +53,70 @@ namespace gr {
      * Output e.g. rate 2/3
      * 00000c0c1c2
      */
-    int
-    inner_coder_impl::generate_punctured_code(dvbt_code_rate_t coderate, int in)
+    void
+    inner_coder_impl::generate_punctured_code(dvbt_code_rate_t coderate, unsigned char * in, unsigned char * out)
     {
       int x, y;
-      int c = 0;
 
       switch(coderate)
       {
         //X1Y1
         case gr::dvbt::C1_2:
-          generate_codeword(in, x, y);
-          c = (x << 1) | y;
+          generate_codeword(in[0], x, y);
+          out[0] = x; out[1] = y;
           break;
         //X1Y1Y2
         case gr::dvbt::C2_3:
-          generate_codeword(in >> 1, x, y);
-          c = (x << 1) | y;
-          generate_codeword(in, x, y);
-          c = (c << 1) | y;
+          generate_codeword(in[0], x, y);
+          out[0] = x; out[1] = y;
+          generate_codeword(in[1], x, y);
+          out[2] = y;
           break;
         //X1Y1Y2X3
         case gr::dvbt::C3_4:
-          generate_codeword(in >> 2, x, y);
-          c = (x << 1) | y;
-          generate_codeword(in >> 1, x, y);
-          c = (c << 1) | y;
-          generate_codeword(in, x, y);
-          c = (c << 1) | x;
+          generate_codeword(in[0], x, y);
+          out[0] = x; out[1] = y;
+          generate_codeword(in[1], x, y);
+          out[2] = y;
+          generate_codeword(in[2], x, y);
+          out[3] = x;
           break;
         //X1Y1Y2X3Y4X5
         case gr::dvbt::C5_6:
-          generate_codeword(in >> 4, x, y);
-          c = (x << 1) | y;
-          generate_codeword(in >> 3, x, y);
-          c = (c << 1) | y;
-          generate_codeword(in >> 2, x, y);
-          c = (c << 1) | x;
-          generate_codeword(in >> 1, x, y);
-          c = (c << 1) | y;
-          generate_codeword(in, x, y);
-          c = (c << 1) | x;
+          generate_codeword(in[0], x, y);
+          out[0] = x; out[1] = y;
+          generate_codeword(in[1], x, y);
+          out[2] = y;
+          generate_codeword(in[2], x, y);
+          out[3] = x;
+          generate_codeword(in[3], x, y);
+          out[4] = y;
+          generate_codeword(in[4], x, y);
+          out[5] = x;
           break;
         //X1Y1Y2X3Y4X5Y6X7
         case gr::dvbt::C7_8:
-          generate_codeword(in >> 6, x, y);
-          c = (x << 1) | y;
-          generate_codeword(in >> 5, x, y);
-          c = (c << 1) | y;
-          generate_codeword(in >> 4, x, y);
-          c = (c << 1) | x;
-          generate_codeword(in >> 3, x, y);
-          c = (c << 1) | y;
-          generate_codeword(in >> 2, x, y);
-          c = (c << 1) | x;
-          generate_codeword(in >> 1, x, y);
-          c = (c << 1) | y;
-          generate_codeword(in, x, y);
-          c = (c << 1) | x;
+          generate_codeword(in[0], x, y);
+          out[0] = x; out[1] = y;
+          generate_codeword(in[1], x, y);
+          out[2] = y;
+          generate_codeword(in[2], x, y);
+          out[3] = y;
+          generate_codeword(in[3], x, y);
+          out[4] = y;
+          generate_codeword(in[4], x, y);
+          out[5] = x;
+          generate_codeword(in[5], x, y);
+          out[6] = y;
+          generate_codeword(in[6], x, y);
+          out[7] = x;
           break;
         default:
-          generate_codeword(in, x, y);
-          c = (x << 1) | y;
+          generate_codeword(in[0], x, y);
+          out[0] = x; out[1] = y;
           break;
       }
 
-      return c;
     }
 
     inner_coder::sptr
@@ -133,10 +132,9 @@ namespace gr {
      */
     inner_coder_impl::inner_coder_impl(int ninput, int noutput, dvbt_constellation_t constellation, \
         dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate)
-      : sync_decimator("inner_coder",
+      : block("inner_coder",
           io_signature::make(1, 1, sizeof (unsigned char)),
-          io_signature::make(1, 1, sizeof (unsigned char) * noutput),
-          noutput),
+          io_signature::make(1, 1, sizeof (unsigned char) * noutput)),
       config(constellation, hierarchy, coderate, coderate),
       d_ninput(ninput), d_noutput(noutput),
       d_reg(0),
@@ -149,13 +147,49 @@ namespace gr {
       //Determine m - constellation symbol size
       d_m = config.d_m;
 
-      //We process nm bits blocks
-      //Corespondingly we process km input bits(km/8 Bytes)
-      //We output one byte for a symbol of m bits
-      //The out/in rate in bytes is: 8n/km (Bytes)
-      assert((d_noutput * d_k * d_m) % (d_ninput * 8 * d_n));
+      printf("Inner_coder: d_k: %i, d_n: %i, d_m: %i\n", d_k, d_n, d_m);
+      printf("Inner_coder: d_noutput: %i, d_ninput: %i\n", d_noutput, d_ninput);
 
-      set_decimation((d_noutput * d_k * d_m) / (d_ninput * 8 * d_n));
+      // In order to accomodate all constalations (m=2,4,6)
+      // and rates (1/2, 2/3, 3/4, 5/6, 7/8)
+      // We need the following things to happen:
+      // - output item size multiple of 1512bytes
+      // - noutput_items multiple of 4
+      // - in block size 4*(k*m/8)
+      // - out block size 4*n
+      //
+      // Rate calculation follows:
+      // We process km input bits(km/8 Bytes)
+      // We output nm bits
+      // We output one byte for a symbol of m bits
+      // The out/in rate in bytes is: 8n/km (Bytes)
+
+      assert(d_ninput % 1);
+      assert(d_noutput % 1512);
+
+      // Set output items multiple of 4
+      set_output_multiple(4);
+
+      // Set relative rate out/in
+      assert((d_noutput * d_k * d_m) % (d_ninput * 8 * d_n));
+      set_relative_rate((float)(d_ninput * 8 * d_n) / (float)d_noutput * d_k * d_m);
+
+      // calculate in and out block sizes
+      d_in_bs = (d_k * d_m) / 2;
+      d_out_bs = 4 * d_n;
+
+      // allocate bit buffers
+      d_in_buff = new unsigned char[8 * d_in_bs];
+      if (d_in_buff == NULL)
+      {
+        std::cout << "Error allocating d_in_buff" << std::endl;
+      }
+
+      d_out_buff = new unsigned char[8 * d_in_bs * d_n / d_k];
+      if (d_in_buff == NULL)
+      {
+        std::cout << "Error allocating d_out_buff" << std::endl;
+      }
     }
 
     /*
@@ -165,60 +199,54 @@ namespace gr {
     {
     }
 
+    void
+    inner_coder_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    {
+       int input_required = noutput_items * d_noutput * d_k * d_m / (d_ninput * 8 * d_n);
+
+       unsigned ninputs = ninput_items_required.size();
+       for (unsigned int i = 0; i < ninputs; i++) {
+         ninput_items_required[i] = input_required;
+       }
+    }
+
     int
-    inner_coder_impl::work (int noutput_items,
+    inner_coder_impl::general_work (int noutput_items,
+                       gr_vector_int &ninput_items,
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        //TODO - allocate these dynamically 
-        unsigned char in_buff[d_n * d_m];
-        unsigned char out_buff[d_n * d_m];
-
-        int in_count = 0;
-        int out_count = 0;
-        int krem = d_k;
-
-        while (out_count < (noutput_items * d_noutput))
+        for (int k = 0; k < (noutput_items * d_noutput / d_out_bs); k++)
         {
-          int ncount = 0;
-          //keep buffer into 64bits
-          long long ll = 0;
-          int y = 0;
-
-          while(ncount < (d_n * d_m))
+          // Unpack input to bits
+          for (int i = 0; i < d_in_bs; i++)
           {
-            int x = 0;
-            int c = 0;
-            int bitrem = 8;
-            int byte = in[in_count];
-
-            //Do this till finish the byte
-            while(bitrem >= krem)
-            {
-              x = ((byte >> (bitrem - krem)) & ((1 << d_k) - 1));
-              c = generate_punctured_code(config.d_code_rate_HP, y | x);
-              ll = (ll << d_n) | c;
-              bitrem -= krem;
-              krem = d_k;
-              ncount += d_n;
-            }
-            //Put remaining bits 
-            if (bitrem > 0)
-            {
-              krem = d_k - bitrem;
-              y = (byte & ((1 << bitrem) - 1)) << krem;
-            }
-            in_count++;
+            for (int j = 0; j < 8; j++)
+              d_in_buff[8*i + j] = (in[k*d_in_bs + i] >> (7 - j)) & 1;
           }
 
-          int count = ncount / d_m;
+          // Encode the data
+          for (int in_bit = 0, out_bit = 0; in_bit < (8 * d_in_bs); in_bit += d_k, out_bit += d_n)
+            generate_punctured_code(config.d_code_rate_HP, &d_in_buff[in_bit], &d_out_buff[out_bit]);
 
-          while(count--)
-            out[out_count++] = (ll >> (d_m * count)) & ((1 << d_m) - 1);
+          // Pack d_m bit in one output byte
+          for (int i = 0; i < d_out_bs; i++)
+          {
+            unsigned char c = 0;
+
+            for (int j = 0; j < d_m; j++)
+              c |= d_out_buff[d_m*i + j] << (d_m - 1 - j);
+
+            out[k*d_out_bs + i] = c;
+          }
         }
+
+        // Tell runtime system how many input items we consumed on
+        // each input stream.
+        consume_each(noutput_items * d_noutput * d_k * d_m / (d_ninput * 8 * d_n));
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

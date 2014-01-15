@@ -26,6 +26,7 @@
 #include <complex>
 #include "dvbt_map_impl.h"
 #include <stdio.h>
+#include <math.h>
 
 namespace gr {
   namespace dvbt {
@@ -59,21 +60,21 @@ namespace gr {
       d_alpha = config.d_alpha;
       d_gain = gain * config.d_norm;
 
-      printf("d_constellation_size: %i\n", d_constellation_size);
-      printf("d_step: %i\n", d_step);
-      printf("d_alpha: %i\n", d_alpha);
-      printf("d_gain: %f\n", d_gain);
+      printf("DVBT map, d_constellation_size: %i\n", d_constellation_size);
+      printf("DVBT map, d_step: %i\n", d_step);
+      printf("DVBT map, d_alpha: %i\n", d_alpha);
+      printf("DVBT map, d_gain: %f\n", d_gain);
 
       d_constellation_points = new gr_complex[d_constellation_size];
       if (d_constellation_points == NULL)
       {
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate d_constellation_points" << std::endl;
       }
 
       d_constellation_bits = new int[d_constellation_size];
       if (d_constellation_bits == NULL)
       {
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate d_constellation_bits" << std::endl;
       }
 
       make_constellation_points(d_constellation_size, d_step, d_alpha);
@@ -99,15 +100,27 @@ namespace gr {
     {
       //TODO - verify if QPSK works
       
+      // The simetry of the constellation is used to calculate 
+      // 16-QAM from QPSK and 64-QAM form 16-QAM
+
       int bits_per_axis = log2(size) / 2;
+      int steps_per_axis = sqrt(size) / 2 - 1;
 
       for (int i = 0; i < size; i++)
       {
-        int x = i >> bits_per_axis;
-        int y = i & ((1 << bits_per_axis) - 1);
+        // This is the quadrant made of the first two bits starting from MSB
+        int q = i >> (2 * (bits_per_axis - 1)) & 3;
+        // Sign for correctly calculate I and Q in each quadrant
+        int sign0 = (q >> 1) ? -1 : 1; int sign1 = (q & 1) ? -1 : 1;
 
-        d_constellation_points[i] = gr_complex(alpha + step - 2 * x, alpha + step - 2 * y);
-        d_constellation_bits[i] = (bin_to_gray(x) << bits_per_axis) + bin_to_gray(y);
+        int x = (i >> (bits_per_axis - 1)) & ((1 << (bits_per_axis - 1)) - 1);
+        int y = i & ((1 << (bits_per_axis - 1)) - 1);
+
+        int xval = alpha + (steps_per_axis - x) * step;
+        int yval = alpha + (steps_per_axis - y) * step;
+
+        d_constellation_points[i] = gr_complex(sign0 * xval, sign1 * yval);
+        d_constellation_bits[i] = (bin_to_gray(x) << (bits_per_axis - 1)) + bin_to_gray(y);
 
         // ETSI EN 300 744 Clause 4.3.5
         // Actually the constellation is gray coded
@@ -116,18 +129,17 @@ namespace gr {
 
         x = 0; y = 0;
 
-        for (int j = 0; j < bits_per_axis; j++)
+        for (int j = 0; j < (bits_per_axis - 1); j++)
         {
           x += ((d_constellation_bits[i] >> (1 + 2 * j)) & 1) << j;
           y += ((d_constellation_bits[i] >> (2 * j)) & 1) << j;
         }
 
-        d_constellation_bits[i] = (x << bits_per_axis) + y;
-      }
+        d_constellation_bits[i] = (q << 2 * (bits_per_axis - 1)) + (x << (bits_per_axis - 1)) + y;
 
-      for (int i = 0; i < size; i++)
-        printf("constellation points: %f, %f, bits: %x\n", d_constellation_points[i].real(), d_constellation_points[i].imag(), \
-            d_constellation_bits[i]);
+        printf("DVBT map, constellation points[%i]: %f, %f, bits: %x\n", \
+            i, d_constellation_points[i].real(), d_constellation_points[i].imag(), d_constellation_bits[i]);
+      }
     }
 
     gr_complex
@@ -135,6 +147,7 @@ namespace gr {
     {
       gr_complex point;
 
+      // TODO - do this search optimum
       for (int i = 0; i < d_constellation_size; i++)
         if (d_constellation_bits[i] == val)
           point = d_constellation_points[i];
@@ -157,6 +170,7 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         gr_complex *out = (gr_complex *) output_items[0];
 
+        // TODO - use VOLK for multiplication
         for (int i = 0; i < (noutput_items * d_nsize); i++)
           out[i] = d_gain * find_constellation_point(in[i]);
 

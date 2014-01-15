@@ -231,12 +231,12 @@ namespace gr {
         case 2:
           d_norm = 1.0 / sqrt(2);
           break;
-        case 16:
+        case 4:
           if (d_alpha == 1) d_norm = 1.0 / sqrt(10);
           if (d_alpha == 2) d_norm = 1.0 / sqrt(20);
           if (d_alpha == 4) d_norm = 1.0 / sqrt(52);
           break;
-        case 64:
+        case 6:
           if (d_alpha == 1) d_norm = 1.0 / sqrt(42);
           if (d_alpha == 2) d_norm = 1.0 / sqrt(60);
           if (d_alpha == 4) d_norm = 1.0 / sqrt(108);

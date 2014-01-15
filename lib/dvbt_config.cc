@@ -126,7 +126,7 @@ namespace gr {
       switch (d_constellation)
       {
         case gr::dvbt::QPSK:
-          d_constellation_size = 2;
+          d_constellation_size = 4;
           d_step = 2;
           d_m = 2;
           break;

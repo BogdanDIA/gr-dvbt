@@ -29,8 +29,8 @@
 namespace gr {
   namespace dvbt {
 
-    const int energy_dispersal_impl::d_nblocks = 8;
-    const int energy_dispersal_impl::d_bsize = 188;
+    const int energy_dispersal_impl::d_npacks = 8;
+    const int energy_dispersal_impl::d_psize = 188;
     const int energy_dispersal_impl::d_SYNC = 0x47;
     const int energy_dispersal_impl::d_NSYNC = 0xB8;
 
@@ -69,9 +69,10 @@ namespace gr {
     energy_dispersal_impl::energy_dispersal_impl(int nblocks)
       : gr::block("energy_dispersal",
           gr::io_signature::make(1, 1, sizeof(unsigned char)),
-          gr::io_signature::make(1, 1, sizeof(unsigned char) * d_nblocks * d_bsize))
+          gr::io_signature::make(1, 1, sizeof(unsigned char) * nblocks * d_npacks * d_psize)),
+      d_nblocks(nblocks)
     {
-      set_relative_rate(1.0/(double) (d_nblocks * d_bsize)); 
+      set_relative_rate(1.0/(double) (d_nblocks * d_npacks * d_psize)); 
     }
 
     /*
@@ -85,7 +86,7 @@ namespace gr {
     energy_dispersal_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
       // Add one block size for SYNC search
-      ninput_items_required[0] = d_nblocks * (d_bsize + 1) * noutput_items;
+      ninput_items_required[0] = d_npacks * (d_psize + 1) * d_nblocks * noutput_items;
     }
 
     int
@@ -103,7 +104,7 @@ namespace gr {
         int is_sync = 0;
 
         // Search for SYNC byte
-        while(is_sync == 0 && index < d_bsize)
+        while(is_sync == 0 && index < d_psize)
           if (in[index] == d_SYNC)
             is_sync = 1;
           else
@@ -112,27 +113,27 @@ namespace gr {
         // If we found a SYNC byte
         if (is_sync)
         {
-          for (int i = 0; i < noutput_items; i++)
+          for (int i = 0; i < (d_nblocks * noutput_items); i++)
           {
             init_prbs();
 
             int sync = d_NSYNC;
 
-            for (int j = 0; j < d_nblocks; j++)
+            for (int j = 0; j < d_npacks; j++)
             {
               if (in[index + count] != d_SYNC)
                 printf("error: Malformed MPEG-TS!\n");
 
               out[count++] = sync;
 
-              for (int k = 1; k < d_bsize; k++)
-                out[count++] = in[index + count] ^ clock_prbs(d_nblocks);
+              for (int k = 1; k < d_psize; k++)
+                out[count++] = in[index + count] ^ clock_prbs(d_npacks);
 
               sync = d_SYNC;
-              clock_prbs(d_nblocks);
+              clock_prbs(d_npacks);
             }
           }
-          consume_each(index + d_nblocks * d_bsize * noutput_items);
+          consume_each(index + d_npacks * d_psize * d_nblocks * noutput_items);
           ret = noutput_items;
         }
         else

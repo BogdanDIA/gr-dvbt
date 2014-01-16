@@ -29,15 +29,21 @@ namespace gr {
      * \brief DVBT Energy dispersal class. \n 
      * \ingroup dvbt
      * Randomizes MPEG-2 packets using a PRBS generator. \n
-     * Each block has 188 bytes. \n
+     * Each packet has 188 bytes. \n
      * \param nsize number of blocks \n
      */
     class energy_dispersal_impl : public energy_dispersal
     {
     private:
-      static const int d_nblocks;
-      static const int d_bsize;
+      // Packet size
+      static const int d_psize;
+      // Number of packets after which PRBS is reset
+      static const int d_npacks;
+      // Number of blocks
+      int d_nblocks;
+      // SYNC value
       static const int d_SYNC;
+      // Negative SYNC value
       static const int d_NSYNC;
 
       // Register for PRBS

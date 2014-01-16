@@ -71,12 +71,6 @@ namespace gr {
         std::cout << "cannot allocate d_constellation_points" << std::endl;
       }
 
-      d_constellation_bits = new int[d_constellation_size];
-      if (d_constellation_bits == NULL)
-      {
-        std::cout << "cannot allocate d_constellation_bits" << std::endl;
-      }
-
       make_constellation_points(d_constellation_size, d_step, d_alpha);
     }
 
@@ -86,7 +80,6 @@ namespace gr {
     dvbt_map_impl::~dvbt_map_impl()
     {
       delete [] d_constellation_points;
-      delete [] d_constellation_bits;
     }
 
     unsigned int
@@ -119,8 +112,7 @@ namespace gr {
         int xval = alpha + (steps_per_axis - x) * step;
         int yval = alpha + (steps_per_axis - y) * step;
 
-        d_constellation_points[i] = gr_complex(sign0 * xval, sign1 * yval);
-        d_constellation_bits[i] = (bin_to_gray(x) << (bits_per_axis - 1)) + bin_to_gray(y);
+        int val = (bin_to_gray(x) << (bits_per_axis - 1)) + bin_to_gray(y);
 
         // ETSI EN 300 744 Clause 4.3.5
         // Actually the constellation is gray coded
@@ -131,28 +123,24 @@ namespace gr {
 
         for (int j = 0; j < (bits_per_axis - 1); j++)
         {
-          x += ((d_constellation_bits[i] >> (1 + 2 * j)) & 1) << j;
-          y += ((d_constellation_bits[i] >> (2 * j)) & 1) << j;
+          x += ((val >> (1 + 2 * j)) & 1) << j;
+          y += ((val >> (2 * j)) & 1) << j;
         }
 
-        d_constellation_bits[i] = (q << 2 * (bits_per_axis - 1)) + (x << (bits_per_axis - 1)) + y;
+        val = (q << 2 * (bits_per_axis - 1)) + (x << (bits_per_axis - 1)) + y;
+
+        // Keep corespondence symbol bits->complex symbol in one vector
+        d_constellation_points[val] = gr_complex(sign0 * xval, sign1 * yval);
 
         printf("DVBT map, constellation points[%i]: %f, %f, bits: %x\n", \
-            i, d_constellation_points[i].real(), d_constellation_points[i].imag(), d_constellation_bits[i]);
+            i, d_constellation_points[i].real(), d_constellation_points[i].imag(), val);
       }
     }
 
     gr_complex
     dvbt_map_impl::find_constellation_point(int val)
     {
-      gr_complex point;
-
-      // TODO - do this search optimum
-      for (int i = 0; i < d_constellation_size; i++)
-        if (d_constellation_bits[i] == val)
-          point = d_constellation_points[i];
-
-      return point;
+      return d_constellation_points[val];
     }
 
     void

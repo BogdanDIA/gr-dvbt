@@ -8,6 +8,7 @@ http://yo3iiu.ro/blog/?p=1244
 
 ###HowTo:
 **Run TX**   
+The dvbt TX implementation now supports 2k/8k mode, QPSK, QAM16, QAM64 constelaltions and rates 1/2, 2/3, 3/4, 5/6, 7/8.  
 The simplest way to run DVB-T encoding is to use the gnuradio-companion flowgraphs apps/dvbt_tx_demo.grc. It will start with a MPEG-2 TS file and will eventually generate the 10Msps baseband samples.  
 test.ts(MPEG-2 TS)->test.bin(BB)  
 

@@ -1,6 +1,7 @@
 Notes:
+The dvbt TX implementation now supports 2k/8k mode, QPSK, QAM16, QAM64 constelaltions and rates 1/2, 2/3, 3/4, 5/6, 7/8.
 Enable Doxygen: cmake ../ -DENABLE_DOXYGEN=ON
-Use AWGN generator to add noise to signals with hue SNR. Otherwise the signal is not decoded correctly.
+Use AWGN generator to add noise to signals with huge SNR. Otherwise the signal is not decoded correctly.
 
 Various TODOs beside what can be found in the sourcecode:
 
@@ -14,7 +15,6 @@ Rework:
  - Move pilot_generator class in its own file
 
 Features: 
- - Convert to gnuradio 3.7.2
  - Support 8k mode.
  - Include puncturing matrix on convolutional encoder/decoder.
  - Support the other rates beside 1/2 on convolutional encoder/decoder.
@@ -37,8 +37,6 @@ Documentation:
 QA:
  - Add tests for each block.
  - Check Viterbi-SSE2 implementation.
- - check the situation when only noise is received. There is a crash there.
  - Use ETR290 to measure DVB-T parameters.
-
 
 

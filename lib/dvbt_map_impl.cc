@@ -129,11 +129,12 @@ namespace gr {
 
         val = (q << 2 * (bits_per_axis - 1)) + (x << (bits_per_axis - 1)) + y;
 
-        // Keep corespondence symbol bits->complex symbol in one vector
-        d_constellation_points[val] = gr_complex(sign0 * xval, sign1 * yval);
+        printf("DVBT map, constellation points[%i]: re: %i, imag: %i, bits: %x\n", \
+            i, sign0 * xval, sign1 * yval, val);
 
-        printf("DVBT map, constellation points[%i]: %f, %f, bits: %x\n", \
-            i, d_constellation_points[val].real(), d_constellation_points[val].imag(), val);
+        // Keep corespondence symbol bits->complex symbol in one vector
+        // Norm the signal using gain
+        d_constellation_points[val] = d_gain * gr_complex(sign0 * xval, sign1 * yval);
       }
     }
 
@@ -158,9 +159,8 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         gr_complex *out = (gr_complex *) output_items[0];
 
-        // TODO - use VOLK for multiplication
         for (int i = 0; i < (noutput_items * d_nsize); i++)
-          out[i] = d_gain * find_constellation_point(in[i]);
+          out[i] = find_constellation_point(in[i]);
 
         // Tell runtime system how many input items we consumed on
         // each input stream.

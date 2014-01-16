@@ -66,7 +66,7 @@ namespace gr {
       d_transmission_mode = config.d_transmission_mode;
       d_step = config.d_step;
       d_alpha = config.d_alpha;
-      d_gain = gain / config.d_norm;
+      d_gain = gain * config.d_norm;
 
       printf("DVBT demap, d_constellation_size: %i\n", d_constellation_size);
       printf("DVBT demap, d_step: %i\n", d_step);
@@ -79,12 +79,6 @@ namespace gr {
         std::cout << "cannot allocate d_constellation_points" << std::endl;
       }
 
-      d_constellation_bits = new int[d_constellation_size];
-      if (d_constellation_bits == NULL)
-      {
-        std::cout << "cannot allocate d_constellation_bits" << std::endl;
-      }
-
       make_constellation_points(d_constellation_size, d_step, d_alpha);
     }
 
@@ -94,7 +88,6 @@ namespace gr {
     dvbt_demap_impl::~dvbt_demap_impl()
     {
       delete [] d_constellation_points;
-      delete [] d_constellation_bits;
     }
 
     void
@@ -121,8 +114,7 @@ namespace gr {
         int xval = alpha + (steps_per_axis - x) * step;
         int yval = alpha + (steps_per_axis - y) * step;
 
-        d_constellation_points[i] = gr_complex(sign0 * xval, sign1 * yval);
-        d_constellation_bits[i] = (bin_to_gray(x) << (bits_per_axis - 1)) + bin_to_gray(y);
+        int val = (bin_to_gray(x) << (bits_per_axis - 1)) + bin_to_gray(y);
 
         // ETSI EN 300 744 Clause 4.3.5
         // Actually the constellation is gray coded
@@ -133,14 +125,18 @@ namespace gr {
 
         for (int j = 0; j < (bits_per_axis - 1); j++)
         {
-          x += ((d_constellation_bits[i] >> (1 + 2 * j)) & 1) << j;
-          y += ((d_constellation_bits[i] >> (2 * j)) & 1) << j;
+          x += ((val >> (1 + 2 * j)) & 1) << j;
+          y += ((val >> (2 * j)) & 1) << j;
         }
 
-        d_constellation_bits[i] = (q << 2 * (bits_per_axis - 1)) + (x << (bits_per_axis - 1)) + y;
+        val = (q << 2 * (bits_per_axis - 1)) + (x << (bits_per_axis - 1)) + y;
 
-        printf("DVBT map, constellation points[%i]: %f, %f, bits: %x\n", \
-            i, d_constellation_points[i].real(), d_constellation_points[i].imag(), d_constellation_bits[i]);
+        printf("DVBT demap, constellation points[%i]: re: %i, imag: %i, bits: %x\n", \
+            i, sign0 * xval, sign1 * yval, val);
+
+        // Keep corespondence symbol bits->complex symbol in one vector
+        // Norm the signal using gain
+        d_constellation_points[val] = d_gain * gr_complex(sign0 * xval, sign1 * yval);
       }
     }
 
@@ -181,7 +177,8 @@ namespace gr {
       }
 #endif
 
-      return d_constellation_bits[min_index];
+      //return d_constellation_bits[min_index];
+      return min_index;
     }
 
     int
@@ -209,22 +206,9 @@ namespace gr {
 
         //gettimeofday(&tvs, &tzs);
 
-#ifdef USE_VOLK
-        // TODO - allocate this on heap
-        gr_complex ff[noutput_items * d_nsize];
-        gr_complex gg(d_gain, 0.0);
-
-        if (is_unaligned())
-          volk_32fc_s32fc_multiply_32fc_u(&ff[0], &in[0], gg, noutput_items * d_nsize);
-        else
-          volk_32fc_s32fc_multiply_32fc_a(&ff[0], &in[0], gg, noutput_items * d_nsize);
-
         for (int i = 0; i < (noutput_items * d_nsize); i++)
-          out[i] = find_constellation_value(ff[i]);
-#else
-        for (int i = 0; i < (noutput_items * d_nsize); i++)
-          out[i] = find_constellation_value(in[i] * d_gain);
-#endif
+          out[i] = find_constellation_value(in[i]);
+
         //gettimeofday(&tve, &tze);
         //printf("dvbt demap: us: %f\n", (float) (tve.tv_usec - tvs.tv_usec) / (float) (noutput_items * d_nsize));
 

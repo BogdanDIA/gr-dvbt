@@ -50,19 +50,10 @@ namespace gr {
       unsigned char d_step;
       //Keep Alpha internally
       unsigned char d_alpha;
-      //Quadrant of the current symbol
-      unsigned char d_quadrant;
-      //Number of bits per symbol
-      unsigned char d_bits_per_symbol;
-      //Number of points on x,y axis in a quadrant
-      unsigned char d_qaxis_points;
-      //Number of steps on x,y axis in a quadrant
-      unsigned char d_qaxis_steps;
       //Gain for the complex values
       float d_gain;
 
       gr_complex * d_constellation_points;
-      int * d_constellation_bits;
 
       void make_constellation_points(int size, int step, int alpha);
       int find_constellation_value(gr_complex val);

@@ -133,7 +133,7 @@ namespace gr {
         d_constellation_points[val] = gr_complex(sign0 * xval, sign1 * yval);
 
         printf("DVBT map, constellation points[%i]: %f, %f, bits: %x\n", \
-            i, d_constellation_points[i].real(), d_constellation_points[i].imag(), val);
+            i, d_constellation_points[val].real(), d_constellation_points[val].imag(), val);
       }
     }
 

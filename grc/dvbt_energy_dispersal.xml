@@ -6,7 +6,7 @@
   <import>import dvbt</import>
   <make>dvbt.energy_dispersal($nsize)</make>
   <param>
-    <name>Blocks(188 Bytes)</name>
+    <name>Blocks(1504 Bytes)</name>
     <key>nsize</key>
     <value>8</value>
     <type>int</type>
@@ -20,6 +20,6 @@
   <source>
     <name>out</name>
     <type>byte</type>
-    <vlen>188*8</vlen>
+    <vlen>1504*$nsize</vlen>
   </source>
 </block>

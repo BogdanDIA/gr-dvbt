@@ -30,11 +30,11 @@
     const int SYMBOLS_PER_FRAME = 68;
     const int FRAMES_PER_SUPERFRAME = 4;
 
-    const int SCATTERED_PILOT_SIZE_2k = 142; // TODO - fix this - what should be here
+    const int SCATTERED_PILOT_SIZE_2k = 142;
     const int CONTINUAL_PILOT_SIZE_2k = 45;
     const int TPS_PILOT_SIZE_2k = 17;
 
-    const int SCATTERED_PILOT_SIZE_8k = 567; //TODO
+    const int SCATTERED_PILOT_SIZE_8k = 568;
     const int CONTINUAL_PILOT_SIZE_8k = 177;
     const int TPS_PILOT_SIZE_8k = 68;
 

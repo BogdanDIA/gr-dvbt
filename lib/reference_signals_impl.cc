@@ -544,42 +544,38 @@ namespace gr {
       // current block - result is (symbol index % 4)
       /*************************************************************/
       float max = 0; float sum = 0;
-      float known_phase = 0; float phase = 0;
  
       for (int scount = 0; scount < 4; scount++)
       {
         d_spilot_index = 0; d_cpilot_index = 0;
         d_chanestim_index = 0;
 
-      for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
-      {
-        // Keep data for channel estimation
-        if (k == get_current_spilot(scount))
+        for (int k = 0; k < (d_Kmax - d_Kmin + 1); k++)
         {
-          set_chanestim_carrier(k);
-          advance_spilot(scount); 
-          advance_chanestim();
+          // Keep data for channel estimation
+          if (k == get_current_spilot(scount))
+          {
+            set_chanestim_carrier(k);
+            advance_spilot(scount); 
+            advance_chanestim();
+          }
         }
-      }
-      //printf("d_chanestim_index: %i\n", d_chanestim_index);
+        //printf("d_chanestim_index: %i\n", d_chanestim_index);
 
-      sum = 0;
-      float s = 0;
-      for (int j = 0; j < (d_chanestim_index - 1); j++)
-      {
-        known_phase = norm(get_spilot_value(d_chanestim_carriers[j + 1]) - get_spilot_value(d_chanestim_carriers[j]));
-        phase = norm(in[d_zeros_on_left + d_chanestim_carriers[j + 1]] - \
-            in[d_zeros_on_left + d_chanestim_carriers[j]]);
+        gr_complex c = gr_complex(0.0, 0.0);
 
-        sum += known_phase * phase;
-      }
+        for (int j = 0; j < d_chanestim_index; j++)
+        {
+          c += get_spilot_value(d_chanestim_carriers[j]) * conj(in[d_zeros_on_left + d_chanestim_carriers[j]]);
+        }
+        sum = norm(c);
 
-      //printf("sum: %f, max: %f, scount: %i\n", sum, max, scount);
-      if (sum > max)
-      {
-        max = sum;
-        d_mod_symbol_index = scount;
-      }
+        //printf("sum: %f, max: %f, scount: %i\n", sum, max, scount);
+        if (sum > max)
+        {
+          max = sum;
+          d_mod_symbol_index = scount;
+        }
     }
 
 #if 1
@@ -1094,7 +1090,7 @@ namespace gr {
         } 
 
         // Keep payload carrier number
-  // This depends on the symbol index
+        // This depends on the symbol index
         if (is_payload)
         {
           set_payload_carrier(k);

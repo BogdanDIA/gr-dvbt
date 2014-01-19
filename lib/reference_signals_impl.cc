@@ -564,7 +564,9 @@ namespace gr {
 
         gr_complex c = gr_complex(0.0, 0.0);
 
-        for (int j = 0; j < d_chanestim_index; j++)
+        // This should be of range 0 to d_chanestim_index bit for now we use just a 
+        // small number of spilots to obtain the symbol index
+        for (int j = 0; j < 10; j++)
         {
           c += get_spilot_value(d_chanestim_carriers[j]) * conj(in[d_zeros_on_left + d_chanestim_carriers[j]]);
         }

@@ -1233,39 +1233,6 @@ namespace gr {
       // Process payload data with correct symbol index
       process_payload_data(d_derot_in, out);
 
-#if 0
-      int bigger = 0;
-      int smaller = 0;
-      for (int i = 0; i < d_payload_length; i++)
-      {
-        if (abs(out[i]) > 1.5)
-          bigger++;
-        if (abs(out[i]) < 0.3 && abs(out[i]) > 0.0)
-          smaller++;
-
-      }
-      if (bigger > 0)
-        printf("bigger: %i\n", bigger);
-      if (smaller > 0)
-      {
-        printf("smaller: %i, d_trigger_index: %i, d_symbol_index: %i, diff_symbol_index: %i\n", \
-    smaller, d_trigger_index, d_symbol_index, diff_symbol_index);
-
-        for (int i = 0; i < d_fft_length; i++)
-          printf("d_trigger_index: %i, d_symbol_index: %i, in[%i]: angle:%f, abs:%f, %f, %f\n", \
-            d_trigger_index, d_symbol_index, i, 360 * arg(in[i]) / 6.28, abs(in[i]), in[i].real(), in[i].imag());
-
-        for (int i = 0; i < d_fft_length; i++)
-          printf("d_trigger_index: %i, d_symbol_index: %i, d_channel_gain[%i]: re: %f, img: %f, in[%i]: angle:%f, abs:%f, %f, %f\n", \
-            d_trigger_index, d_symbol_index, i - d_zeros_on_left, \
-      d_channel_gain[i - d_zeros_on_left].real(), d_channel_gain[i - d_zeros_on_left].imag(), \
-            i, 360 * arg(in[i]) / 6.28, abs(in[i]), in[i].real(), in[i].imag());
-  
-        for (int i = 0; i < d_payload_length; i++)
-          printf("d_symbol_index: %i, out[%i]: abs:%f, re: %f, img:%f\n", d_symbol_index, i, abs(out[i]), out[i].real(), out[i].imag());
-      }
-#endif
-
       // noutput_items should be 1 in this case
       return 1;
     }

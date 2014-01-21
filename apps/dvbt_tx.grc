@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Fri Jan 10 14:03:12 2014</timestamp>
+  <timestamp>Tue Jan 21 20:05:39 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -77,41 +77,6 @@
     <param>
       <key>_coordinate</key>
       <value>(182, 5)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>dvbt_energy_dispersal</key>
-    <param>
-      <key>id</key>
-      <value>dvbt_energy_dispersal_0</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>nsize</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(244, 115)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1729,6 +1694,41 @@
     <param>
       <key>_rotation</key>
       <value>180</value>
+    </param>
+  </block>
+  <block>
+    <key>dvbt_energy_dispersal</key>
+    <param>
+      <key>id</key>
+      <value>dvbt_energy_dispersal_0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>nsize</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(244, 115)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
     </param>
   </block>
   <connection>

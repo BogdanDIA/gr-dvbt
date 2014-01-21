@@ -162,7 +162,7 @@ namespace gr {
       if(is_unaligned())
         volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
       else
-        volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
+        volk_32fc_magnitude_squared_32f_a(&d_norm[low], &in[low], size);
 #else
       for (int i = lookup_start; i >= (lookup_stop - (d_cp_length + d_fft_length - 1)); i--)
         d_norm[i] = std::norm(in[i]);

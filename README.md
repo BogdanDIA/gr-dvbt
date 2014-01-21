@@ -27,5 +27,13 @@ The baseband samples can be sent to USRP N210 on TX and received with another US
 
 The encoder/decoder currently works with gnuradio 3.7.2.x and 3.6 (if taken from Gnuradio_v_3_6 tag) but it is not dependent heavily on it. There is also a list of todo tasks in TODO.txt.  
 
+**Build**  
+git clone https://github.com/BogdanDIA/gr-dvbt.git  
+cd gr-dvbt  
+mkdir build  
+cd build  
+cmake ../  
+make && sudo make install  
 
+Seems on some systems there is need to specifically build the package with cmake -DCMAKE_C_FLAGS=-mavx ../  
 

@@ -38,6 +38,7 @@
 #endif
 
 #define USE_VOLK 1
+#define USE_POSIX_MEMALIGN 1
 
 void print_float(float f)
 {
@@ -369,34 +370,63 @@ namespace gr {
       d_snr = pow(10, d_snr / 10.0);
       d_rho = d_snr / (d_snr + 1.0);
 
-      printf("blocks: %i\n", blocks);
-      printf("fft_length: %i\n", fft_length);
-      printf("occupied_tones: %i\n", occupied_tones);
-      printf("SNR: %f\n", d_snr);
+      printf("OFDM sym acq: blocks: %i\n", blocks);
+      printf("OFDM sym acq: fft_length: %i\n", fft_length);
+      printf("OFDM sym acq: occupied_tones: %i\n", occupied_tones);
+      printf("OFDM sym acq: SNR: %f\n", d_snr);
+
+      const int alignment_multiple = volk_get_alignment() / sizeof(gr_complex);
+      set_alignment(std::max(1, alignment_multiple));
+
+      int alignment = volk_get_alignment();
+
+#ifdef USE_POSIX_MEMALIGN
+
+      if (posix_memalign((void **)&d_gamma, alignment, sizeof(gr_complex) * d_fft_length))
+        std::cout << "cannot allocate memory: d_gamma" << std::endl;
+
+      if (posix_memalign((void **)&d_lambda, alignment, sizeof(float) * d_fft_length))
+        std::cout << "cannot allocate memory: d_lambda" << std::endl;
+
+      if (posix_memalign((void **)&d_derot, alignment, sizeof(gr_complex) * (d_fft_length + d_cp_length)))
+        std::cout << "cannot allocate memory: d_derot" << std::endl;
+
+      if (posix_memalign((void **)&d_conj, alignment, sizeof(gr_complex) * (2 * d_fft_length + d_cp_length)))
+        std::cout << "cannot allocate memory: d_conj" << std::endl;
+
+      if (posix_memalign((void **)&d_norm, alignment, sizeof(gr_complex) * (2 * d_fft_length + d_cp_length)))
+        std::cout << "cannot allocate memoryi: d_norm" << std::endl;
+
+      if (posix_memalign((void **)&d_corr, alignment, sizeof(gr_complex) * (2 * d_fft_length + d_cp_length)))
+        std::cout << "cannot allocate memoryi: d_corr" << std::endl;
+
+#else
 
       d_gamma = new gr_complex[d_fft_length];
       if (d_gamma == NULL)
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory: d_gamma" << std::endl;
 
       d_lambda = new float[d_fft_length];
       if (d_lambda == NULL)
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory: d_lambda" << std::endl;
 
       d_derot = new gr_complex[d_cp_length + d_fft_length];
       if (d_derot == NULL)
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory: d_derot" << std::endl;
 
       d_conj = new gr_complex[2 * d_fft_length + d_cp_length];
       if (d_conj == NULL)
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory: d_conj" << std::endl;
 
       d_norm = new float[2 * d_fft_length + d_cp_length];
       if (d_norm == NULL)
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory: d_norm" << std::endl;
 
       d_corr = new gr_complex[2 * d_fft_length + d_cp_length];
       if (d_corr == NULL)
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory: d_corr" << std::endl;
+
+#endif
 
       //peak_detect_init(0.2, 0.25, 30, 0.0005);
       peak_detect_init(0.8, 0.9, 30, 0.9);
@@ -407,9 +437,21 @@ namespace gr {
      */
     ofdm_sym_acquisition_impl::~ofdm_sym_acquisition_impl()
     {
+#ifdef USE_POSIX_MEMALIGN
+      free(d_gamma);
+      free(d_lambda);
+      free(d_derot);
+      free(d_conj);
+      free(d_norm);
+      free(d_corr);
+#else
       delete [] d_gamma;
       delete [] d_lambda;
       delete [] d_derot;
+      delete [] d_conj;
+      delete [] d_norm;
+      delete [] d_corr;
+#endif
     }
 
     void

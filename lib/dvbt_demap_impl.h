@@ -54,6 +54,7 @@ namespace gr {
       float d_gain;
 
       gr_complex * d_constellation_points;
+      float * d_sq_dist;
 
       void make_constellation_points(int size, int step, int alpha);
       int find_constellation_value(gr_complex val);

@@ -35,6 +35,7 @@ static struct timeval tvs, tve;
 static struct timezone tzs, tze;
 
 #define USE_VOLK 1
+#define USE_POSIX_MEMALIGN 1
 
 namespace gr {
   namespace dvbt {
@@ -73,11 +74,26 @@ namespace gr {
       printf("DVBT demap, d_alpha: %i\n", d_alpha);
       printf("DVBT demap, d_gain: %f\n", d_gain);
 
+      const int alignment_multiple = volk_get_alignment() / sizeof(gr_complex);
+      set_alignment(std::max(1, alignment_multiple));
+
+      int alignment = volk_get_alignment();
+
+#ifdef USE_POSIX_MEMALIGN
+      if (posix_memalign((void **)&d_constellation_points, alignment, sizeof(gr_complex) * d_constellation_size))
+        std::cout << "cannot allocate memory: d_constellation_points" << std::endl;
+
+      if (posix_memalign((void **)&d_sq_dist, alignment, sizeof(float) * d_constellation_size))
+        std::cout << "cannot allocate memory: d_sq_dist" << std::endl;
+#else
       d_constellation_points = new gr_complex[d_constellation_size];
       if (d_constellation_points == NULL)
-      {
         std::cout << "cannot allocate d_constellation_points" << std::endl;
-      }
+
+      d_sq_dist = new float[d_constellation_size];
+      if (d_sq_dist == NULL)
+        std::cout << "cannot allocate d_sq_dist" << std::endl;
+#endif
 
       make_constellation_points(d_constellation_size, d_step, d_alpha);
     }
@@ -87,7 +103,13 @@ namespace gr {
      */
     dvbt_demap_impl::~dvbt_demap_impl()
     {
+#ifdef USE_POSIX_MEMALIGN
+      free(d_constellation_points);
+      free(d_sq_dist);
+#else
       delete [] d_constellation_points;
+      delete [] d_sq_dist;
+#endif
     }
 
     void
@@ -147,19 +169,17 @@ namespace gr {
       int min_index = 0;
 
 #ifdef USE_VOLK
-      float ff[d_constellation_size];
 
       if (is_unaligned())
-        volk_32fc_x2_square_dist_32f_u(&ff[0], &val, &d_constellation_points[0], d_constellation_size);
+        volk_32fc_x2_square_dist_32f_u(&d_sq_dist[0], &val, &d_constellation_points[0], d_constellation_size);
       else
-        volk_32fc_x2_square_dist_32f_a(&ff[0], &val, &d_constellation_points[0], d_constellation_size);
+        volk_32fc_x2_square_dist_32f_a(&d_sq_dist[0], &val, &d_constellation_points[0], d_constellation_size);
 
       for (int i = 0; i < d_constellation_size; i++)
       {
-        //printf("ff: %f\n", ff[i]);
-        if (ff[i] < min_dist)
+        if (d_sq_dist[i] < min_dist)
         {
-          min_dist = ff[i];
+          min_dist = d_sq_dist[i];
           min_index = i;
         }
       }
@@ -167,7 +187,6 @@ namespace gr {
       for (int i = 0; i < d_constellation_size; i++)
       {
         float dist = std::norm(val - d_constellation_points[i]);
-        //printf("dist: %f\n", dist);
 
         if (dist < min_dist)
         {

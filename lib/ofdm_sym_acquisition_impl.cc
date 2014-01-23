@@ -381,7 +381,6 @@ namespace gr {
       int alignment = volk_get_alignment();
 
 #ifdef USE_POSIX_MEMALIGN
-
       if (posix_memalign((void **)&d_gamma, alignment, sizeof(gr_complex) * d_fft_length))
         std::cout << "cannot allocate memory: d_gamma" << std::endl;
 
@@ -394,14 +393,12 @@ namespace gr {
       if (posix_memalign((void **)&d_conj, alignment, sizeof(gr_complex) * (2 * d_fft_length + d_cp_length)))
         std::cout << "cannot allocate memory: d_conj" << std::endl;
 
-      if (posix_memalign((void **)&d_norm, alignment, sizeof(gr_complex) * (2 * d_fft_length + d_cp_length)))
+      if (posix_memalign((void **)&d_norm, alignment, sizeof(float) * (2 * d_fft_length + d_cp_length)))
         std::cout << "cannot allocate memoryi: d_norm" << std::endl;
 
       if (posix_memalign((void **)&d_corr, alignment, sizeof(gr_complex) * (2 * d_fft_length + d_cp_length)))
         std::cout << "cannot allocate memoryi: d_corr" << std::endl;
-
 #else
-
       d_gamma = new gr_complex[d_fft_length];
       if (d_gamma == NULL)
         std::cout << "cannot allocate memory: d_gamma" << std::endl;
@@ -425,7 +422,6 @@ namespace gr {
       d_corr = new gr_complex[2 * d_fft_length + d_cp_length];
       if (d_corr == NULL)
         std::cout << "cannot allocate memory: d_corr" << std::endl;
-
 #endif
 
       //peak_detect_init(0.2, 0.25, 30, 0.0005);

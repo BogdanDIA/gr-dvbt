@@ -65,8 +65,6 @@ namespace gr {
       // Viterbi tables
       struct viterbi_state state0[64];
       struct viterbi_state state1[64];
-      __m128i metric0[4], metric1[4];
-      __m128i path0[4], path1[4];
       int mettab[2][256];
 
     public:

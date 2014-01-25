@@ -57,7 +57,8 @@ set_target_properties(gnuradio-dvbt PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt_EXPO
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
 #set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -mavx")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -msse2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -msse2")
 
 ########################################################################
 # Install built library files

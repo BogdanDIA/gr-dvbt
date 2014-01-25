@@ -74,10 +74,10 @@ namespace gr {
       printf("DVBT demap, d_alpha: %i\n", d_alpha);
       printf("DVBT demap, d_gain: %f\n", d_gain);
 
-      const int alignment_multiple = volk_get_alignment() / sizeof(gr_complex);
+      const int alignment_multiple = volk_get_alignment() / sizeof(unsigned char);
       set_alignment(std::max(1, alignment_multiple));
 
-      int alignment = volk_get_alignment();
+      const int alignment = volk_get_alignment();
 
 #ifdef USE_POSIX_MEMALIGN
       if (posix_memalign((void **)&d_constellation_points, alignment, sizeof(gr_complex) * d_constellation_size))

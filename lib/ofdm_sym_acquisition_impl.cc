@@ -163,7 +163,9 @@ namespace gr {
       if(is_unaligned())
         volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
       else
-        volk_32fc_magnitude_squared_32f_a(&d_norm[low], &in[low], size);
+        volk_32fc_magnitude_squared_32f_u(&d_norm[low], &in[low], size);
+        //volk_32fc_magnitude_squared_32f_a(&d_norm[low], &in[low], size);
+        //TODO - fix the alignment
 #else
       for (int i = lookup_start; i >= (lookup_stop - (d_cp_length + d_fft_length - 1)); i--)
         d_norm[i] = std::norm(in[i]);
@@ -177,7 +179,9 @@ namespace gr {
       if (is_unaligned())
         volk_32fc_x2_multiply_conjugate_32fc_u(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
       else
-        volk_32fc_x2_multiply_conjugate_32fc_a(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
+        volk_32fc_x2_multiply_conjugate_32fc_u(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
+        //volk_32fc_x2_multiply_conjugate_32fc_a(&d_corr[low - d_fft_length], &in[low], &in[low - d_fft_length], size);
+        // TODO fix the alignment
 #else
       for (int i = lookup_start; i >= (lookup_stop - d_cp_length - 1); i--)
         d_corr[i - d_fft_length] = in[i] * std::conj(in[i - d_fft_length]);
@@ -210,7 +214,9 @@ namespace gr {
       if (is_unaligned())  
         volk_32fc_magnitude_32f_u(&d_lambda[low], &d_gamma[low], size);
       else
-        volk_32fc_magnitude_32f_a(&d_lambda[low], &d_gamma[low], size);
+        volk_32fc_magnitude_32f_u(&d_lambda[low], &d_gamma[low], size);
+        //volk_32fc_magnitude_32f_a(&d_lambda[low], &d_gamma[low], size);
+        // TODO - fix alignment
 #else
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
         d_lambda[i] = std::abs(d_gamma[i]);
@@ -228,8 +234,11 @@ namespace gr {
       }
       else
       {
-        volk_32f_s32f_multiply_32f_a(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
-        volk_32f_x2_subtract_32f_a(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
+        //volk_32f_s32f_multiply_32f_a(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
+        //volk_32f_x2_subtract_32f_a(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
+        volk_32f_s32f_multiply_32f_u(&d_phi[low], &d_phi[low], d_rho / 2.0, size);
+        volk_32f_x2_subtract_32f_u(&d_lambda[low], &d_lambda[low], &d_phi[low], size);
+        //TODO - fix the alignment
       }
 #else
       for (int i = 0; i < (lookup_start - lookup_stop); i++)
@@ -378,7 +387,7 @@ namespace gr {
       const int alignment_multiple = volk_get_alignment() / sizeof(gr_complex);
       set_alignment(std::max(1, alignment_multiple));
 
-      int alignment = volk_get_alignment();
+      const int alignment = volk_get_alignment();
 
 #ifdef USE_POSIX_MEMALIGN
       if (posix_memalign((void **)&d_gamma, alignment, sizeof(gr_complex) * d_fft_length))
@@ -505,7 +514,9 @@ namespace gr {
             if(is_unaligned())
               volk_32fc_x2_multiply_32fc_u(&out[0], &d_derot[0], &in[low], size);
             else
-              volk_32fc_x2_multiply_32fc_a(&out[0], &d_derot[0], &in[low], size);
+              //volk_32fc_x2_multiply_32fc_a(&out[0], &d_derot[0], &in[low], size);
+              volk_32fc_x2_multiply_32fc_u(&out[0], &d_derot[0], &in[low], size);
+              // TODO - fix the alignment
 #else
             int j = 0;
             for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)

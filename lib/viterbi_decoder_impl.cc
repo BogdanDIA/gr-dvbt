@@ -35,6 +35,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "viterbi_decoder_impl.h"
+#include <xmmintrin.h>
 #include <stdio.h>
 #include <sys/time.h>
 
@@ -45,6 +46,14 @@
 #else
 #define PRINTF(a...)
 #endif
+
+// TODO - these variables should not be static/global
+// but members of the class. DO the change when refactor
+// the viterbi decoder.
+static __m128i metric0[4] __attribute__ ((aligned(16)));
+static __m128i metric1[4] __attribute__ ((aligned(16)));
+static __m128i path0[4] __attribute__ ((aligned(16)));
+static __m128i path1[4] __attribute__ ((aligned(16)));
 
 // For timing debug
 static struct timeval tvs, tve;

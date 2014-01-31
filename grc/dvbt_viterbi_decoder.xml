@@ -4,8 +4,7 @@
   <key>dvbt_viterbi_decoder</key>
   <category>dvbt</category>
   <import>import dvbt</import>
-  <import>from gnuradio import trellis</import>
-  <make>dvbt.viterbi_decoder($constellation.val, $hierarchy.val, $code_rate.val, trellis.fsm($fsm_args), $block_size, $init_state, $final_state)</make>
+  <make>dvbt.viterbi_decoder($constellation.val, $hierarchy.val, $code_rate.val, $block_size, $init_state, $final_state)</make>
   <param>
     <name>Constellation Type</name>
     <key>constellation</key>
@@ -136,11 +135,6 @@
       <key>b</key>
       <opt>io:byte</opt>
     </option>
-  </param>
-  <param>
-    <name>FSM Args</name>
-    <key>fsm_args</key>
-    <type>raw</type>
   </param>
   <param>
     <name>Block Size</name>

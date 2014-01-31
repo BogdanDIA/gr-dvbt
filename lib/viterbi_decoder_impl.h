@@ -23,7 +23,6 @@
 #ifndef INCLUDED_DVBT_VITERBI_DECODER_IMPL_H
 #define INCLUDED_DVBT_VITERBI_DECODER_IMPL_H
 
-#include <dvbt/fsm.h>
 #include <dvbt/viterbi_decoder.h>
 #include <dvbt/dvbt_config.h>
 
@@ -34,8 +33,6 @@ extern "C" {
 
 namespace gr {
   namespace dvbt {
-
-    using namespace gr::trellis;
 
     class viterbi_decoder_impl : public gr::dvbt::viterbi_decoder
     {
@@ -51,7 +48,7 @@ namespace gr {
       // Symbols to consume on decoding
       int d_nsymbols;
 
-      fsm d_FSM;
+      //fsm d_FSM;
       int d_K;
       int d_S0;
       int d_SK;
@@ -68,23 +65,8 @@ namespace gr {
       int mettab[2][256];
 
     public:
-      fsm FSM () const { return d_FSM; } 
-      int K () const { return d_K; }
-      int S0 () const { return d_S0; }
-      int SK () const { return d_SK; }
-
-      void viterbi_algorithm (int I, int S, int O,
-        const std::vector<int> &NS,
-        const std::vector<int> &OS,
-        const std::vector< std::vector<int> > &PS,
-        const std::vector< std::vector<int> > &PI,
-        int K,
-        int S0, int SK,
-        const unsigned char *in, unsigned char *out
-      );
-
       viterbi_decoder_impl(dvbt_constellation_t constellation, \
-                  dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK);
+                  dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK);
       ~viterbi_decoder_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

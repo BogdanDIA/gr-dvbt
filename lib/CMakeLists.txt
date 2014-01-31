@@ -46,8 +46,6 @@ add_library(gnuradio-dvbt SHARED
     reed_solomon.cc
     reed_solomon_dec_impl.cc
     ofdm_sym_acquisition_impl.cc
-    fsm.cc
-    base.cc
     viterbi_decoder_impl.cc
     d_viterbi.c
     d_metrics.c

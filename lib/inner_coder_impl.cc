@@ -35,6 +35,21 @@ namespace gr {
     {
       //insert input bit
       d_reg |= ((in & 0x1) << 7);
+
+      int val = d_reg;
+
+      int bit7 = (val >> 7) & 1;
+      int bit6 = (val >> 6) & 1;
+      int bit5 = (val >> 5) & 1;
+      int bit4 = (val >> 4) & 1;
+      int bit3 = (val >> 3) & 1;
+      int bit2 = (val >> 2) & 1;
+
+      int state = (bit2 << 5) | (bit3 << 4) | (bit4 << 3) | (bit5 << 2) | (bit6 << 1) | bit7;
+      //printf("d_reg: %x, state: %x\n", d_reg, state);
+
+
+
       d_reg  = d_reg >> 1;
 
       // TODO - do this with polynoms and bitcnt
@@ -227,8 +242,12 @@ namespace gr {
           for (int i = 0; i < d_in_bs; i++)
           {
             for (int j = 0; j < 8; j++)
+            {
               d_in_buff[8*i + j] = (in[k*d_in_bs + i] >> (7 - j)) & 1;
+            }
+            //printf("in[%i]: %x\n", k*d_in_bs + i, in[k*d_in_bs + i]);
           }
+
 
           // Encode the data
           for (int in_bit = 0, out_bit = 0; in_bit < (8 * d_in_bs); in_bit += d_k, out_bit += d_n)
@@ -243,6 +262,8 @@ namespace gr {
               c |= d_out_buff[d_m*i + j] << (d_m - 1 - j);
 
             out[k*d_out_bs + i] = c;
+
+            //printf("out[%i]: %x\n", k*d_out_bs + i, out[k*d_out_bs + i]);
           }
         }
 

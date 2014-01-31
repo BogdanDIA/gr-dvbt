@@ -1,6 +1,5 @@
 /* -*- c++ -*- */
 /*
- * Based on gnuradio implementation of fsm and Viterbi decoder
  * Based on Phil Karn, KA9Q impl of Viterbi decoder
  * 2013 <Bogdan Diaconescu, yo3iiu@yo3iiu.ro>.
  * 
@@ -21,12 +20,9 @@
  */
 
 /*
- * There are three implementatios of Viterbi algorithms:
- * - one based on gnuradio
+ * There are two implementatios of Viterbi algorithms:
  * - one based on Karn's implementation
  * - one based on Karn's with SSE2 vectorization
- * Note: for general implementation the output is padded with 4 bytes of 0 value
- * Note2: for SSE2 implementation the output is padded with 4 bytes of 0 value
  */
 
 #ifdef HAVE_CONFIG_H
@@ -39,16 +35,16 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-//#define DEBUG 1
+//#define VITERBI_DEBUG 1
 
-#ifdef DEBUG
+#ifdef VITERBI_DEBUG
 #define PRINTF(a...) printf(a)
 #else
 #define PRINTF(a...)
 #endif
 
 // TODO - these variables should not be static/global
-// but members of the class. DO the change when refactor
+// but members of the class. DO the change when refactoring
 // the viterbi decoder.
 static __m128i metric0[4] __attribute__ ((aligned(16)));
 static __m128i metric1[4] __attribute__ ((aligned(16)));
@@ -59,163 +55,25 @@ static __m128i path1[4] __attribute__ ((aligned(16)));
 static struct timeval tvs, tve;
 static struct timezone tzs, tze;
 
-//#define VITERBI_DEBUG 1
-
-static const float INF = 1.0e9;
-
 namespace gr {
   namespace dvbt {
 
-  using namespace gr::trellis;
-
-  void viterbi_decoder_impl::viterbi_algorithm(int I, int S, int O,
-              const std::vector<int> &NS,
-              const std::vector<int> &OS,
-              const std::vector< std::vector<int> > &PS,
-              const std::vector< std::vector<int> > &PI,
-              int K,
-              int S0,int SK,
-              const unsigned char *in, unsigned char *out)
-  {
-    std::vector<int> trace(S*K);
-    std::vector<int> alpha(S*2);
-    int alphai;
-    int norm,mm,minm;
-    int minmi;
-    int st;
-
-#ifdef VITERBI_DEBUG
-    printf("I: %i\n", I);
-    printf("S: %i\n", S);
-    printf("O: %i\n", O);
-
-    for (int i = 0; i < NS.size(); i++)
-      printf("NS[%i]: %i\n", i, NS[i]);
-
-    for (int i = 0; i < OS.size(); i++)
-      printf("OS[%i]: %i\n", i, OS[i]);
-
-
-    for (int i = 0; i < PS.size(); i++)
-      for (int j = 0; j < PS[i].size(); j++)
-        printf("PS[%i][%i]: %i\n", i, j, (PS[i])[j]);
-
-    for (int i = 0; i < PI.size(); i++)
-      for (int j = 0; j < PI[i].size(); j++)
-        printf("PI[%i][%i]: %i\n", i, j, (PI[i])[j]);
-
-    printf("K: %i\n", K);
-    printf("S0: %i\n", S0);
-    printf("SK: %i\n", SK);
-#endif
-
-    // Init the initial state with the state
-    // from the previous block
-    S0 = d_state;
-    if(S0<0) { // initial state not specified
-        for(int i=0;i<S;i++) alpha[0*S+i]=0;
-    }
-    else {
-        for(int i=0;i<S;i++) alpha[0*S+i]=INF;
-        alpha[0*S+S0]=0;
-    }
-
-    alphai=0;
-    for(int k=0;k<K;k++) {
-        norm=INF;
-
-        for(int j=0;j<S;j++) { // for each next state do ACS
-            minm=INF;
-            minmi=0;
-            for(unsigned int i=0;i<PS[j].size();i++) {
-                //int i0 = j*I+i;
-                //if((mm=alpha[alphai*S+PS[j][i]]+in[k*O+OS[PS[j][i]*I+PI[j][i]]])<minm)
-                    //minm=mm,minmi=i;
-
-              // Calculate Hamming distance between received codeword
-              // and output symbol
-              int metric = OS[PS[j][i]*I+PI[j][i]] ^ (int)in[k];
-              int distance = 0;
-#if 0
-              while (metric)
-              {
-                if (metric & 1)
-                  distance++;
-
-                metric &= metric - 1;
-              }
-#else
-              distance = __builtin_popcount(metric);
-#endif
-
-              if((mm=(int)alpha[alphai*S+PS[j][i]]+distance)<minm)
-                        minm=mm,minmi=i;
-
-#ifdef VITERBI_DEBUG
-              printf("in[%i]: %i\n", k*O+OS[PS[j][i]*I+PI[j][i]], in[k*O+OS[PS[j][i]*I+PI[j][i]]]);
-              printf("PS[%i][%i]: %i, PI[%i][%i]: %i\n", j, i, PS[j][i], j, i, PI[j][i]);
-              printf("k: %i, S: %i, j: %i\n", k, S, j);
-              printf("alpha[%i]: %i, mm: %i\n", alphai*S+PS[j][i], alpha[alphai*S+PS[j][i]], mm);
-#endif
-            }
-            trace[k*S+j]=minmi;
-            alpha[((alphai+1)%2)*S+j]=minm;
-#ifdef VITERBI_DEBUG
-            printf("******* minm: %i, minmi: %i\n", minm, minmi);
-            printf("******* trace[%i]: %i\n", k*S+j, trace[k*S+j]);
-            printf("******* alpha[%i]: %i\n", ((alphai+1)%2)*S+j, minm);
-#endif
-            if(minm<norm) norm=minm;
-
-        }
-        for(int j=0;j<S;j++)
-            alpha[((alphai+1)%2)*S+j]-=norm; // normalize total metrics so they do not explode
-        alphai=(alphai+1)%2;
-
-    }
-
-    if(SK<0) { // final state not specified
-        minm=INF;
-        minmi=0;
-        for(int i=0;i<S;i++)
-            if((mm=alpha[alphai*S+i])<minm) minm=mm,minmi=i;
-        st=minmi;
-    }
-    else {
-        st=SK;
-    }
-    d_state = st;
-
-    for(int k=K-1;k>=0;k--) { // traceback
-        int i0=trace[k*S+st];
-        out[k]= (unsigned char) PI[st][i0];
-#ifdef VITERBI_DEBUG
-        printf("st: %i\n", st);
-        printf("trace[%i]: %i\n", k*S+st, trace[k*S+st]);
-        printf("out[%i]: %i, PI[%i][%i]: %i\n", k, out[k], st, i0, out[k]);
-#endif
-        st=PS[st][i0];
-    }
-  }
-
-
     viterbi_decoder::sptr
     viterbi_decoder::make(dvbt_constellation_t constellation, \
-                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK)
+                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK)
     {
-      return gnuradio::get_initial_sptr (new viterbi_decoder_impl(constellation, hierarchy, coderate, FSM, K, S0, SK));
+      return gnuradio::get_initial_sptr (new viterbi_decoder_impl(constellation, hierarchy, coderate, K, S0, SK));
     }
 
     /*
      * The private constructor
      */
     viterbi_decoder_impl::viterbi_decoder_impl(dvbt_constellation_t constellation, \
-                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, const fsm &FSM, int K, int S0, int SK)
+                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK)
       : block("viterbi_decoder",
           io_signature::make(1, 1, sizeof (unsigned char)),
           io_signature::make(1, 1, sizeof (unsigned char))),
       config(constellation, hierarchy, coderate, coderate),
-      d_FSM (FSM),
       d_K (K),
       d_S0 (S0),
       d_SK (SK),

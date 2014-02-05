@@ -15,6 +15,7 @@ test.ts(MPEG-2 TS)->test.bin(BB)
 The parameters used are: 2k OFDM, FEC code 1/2, Modulation 16-QAM, Guard Interval 1/32
 
 **Run RX** 
+The dvbt RX implementation now supports all rates: 1/2, 2/3, 3/4, 5/6, 7/8.  
 To run DVB-T decoding just run apps/dvbt_rx_demo.grc. It will take the baseband samples and turn them into MPEG-2 TS file.  
 test.bin(BB)->test_out.ts(MPEG-2 TS)  
 
@@ -26,6 +27,8 @@ mplayer test_out.ts
 The baseband samples can be sent to USRP N210 on TX and received with another USRP N210 on RX. The decoder/encoder consumes a lot of processing power and therefore the realtime functionality will depend on the available computing power. On my computer - Sandybridge 2600K - it is possible to send and receive in realtime the stream.  
 
 The encoder/decoder currently works with gnuradio 3.7.2.x and 3.6 (if taken from Gnuradio_v_3_6 tag) but it is not dependent heavily on it. There is also a list of todo tasks in TODO.txt.  
+
+The rational resampler adds a lot of noise on receiving and that is why the AWGN noise source is mixed over the signal when doing back to back testing. If no TS file is decoded it may need to play with the level of the noise source. For transmission over real channel the resampler seems to work ok.  
 
 The dvb-t module requires SSE2 SIMD instructions available in the processor. If the SSE2 is not available then illegal instruction will be seen at runtime.  
 

@@ -58,26 +58,31 @@ static struct timezone tzs, tze;
 namespace gr {
   namespace dvbt {
 
+    const unsigned char viterbi_decoder_impl::d_puncture_1_2[2] = {1, 1};
+    const unsigned char viterbi_decoder_impl::d_puncture_2_3[4] = {1, 1, 0, 1};
+    const unsigned char viterbi_decoder_impl::d_puncture_3_4[6] = {1, 1, 0, 1, 1, 0};
+    const unsigned char viterbi_decoder_impl::d_puncture_5_6[10] = {1, 1, 0, 1, 1, 0, 0, 1, 1, 0};
+    const unsigned char viterbi_decoder_impl::d_puncture_7_8[14] = {1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0};
+
     viterbi_decoder::sptr
     viterbi_decoder::make(dvbt_constellation_t constellation, \
-                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK)
+                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int bsize, int S0, int SK)
     {
-      return gnuradio::get_initial_sptr (new viterbi_decoder_impl(constellation, hierarchy, coderate, K, S0, SK));
+      return gnuradio::get_initial_sptr (new viterbi_decoder_impl(constellation, hierarchy, coderate, bsize, S0, SK));
     }
 
     /*
      * The private constructor
      */
     viterbi_decoder_impl::viterbi_decoder_impl(dvbt_constellation_t constellation, \
-                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK)
+                dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int bsize, int S0, int SK)
       : block("viterbi_decoder",
           io_signature::make(1, 1, sizeof (unsigned char)),
           io_signature::make(1, 1, sizeof (unsigned char))),
       config(constellation, hierarchy, coderate, coderate),
-      d_K (K),
-      d_S0 (S0),
-      d_SK (SK),
-      d_state (S0)
+      d_bsize(bsize),
+      d_S0(S0),
+      d_SK(SK)
     {
       //Determine k - input of encoder
       d_k = config.d_cr_k;
@@ -85,15 +90,42 @@ namespace gr {
       d_n = config.d_cr_n;
       //Determine m - constellation symbol size
       d_m = config.d_m;
-
-
-      set_relative_rate (1.0);
-      set_output_multiple (d_K/8);
+      // Determine puncturing vector and traceback
+      if (config.d_code_rate_HP == gr::dvbt::C1_2)
+      {
+        d_puncture = d_puncture_1_2;
+        d_ntraceback = 5;
+      }
+      else if (config.d_code_rate_HP == gr::dvbt::C2_3)
+      {
+        d_puncture = d_puncture_2_3;
+        d_ntraceback = 9;
+      }
+      else if (config.d_code_rate_HP == gr::dvbt::C3_4)
+      {
+        d_puncture = d_puncture_3_4;
+        d_ntraceback = 10;
+      }
+      else if (config.d_code_rate_HP == gr::dvbt::C5_6)
+      {
+        d_puncture = d_puncture_5_6;
+        d_ntraceback = 15;
+      }
+      else if (config.d_code_rate_HP == gr::dvbt::C7_8)
+      {
+        d_puncture = d_puncture_7_8;
+        d_ntraceback = 24;
+      }
+      else
+      {
+        d_puncture = d_puncture_1_2;
+        d_ntraceback = 5;
+      }
 
       printf("Viterbi: k: %i\n", d_k);
       printf("Viterbi: n: %i\n", d_n);
       printf("Viterbi: m: %i\n", d_m);
-      printf("Viterbi: K: %i\n", d_K);
+      printf("Viterbi: block size: %i\n", d_bsize);
 
       /*
        * We input n bytes, each carrying m bits => nm bits
@@ -101,21 +133,31 @@ namespace gr {
        *
        * out/in rate is therefore km/8n in bytes
        */
-
       assert((d_k * d_m) % (8 * d_n));
-
       set_relative_rate((d_k * d_m) / (8 * d_n));
 
-      assert ((d_K * d_n) % d_m == 0);
-      d_nsymbols = d_K * d_n / d_m;
+      assert ((d_bsize * d_n) % d_m == 0);
+      set_output_multiple (d_bsize * d_k / 8);
 
+      /*
+       * Calculate process variables:
+       * Number of symbols (d_m bits) in all blocks
+       * It is also the number of input bytes since
+       * one byte always contains just one symbol.
+       */
+      d_nsymbols = d_bsize * d_n / d_m;
+      // Number of bits after depuncturing a block (before decoding)
+      d_nbits = 2 * d_k * d_bsize;
+      // Number of output bytes after decoding
+      d_nout = d_nbits / 2 / 8;
+
+      // TODO - clean this up
       int amp = 100;
       float RATE=0.5;
       float ebn0 = 12.0;
       float esn0 = RATE*pow(10.0, ebn0/10);
       d_gen_met(mettab, amp, esn0, 0.0, 4);
       d_viterbi_chunks_init(state0);
-
 
       d_viterbi_chunks_init_sse2(metric0, path0);
     }
@@ -130,8 +172,6 @@ namespace gr {
     void
     viterbi_decoder_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-       assert (noutput_items % d_K == 0);
-
        int input_required = noutput_items * 8 * d_n / (d_k * d_m);
 
        unsigned ninputs = ninput_items_required.size();
@@ -146,68 +186,67 @@ namespace gr {
                        gr_vector_const_void_star &input_items,
                        gr_vector_void_star &output_items)
     {
-        assert (input_items.size() == output_items.size());
         int nstreams = input_items.size();
-        assert (noutput_items % d_K == 0);
-        int nblocks = 8*noutput_items / d_K;
-
-        // TODO - Allocate dynamically these buffers
-        unsigned char in_bits[d_K * d_n * nblocks];
+        int nblocks = 8 * noutput_items / (d_bsize * d_k);
 
         gettimeofday(&tvs, &tzs);
 
-        for (int m=0;m<nstreams;m++) {
+        for (int m=0;m<nstreams;m++)
+        {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
 
-          for (int n = 0; n < nblocks; n++) {
-
+          for (int n = 0; n < nblocks; n++)
+          {
             /*
+             * Depuncture and unpack a block.
              * We receive the symbol (d_m bits/byte) in one byte (e.g. for QAM16 00001111).
              * Create a buffer of bytes containing just one bit/byte.
+             * Also depuncture according to the puncture vector.
+             * TODO - reduce the number of branches while depuncturing.
              */
             for (int count = 0, i = 0; i < d_nsymbols; i++)
             {
               for (int j = (d_m - 1); j >= 0; j--)
+              {
+                // Depuncture
+                while (d_puncture[count % (2 * d_k)] == 0)
+                  in_bits[count++] = 2;
+
+                // Insert received bits
                 in_bits[count++] = (in[(n * d_nsymbols) + i] >> j) & 1;
 
-              //printf("in[%i]: %x\n", \
-                //(n * d_nsymbols) + i, in[(n * d_nsymbols) + i]);
+                // Depuncture
+                while (d_puncture[count % (2 * d_k)] == 0)
+                  in_bits[count++] = 2;
+              }
             }
 
             /*
              * Decode a block.
              */
-
-            int out_count = 0;
-
-            for (int count = 0, i = 0; i < (d_K * 2); i++)
+            for (int out_count = 0, in_count = 0; in_count < d_nbits; in_count++)
             {
-              if ((count % 4) == 3)
+              if ((in_count % 4) == 0) //0 or 3
               {
-                d_viterbi_butterfly2_sse2(&in_bits[i & 0xfffffffc], metric0, metric1, path0, path1);
+                d_viterbi_butterfly2_sse2(&in_bits[in_count & 0xfffffffc], metric0, metric1, path0, path1);
                 //d_viterbi_butterfly2(&in_bits[i & 0xfffffffc], mettab, state0, state1);
 
-                if ((count > 0) && (count % 16) == 11)
-                  d_viterbi_get_output_sse2(metric0, path0, &out[n*(d_K/8) + out_count++]);
+                if ((in_count > 0) && (in_count % 16) == 8) // 8 or 11
+                  d_viterbi_get_output_sse2(metric0, path0, d_ntraceback, &out[n*d_nout + out_count++]);
                   //d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
               }
-
-              count++;
             }
-
-            // TODO - Make Viterbi algorithm aware of puncturing matrix
           }
         }
 
-
         gettimeofday(&tve, &tze);
-        PRINTF("VITERBI: nblocks: %i, Mbit/s out: %f\n", \
-            nblocks, (float) (nblocks * d_K) / (float)(tve.tv_usec - tvs.tv_usec));
+        PRINTF("VITERBI: nblocks: %i, out: %f Mbit/s\n", \
+            nblocks, (float) (nblocks * d_nout * 8) / (float)(tve.tv_usec - tvs.tv_usec));
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
-        consume_each (noutput_items * 8 * d_n / (d_k * d_m));
+        consume_each (nblocks * d_nsymbols);
 
         // Tell runtime system how many output items we produced.
         return noutput_items;

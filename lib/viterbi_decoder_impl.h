@@ -39,22 +39,38 @@ namespace gr {
     private:
       dvbt_config config;
 
+      // Puncturing vectors
+      static const unsigned char d_puncture_1_2[];
+      static const unsigned char d_puncture_2_3[];
+      static const unsigned char d_puncture_3_4[];
+      static const unsigned char d_puncture_5_6[];
+      static const unsigned char d_puncture_7_8[];
+
+      // Current puncturing vector
+      const unsigned char * d_puncture;
+
       // Code rate k/n
       int d_k;
       int d_n;
       // Constellation with m
       int d_m;
 
-      // Symbols to consume on decoding
+      // Block size
+      int d_bsize;
+      // Symbols to consume on decoding from one block
       int d_nsymbols;
+      // Number of bits after depuncturing a block
+      int d_nbits;
+      // Number of full packed out bytes
+      int d_nout;
 
-      //fsm d_FSM;
-      int d_K;
+      // Initial state
       int d_S0;
+      // Final state
       int d_SK;
-      // Keep the state from the prev. block
-      int d_state;
-      int d_st;
+
+      // Traceback (in bytes)
+      int d_ntraceback;
 
       // Viterbi decoder pointer
       void *d_vp;
@@ -64,9 +80,11 @@ namespace gr {
       struct viterbi_state state1[64];
       int mettab[2][256];
 
+      unsigned char in_bits[9000];
+
     public:
       viterbi_decoder_impl(dvbt_constellation_t constellation, \
-                  dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK);
+                  dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int bsize, int S0, int SK);
       ~viterbi_decoder_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);

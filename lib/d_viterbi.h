@@ -57,11 +57,14 @@ d_viterbi_butterfly2(unsigned char *symbols, int mettab[2][256], struct viterbi_
 void
 d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i m0[], __m128i m1[], __m128i p0[], __m128i p1[]);
 
+void
+d_viterbi_butterfly_sse2(unsigned char *symbols, __m128i m0[], __m128i m1[], __m128i p0[], __m128i p1[]);
+
 unsigned char
 d_viterbi_get_output(struct viterbi_state *state, unsigned char *outbuf);
 
 unsigned char
-d_viterbi_get_output_sse2(__m128i *mm0, __m128i *pp0, unsigned char *outbuf);
+d_viterbi_get_output_sse2(__m128i *mm0, __m128i *pp0, int ntraceback, unsigned char *outbuf);
 
 
 int 

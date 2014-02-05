@@ -151,6 +151,12 @@ namespace gr {
       // Number of output bytes after decoding
       d_nout = d_nbits / 2 / 8;
 
+      // Allocate the buffer for the bits
+      d_inbits = new unsigned char [d_nbits];
+      if (d_inbits == NULL)
+        std::cout << "error allocating d_inbits" << std::endl;
+        
+
       // TODO - clean this up
       int amp = 100;
       float RATE=0.5;
@@ -167,6 +173,7 @@ namespace gr {
      */
     viterbi_decoder_impl::~viterbi_decoder_impl()
     {
+      delete [] d_inbits;
     }
 
     void
@@ -211,14 +218,14 @@ namespace gr {
               {
                 // Depuncture
                 while (d_puncture[count % (2 * d_k)] == 0)
-                  in_bits[count++] = 2;
+                  d_inbits[count++] = 2;
 
                 // Insert received bits
-                in_bits[count++] = (in[(n * d_nsymbols) + i] >> j) & 1;
+                d_inbits[count++] = (in[(n * d_nsymbols) + i] >> j) & 1;
 
                 // Depuncture
                 while (d_puncture[count % (2 * d_k)] == 0)
-                  in_bits[count++] = 2;
+                  d_inbits[count++] = 2;
               }
             }
 
@@ -229,8 +236,8 @@ namespace gr {
             {
               if ((in_count % 4) == 0) //0 or 3
               {
-                d_viterbi_butterfly2_sse2(&in_bits[in_count & 0xfffffffc], metric0, metric1, path0, path1);
-                //d_viterbi_butterfly2(&in_bits[i & 0xfffffffc], mettab, state0, state1);
+                d_viterbi_butterfly2_sse2(&d_inbits[in_count & 0xfffffffc], metric0, metric1, path0, path1);
+                //d_viterbi_butterfly2(&d_inbits[i & 0xfffffffc], mettab, state0, state1);
 
                 if ((in_count > 0) && (in_count % 16) == 8) // 8 or 11
                   d_viterbi_get_output_sse2(metric0, path0, d_ntraceback, &out[n*d_nout + out_count++]);

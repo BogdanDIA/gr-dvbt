@@ -80,7 +80,8 @@ namespace gr {
       struct viterbi_state state1[64];
       int mettab[2][256];
 
-      unsigned char in_bits[9000];
+      // Buffer to keep the input bits
+      unsigned char * d_inbits;
 
     public:
       viterbi_decoder_impl(dvbt_constellation_t constellation, \

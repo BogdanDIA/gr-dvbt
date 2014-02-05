@@ -49,7 +49,7 @@ namespace gr {
         * creating new instances.
         */
        static sptr make(dvbt_constellation_t constellation, \
-                   dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int K, int S0, int SK);
+                   dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int bsize, int S0, int SK);
     };
 
   } // namespace dvbt

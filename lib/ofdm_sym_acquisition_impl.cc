@@ -31,6 +31,8 @@
 #include <volk/volk.h>
 #include <gnuradio/fxpt.h>
 
+//#define DEBUG 1
+
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
 #else
@@ -248,7 +250,7 @@ namespace gr {
 #if 0
       // Print input
       for (int i = 0; i < (2 * d_fft_length + d_cp_length); i++)
-        printf("in[%i]: %.10f\n", i, d_lambda[i]);
+        printf("in[%i].re: %.10f, in[%i].img: %.10f\n", i, in[i].real(), i, in[i].imag());
 #endif
 
 #if 0
@@ -491,6 +493,8 @@ namespace gr {
         {
           d_initial_aquisition = ml_sync(in, 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
+
+          PRINTF("initial_acq: %i, d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_initial_aquisition, d_cp_start, d_to_consume, d_to_out);
         }
 
         // This is fractional frequency correction (pre FFT)
@@ -500,7 +504,7 @@ namespace gr {
           d_cp_found = ml_sync(in, d_cp_start + 8, d_cp_start - 8, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
 
-          PRINTF("d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_cp_start, d_to_consume, d_to_out);
+          PRINTF("d_cp_found: %i, d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_cp_found, d_cp_start, d_to_consume, d_to_out);
 
           if (d_cp_found)
           {
@@ -521,7 +525,7 @@ namespace gr {
             int j = 0;
             for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)
             {
-              out[j] = d_derot[j] * in[i];
+              out[j] = /*d_derot[j] */ in[i];
               j++;
             }
 #endif

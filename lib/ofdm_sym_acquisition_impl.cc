@@ -525,7 +525,7 @@ namespace gr {
             int j = 0;
             for (int i = (d_cp_start - d_fft_length + 1); i <= d_cp_start; i++)
             {
-              out[j] = /*d_derot[j] */ in[i];
+              out[j] = d_derot[j] * in[i];
               j++;
             }
 #endif

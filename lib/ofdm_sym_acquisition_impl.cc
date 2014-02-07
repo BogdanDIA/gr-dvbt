@@ -58,8 +58,6 @@ void print_double(float d)
 namespace gr {
   namespace dvbt {
 
-    
-
     int 
     ofdm_sym_acquisition_impl::peak_detect_init(float threshold_factor_rise, float threshold_factor_fall, int look_ahead, float alpha)
     {
@@ -72,26 +70,8 @@ namespace gr {
     }
 
     int 
-    ofdm_sym_acquisition_impl::peak_detect_process(const float * datain, const int datain_length, int * peak_pos)
+    ofdm_sym_acquisition_impl::peak_detect_process(const float * datain, const int datain_length, int * peak_pos, int * peak_max)
     {
-#if 0
-      int ret = 0;
-      float peak = datain[0];
-
-      for (int i = 0; i < datain_length; i++)
-        if (datain[i] > peak)
-        {
-          peak = datain[i];
-          *peak_pos = i;
-        }
-
-      if (*peak_pos == datain_length - 1)
-        ret = 0;
-      else
-        ret = 1;
-
-      return (ret);
-#endif
       int state = 0;
       float peak_val = -(float)INFINITY; int peak_index = 0; int peak_pos_length = 0;
 
@@ -138,6 +118,28 @@ namespace gr {
             peak_val = - (float)INFINITY;
           }
         }
+      }
+
+      // Find peak of peaks
+      if (peak_pos_length)
+      {
+        float max = datain[peak_pos[0]];
+        int maxi = 0;
+
+        for (int i = 1; i < peak_pos_length; i++)
+        {
+          if (datain[peak_pos[i]] > max)
+          {
+            max = datain[peak_pos[i]];
+            maxi = i;
+          }
+        }
+
+        *peak_max = maxi;
+#if 0
+      for (int i = 0; i < peak_pos_length; i++)
+        printf("peak_pos[%i]: %i, lambda[%i]: %f\n", i, peak_pos[i], i, datain[peak_pos[i]]);
+#endif
       }
 
       return (peak_pos_length);
@@ -259,23 +261,20 @@ namespace gr {
         printf("lambda[%i]: %.10f\n", i, d_lambda[i]);
 #endif
 
+      int peak_length, peak, peak_max;
       // Find peaks of lambda
-      int peak_length = peak_detect_process(&d_lambda[0], (lookup_start - lookup_stop), &peak_pos[0]);
-      int peak = 0;
-      // We found an end of symbol at peak_pos[0] + CP + FFT
-      if (peak_length)
+      // We have found an end of symbol at peak_pos[0] + CP + FFT
+      if (peak_length = peak_detect_process(&d_lambda[0], (lookup_start - lookup_stop), &peak_pos[0], &peak_max))
       {
-        /* peak = peak_pos[0] + lookup_stop; */
-        peak = peak_pos[peak_length - 1] + lookup_stop;
+        peak = peak_pos[peak_max] + lookup_stop;
 #if 0
-        for (int i = 0; i < peak_length; i++)
-          printf("peak: %i, peak_pos[%i]: %i\n", peak, i, peak_pos[i]);
+        printf("peak: %i, peak_pos: %i, lambda[%i]: %f\n", peak, peak_pos[peak_max], peak_pos[peak_max], d_lambda[peak_pos[peak_max]]);
 #endif
         *cp_pos = peak;
 
         // Calculate frequency correction
         /*float peak_epsilon = gr_fast_atan2f(d_gamma[peak_pos[0]]);*/
-        float peak_epsilon = fast_atan2f(d_gamma[peak_pos[peak_length - 1]]);
+        float peak_epsilon = fast_atan2f(d_gamma[peak_pos[peak_max]]);
         double sensitivity = (double)(-1) / (double)d_fft_length;
 
         //printf("peak_epsilon: %.10f\n", peak_epsilon);
@@ -503,8 +502,8 @@ namespace gr {
         {
           d_cp_found = ml_sync(in, d_cp_start + 8, d_cp_start - 8, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
-
-          PRINTF("d_cp_found: %i, d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_cp_found, d_cp_start, d_to_consume, d_to_out);
+          
+          PRINTF("short_acq: %i, d_cp_start: %i, d_to_consume: %i, d_to_out: %i\n", d_cp_found, d_cp_start, d_to_consume, d_to_out);
 
           if (d_cp_found)
           {
@@ -537,6 +536,9 @@ namespace gr {
             {
               d_initial_aquisition = 0;
               d_freq_correction_count = 0;
+
+              // TODO - Consume a bit more just to add a randomness
+              d_to_consume = 2 * d_to_consume;
 
               printf("restart aquisition\n");
             }

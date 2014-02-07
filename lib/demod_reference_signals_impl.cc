@@ -84,10 +84,18 @@ namespace gr {
       const gr_complex *in = (const gr_complex *) input_items[0];
       gr_complex *out = (gr_complex *) output_items[0];
 
+      int symbol_index;
       int to_out = 0;
 
       for (int i = 0; i < noutput_items; i++)
-        to_out += d_pg.parse_input(&in[i * d_ninput], &out[i * d_noutput]);
+        to_out += d_pg.parse_input(&in[i * d_ninput], &out[i * d_noutput], &symbol_index);
+
+      // Send a tag for each OFDM symbol informing about
+      // symbol index.
+      const uint64_t offset = this->nitems_written(0);
+      pmt::pmt_t key = pmt::string_to_symbol("symbol_index");
+      pmt::pmt_t value = pmt::from_long(symbol_index);
+      this->add_item_tag(0, offset, key, value);
 
       consume_each (noutput_items);
 

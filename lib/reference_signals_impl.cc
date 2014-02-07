@@ -1181,7 +1181,7 @@ namespace gr {
     }
 
     int
-    pilot_gen::parse_input(const gr_complex *in, gr_complex *out)
+    pilot_gen::parse_input(const gr_complex *in, gr_complex *out, int * symbol_index)
     {
       d_trigger_index++;
 
@@ -1221,6 +1221,9 @@ namespace gr {
       // Correct symbol index so that all subsequent processing
       // use correct symbol index
       d_symbol_index = (d_symbol_index + diff_symbol_index) % d_symbols_per_frame;
+
+      // Symbol index is used in other modules too
+      *symbol_index = d_symbol_index;
 
       // Process TPS data
       // If a frame is recognized then signal end of frame

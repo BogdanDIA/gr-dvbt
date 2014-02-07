@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ASCII'?>
 <flow_graph>
-  <timestamp>Fri Jan 10 15:12:22 2014</timestamp>
+  <timestamp>Sat Feb  8 01:39:54 2014</timestamp>
   <block>
     <key>options</key>
     <param>
@@ -316,10 +316,6 @@
     <param>
       <key>type</key>
       <value>b</value>
-    </param>
-    <param>
-      <key>fsm_args</key>
-      <value>1,2,[0x79,0x5b]</value>
     </param>
     <param>
       <key>block_size</key>
@@ -1775,7 +1771,7 @@
     </param>
     <param>
       <key>amp</key>
-      <value>0.009</value>
+      <value>0.000</value>
     </param>
     <param>
       <key>seed</key>

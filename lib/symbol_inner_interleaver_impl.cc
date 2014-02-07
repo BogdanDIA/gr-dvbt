@@ -130,7 +130,7 @@ namespace gr {
       d_h = new int[d_fft_length];
       if (d_h == NULL)
       {
-        std::cout << "cannot allocate memory" << std::endl;
+        std::cout << "cannot allocate memory for d_h" << std::endl;
       }
 
       // Setup bit permutation vectors
@@ -168,24 +168,45 @@ namespace gr {
         const unsigned char *in = (unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
+        // Demod reference signals sends a tag per OFDM frame
+        // containing the symbol index.
+        std::vector<tag_t> tags;
+        const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+
+        // Read all tags on the input buffer
+        this->get_tags_in_range(tags, 0, nread, nread + noutput_items);
+
         for (int k = 0; k < noutput_items; k++)
         {
-          for (int q = 0; q < d_nsize; q++)
-          {
-            int blocks = k * d_nsize;
+          int blocks = k * d_nsize;
 
-            if (d_symbol_index % 2)
-              if (d_direction)
+          if (d_direction)
+          {
+            // Interleave
+            for (int q = 0; q < d_nsize; q++)
+            {
+              if (d_symbol_index % 2)
                 out[blocks + q] = in[blocks + H(q)];
               else
                 out[blocks + H(q)] = in[blocks + q];
-            else
-              if (d_direction)
-                out[blocks + H(q)] = in[blocks + q];
-              else
-                out[blocks + q] = in[blocks + H(q)];
+            }
+
+            d_symbol_index = (++d_symbol_index) % d_symbols_per_frame;
           }
-          d_symbol_index = (++d_symbol_index) % d_symbols_per_frame;
+          else
+          {
+            // Deinterleave
+            d_symbol_index = pmt::to_long(tags[k].value);
+            //printf("Symbol deinterleaver: d_symbol_index: %i\n", d_symbol_index);
+
+            for (int q = 0; q < d_nsize; q++)
+            {
+              if (d_symbol_index % 2)
+                out[blocks + H(q)] = in[blocks + q];
+              else
+                out[blocks + q] = in[blocks + H(q)];
+            }
+          }
         }
 
         // Do <+signal processing+>

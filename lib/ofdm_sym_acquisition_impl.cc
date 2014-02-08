@@ -537,9 +537,6 @@ namespace gr {
               d_initial_aquisition = 0;
               d_freq_correction_count = 0;
 
-              // TODO - Consume a bit more just to add a randomness
-              d_to_consume = 2 * d_to_consume;
-
               printf("restart aquisition\n");
             }
           }

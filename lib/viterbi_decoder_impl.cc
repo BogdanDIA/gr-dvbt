@@ -237,11 +237,11 @@ namespace gr {
               if ((in_count % 4) == 0) //0 or 3
               {
                 d_viterbi_butterfly2_sse2(&d_inbits[in_count & 0xfffffffc], metric0, metric1, path0, path1);
-                //d_viterbi_butterfly2(&d_inbits[i & 0xfffffffc], mettab, state0, state1);
+                //d_viterbi_butterfly2(&d_inbits[in_count & 0xfffffffc], mettab, state0, state1);
 
                 if ((in_count > 0) && (in_count % 16) == 8) // 8 or 11
                   d_viterbi_get_output_sse2(metric0, path0, d_ntraceback, &out[n*d_nout + out_count++]);
-                  //d_viterbi_get_output(state0, &out[n*(d_K/8) + out_count++]);
+                  //d_viterbi_get_output(state0, &out[n*d_nout + out_count++]);
               }
             }
           }

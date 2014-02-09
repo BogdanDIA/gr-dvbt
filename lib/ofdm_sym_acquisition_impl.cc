@@ -350,6 +350,15 @@ namespace gr {
       return (peak_length);
     }
 
+    void
+    ofdm_sym_acquisition_impl::send_sync_start()
+    {
+      const uint64_t offset = this->nitems_written(0);
+      pmt::pmt_t key = pmt::string_to_symbol("sync_start");
+      pmt::pmt_t value = pmt::from_long(1);
+      this->add_item_tag(0, offset, key, value);
+    }
+
     int
     ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out)
     {
@@ -492,6 +501,9 @@ namespace gr {
         {
           d_initial_aquisition = ml_sync(in, 2 * d_fft_length + d_cp_length - 1, d_fft_length + d_cp_length - 1, \
               &d_cp_start, &d_derot[0], &d_to_consume, &d_to_out);
+
+          // Send sync_start downstream
+          send_sync_start();
 
           PRINTF("initial_acq: %i, d_cp_start: %i, d_to_consume,: %i, d_to_out: %i\n", d_initial_aquisition, d_cp_start, d_to_consume, d_to_out);
         }

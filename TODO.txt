@@ -1,13 +1,13 @@
 Notes:
 The dvbt TX implementation now supports 2k/8k mode, QPSK, QAM16, QAM64 constelaltions and rates 1/2, 2/3, 3/4, 5/6, 7/8.
 Enable Doxygen: cmake ../ -DENABLE_DOXYGEN=ON
-Use AWGN generator to add noise to signals with huge SNR. Otherwise the signal is not decoded correctly.
+FIXED - Use AWGN generator to add noise to signals with huge SNR. Otherwise the signal is not decoded correctly.
 
 Various TODOs beside what can be found in the sourcecode:
 
 Fixes:
  - Peak detector does not find peaks for small search window (+/-4)
- - Fix the problem with huge SNR input files not being played correctly.
+ - FIXED: Fix the problem with huge SNR input files not being played correctly.
  - Write docs for demod_reference_signals
  - Fix sampling freq correction calculation.
 
@@ -16,8 +16,8 @@ Rework:
 
 Features: 
  - Support 8k mode.
- - Include puncturing matrix on convolutional encoder/decoder.
- - Support the other rates beside 1/2 on convolutional encoder/decoder.
+ - DONE: Include puncturing matrix on convolutional encoder/decoder.
+ - DONE: Support the other rates beside 1/2 on convolutional encoder/decoder.
  - Implement Soft decision Viterbi decoder together with interleaver.
  - Implement BICM.
  - Implement DFE on equalizer.
@@ -36,7 +36,7 @@ Documentation:
 
 QA:
  - Add tests for each block.
- - Check Viterbi-SSE2 implementation.
+ - FIXED: Check Viterbi-SSE2 implementation.
  - Use ETR290 to measure DVB-T parameters.
 
 

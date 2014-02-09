@@ -16,9 +16,9 @@ The parameters used are: 2k OFDM, FEC code 1/2, Modulation 16-QAM, Guard Interva
 
 **Run RX** 
 The dvbt RX implementation now supports all constellation types QPSK, QAM16, QAM64 and rates: 1/2, 2/3, 3/4, 5/6, 7/8.  
-All combinations of rates andn constellations are tested and working for 2k.  
+All combinations of rates and constellations are tested and working for 2k.  
 To run DVB-T decoding just run apps/dvbt_rx_demo.grc. It will take the baseband samples and turn them into MPEG-2 TS file.  
-test.bin(BB)->test_out.ts(MPEG-2 TS)  
+testBB.bin(BB)->test_out.ts(MPEG-2 TS)  
 
 Then the output can be played with any video player that supports MPEG-2 TS:  
 

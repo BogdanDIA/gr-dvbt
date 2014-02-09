@@ -1170,7 +1170,7 @@ namespace gr {
         d_symbol_index = 0;
         if (++d_frame_index == d_frames_per_superframe)
         {
-          d_frame_index == 0;
+          d_frame_index = 0;
           d_superframe_index++;
         }
       }

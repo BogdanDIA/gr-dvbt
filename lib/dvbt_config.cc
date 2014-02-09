@@ -58,7 +58,7 @@ namespace gr {
     dvbt_hierarchy_t
     dvbt_config::get_hierarchical()
     {
-      d_hierarchy;
+      return d_hierarchy;
     }
     void
     dvbt_config::set_code_rate_HP(dvbt_code_rate_t code_rate)

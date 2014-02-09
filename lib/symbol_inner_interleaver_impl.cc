@@ -174,7 +174,7 @@ namespace gr {
         const uint64_t nread = this->nitems_read(0); //number of items read on port 0
 
         // Read all tags on the input buffer
-        this->get_tags_in_range(tags, 0, nread, nread + noutput_items);
+        this->get_tags_in_range(tags, 0, nread, nread + noutput_items, pmt::string_to_symbol("symbol_index"));
 
         for (int k = 0; k < noutput_items; k++)
         {

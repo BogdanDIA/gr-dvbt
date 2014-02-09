@@ -41,6 +41,10 @@ namespace gr {
       int d_ninput;
       int d_noutput;
 
+      int d_skip;
+
+      int is_sync_start(int nitems);
+
     public:
       demod_reference_signals_impl(int itemsize, int ninput, int noutput, \
         dvbt_constellation_t constellation, dvbt_hierarchy_t hierarchy, \

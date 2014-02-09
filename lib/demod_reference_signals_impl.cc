@@ -41,6 +41,16 @@ namespace gr {
             guard_interval, transmission_mode, include_cell_id, cell_id));
     }
 
+    int
+    demod_reference_signals_impl::is_sync_start(int nitems)
+    {
+      std::vector<tag_t> tags;
+      const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+      this->get_tags_in_range(tags, 0, nread, nread + nitems, pmt::string_to_symbol("sync_start"));
+
+      return tags.size() ? 1 : 0;
+    }
+
     /*
      * The private constructor
      */
@@ -57,6 +67,7 @@ namespace gr {
           d_pg(config)
     {
       //
+      d_skip = 1;
     }
 
     /*
@@ -90,6 +101,24 @@ namespace gr {
       for (int i = 0; i < noutput_items; i++)
         to_out += d_pg.parse_input(&in[i * d_ninput], &out[i * d_noutput], &symbol_index);
 
+      /*
+       * Wait for a sync_start tag from upstream that signals when to start.
+       * Skip OFDM symbols to start always with quad symbol (0, 4, 8, etc)
+       */
+      if (is_sync_start(noutput_items))
+        d_skip = 1;
+
+      if (d_skip)
+      {
+        if ((symbol_index % 4) != 0)
+        {
+          consume_each(1);
+          return (0);
+        }
+        else
+          d_skip = 0;
+      }
+
       // Send a tag for each OFDM symbol informing about
       // symbol index.
       const uint64_t offset = this->nitems_written(0);
@@ -97,6 +126,7 @@ namespace gr {
       pmt::pmt_t value = pmt::from_long(symbol_index);
       this->add_item_tag(0, offset, key, value);
 
+      // Consume from input stream
       consume_each (noutput_items);
 
       // Tell runtime system how many output items we produced.

@@ -10,13 +10,11 @@ http://yo3iiu.ro/blog/?p=1244
 **Run TX**   
 The dvbt TX implementation now supports 2k/8k mode, QPSK, QAM16, QAM64 constelaltions and rates 1/2, 2/3, 3/4, 5/6, 7/8.  
 The simplest way to run DVB-T encoding is to use the gnuradio-companion flowgraphs apps/dvbt_tx_demo.grc. It will start with a MPEG-2 TS file and will eventually generate the 10Msps baseband samples.  
-Open dvbt_tx_demo.grc and run it for generatiing testBB.bin from test.ts  
-
-The parameters used are: 2k OFDM, FEC code 1/2, Modulation 16-QAM, Guard Interval 1/32
+Open dvbt_tx_demo.grc and run it for generating testBB.bin from test.ts. This specific flowgraph has the parameters set as: 2k OFDM, FEC code 1/2, Modulation 16-QAM, Guard Interval 1/32  
 
 **Run RX** 
 The dvbt RX implementation now supports all constellation types QPSK, QAM16, QAM64 and rates: 1/2, 2/3, 3/4, 5/6, 7/8.  
-All combinations of rates and constellations are tested and working for 2k.  
+All combinations of rates and constellations are tested and working for 2k OFDM.  
 To run DVB-T decoding just run apps/dvbt_rx_demo.grc. It will take the baseband samples and turn them into MPEG-2 TS file.  
 testBB.bin(BB)->test_out.ts(MPEG-2 TS)  
 
@@ -40,6 +38,4 @@ mkdir build
 cd build  
 cmake ../  
 make && sudo make install  
-
-open apps/dvbt_tx_demo.grc and run it and then open dvbt_rx_demo.grc and run it
 

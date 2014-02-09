@@ -10,7 +10,7 @@ http://yo3iiu.ro/blog/?p=1244
 **Run TX**   
 The dvbt TX implementation now supports 2k/8k mode, QPSK, QAM16, QAM64 constelaltions and rates 1/2, 2/3, 3/4, 5/6, 7/8.  
 The simplest way to run DVB-T encoding is to use the gnuradio-companion flowgraphs apps/dvbt_tx_demo.grc. It will start with a MPEG-2 TS file and will eventually generate the 10Msps baseband samples.  
-test.ts(MPEG-2 TS)->test.bin(BB)  
+Open dvbt_tx_demo.grc and run it for generatiing testBB.bin from test.ts  
 
 The parameters used are: 2k OFDM, FEC code 1/2, Modulation 16-QAM, Guard Interval 1/32
 
@@ -25,17 +25,21 @@ Then the output can be played with any video player that supports MPEG-2 TS:
 mplayer test_out.ts  
 
 **Notes**  
-The baseband samples can be sent to USRP N210 on TX and received with another USRP N210 on RX. The decoder/encoder consumes a lot of processing power and therefore the realtime functionality will depend on the available computing power. On my computer - Sandybridge 2600K - it is possible to send and receive in realtime the stream.  
+The baseband samples can be sent to USRP N210 on TX and received with another USRP N210 on RX. The decoder/encoder consumes a lot of processing power and therefore the realtime functionality will depend on the available computing power. On my computer - i7 Sandybridge 2600K - it is possible to send and receive in realtime the stream.  
 
 The encoder/decoder currently works with gnuradio 3.7.2.x and 3.6 (if taken from Gnuradio_v_3_6 tag) but it is not dependent heavily on it. There is also a list of todo tasks in TODO.txt.  
 
 The dvb-t module requires SSE2 SIMD instructions available in the processor. If the SSE2 is not available then illegal instruction will be seen at runtime.  
 
-**Build**  
+Two new grc files are added to demo encoding/decoding for 2k, QAM64 and rate 7/8: dvbt_tx_demo_2k_QAM64_rate78.grc and dvbt_rx_demo_2k_QAM64_rate78.grc.  
+
+**Build and run**  
 git clone https://github.com/BogdanDIA/gr-dvbt.git  
 cd gr-dvbt  
 mkdir build  
 cd build  
 cmake ../  
 make && sudo make install  
+
+open apps/dvbt_tx_demo.grc and run it and then open dvbt_rx_demo.grc and run it
 

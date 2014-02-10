@@ -127,7 +127,10 @@ namespace gr {
               out[count++] = sync;
 
               for (int k = 1; k < d_psize; k++)
-                out[count++] = in[index + count] ^ clock_prbs(d_npacks);
+              {
+                out[count] = in[index + count] ^ clock_prbs(d_npacks);
+                count++;
+              }
 
               sync = d_SYNC;
               clock_prbs(d_npacks);

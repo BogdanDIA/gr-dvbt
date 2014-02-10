@@ -162,7 +162,10 @@ namespace gr {
             // PRBS clocking starts right after NSYNC
 
             for (int k = 1; k < d_bsize; k++)
-              out[count++] = in[d_index + count] ^ clock_prbs(d_nblocks);
+            {
+              out[count] = in[d_index + count] ^ clock_prbs(d_nblocks);
+              count++;
+            }
 
             // For subsequent blocks PRBS is clocked also on SYNC
             // but its output is not used

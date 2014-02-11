@@ -44,6 +44,13 @@ namespace gr {
       // Register for PRBS
       int d_reg;
 
+      // Index
+      int d_index;
+      // Search interval
+      int d_search;
+
+      int d_offset;
+
       void init_prbs(); 
       int clock_prbs(int clocks);
 

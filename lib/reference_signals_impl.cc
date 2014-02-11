@@ -972,7 +972,8 @@ namespace gr {
         // Verify parity for TPS data
         if (!verify_bch_code(d_rcv_tps_data))
         {
-          printf("Aquired sync - TPS OK for frame 0 or 2\n");
+          d_frame_index = (d_rcv_tps_data[23] << 1) | (d_rcv_tps_data[24]);
+          printf("Aquired sync - TPS OK for frame: %i\n", d_frame_index);
 
           d_symbol_index_known = 1;
           end_frame = 1;
@@ -998,7 +999,8 @@ namespace gr {
         // Verify parity for TPS data
         if (!verify_bch_code(d_rcv_tps_data))
         {
-          printf("Aquired sync - TPS OK for frame 1 or 3\n");
+          d_frame_index = (d_rcv_tps_data[23] << 1) | (d_rcv_tps_data[24]);
+          printf("Aquired sync - TPS OK for frame: %i\n", d_frame_index);
 
           d_symbol_index_known = 1;
           end_frame = 1;
@@ -1170,7 +1172,7 @@ namespace gr {
         d_symbol_index = 0;
         if (++d_frame_index == d_frames_per_superframe)
         {
-          d_frame_index == 0;
+          d_frame_index = 0;
           d_superframe_index++;
         }
       }
@@ -1181,7 +1183,7 @@ namespace gr {
     }
 
     int
-    pilot_gen::parse_input(const gr_complex *in, gr_complex *out, int * symbol_index)
+    pilot_gen::parse_input(const gr_complex *in, gr_complex *out, int * symbol_index, int * frame_index)
     {
       d_trigger_index++;
 
@@ -1224,6 +1226,8 @@ namespace gr {
 
       // Symbol index is used in other modules too
       *symbol_index = d_symbol_index;
+      // Frame index is used in other modules too
+      *frame_index = d_frame_index;
 
       // Process TPS data
       // If a frame is recognized then signal end of frame

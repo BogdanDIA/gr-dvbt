@@ -95,11 +95,11 @@ namespace gr {
       const gr_complex *in = (const gr_complex *) input_items[0];
       gr_complex *out = (gr_complex *) output_items[0];
 
-      int symbol_index;
+      int symbol_index, frame_index;
       int to_out = 0;
 
       for (int i = 0; i < noutput_items; i++)
-        to_out += d_pg.parse_input(&in[i * d_ninput], &out[i * d_noutput], &symbol_index);
+        to_out += d_pg.parse_input(&in[i * d_ninput], &out[i * d_noutput], &symbol_index, &frame_index);
 
       /*
        * Wait for a sync_start tag from upstream that signals when to start.
@@ -110,13 +110,17 @@ namespace gr {
 
       if (d_skip)
       {
-        if ((symbol_index % 4) != 0)
+        // This is super-frame start
+        if (((symbol_index % 68) == 0) && ((frame_index % 4) == 3))
+        {
+          d_skip = 0;
+          printf("symbol_index: %i, frame_index: %i\n", symbol_index, frame_index);
+        }
+        else
         {
           consume_each(1);
           return (0);
         }
-        else
-          d_skip = 0;
       }
 
       // Send a tag for each OFDM symbol informing about

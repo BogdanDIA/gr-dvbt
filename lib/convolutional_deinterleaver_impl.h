@@ -45,10 +45,6 @@ namespace gr {
       int d_M;
       std::vector< std::deque<unsigned char> * > d_shift;
 
-      int d_index;
-      int d_offset;
-      int d_continue;
-
     public:
       convolutional_deinterleaver_impl(int nsize, int I, int M);
       ~convolutional_deinterleaver_impl();

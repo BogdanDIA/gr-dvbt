@@ -55,7 +55,7 @@ namespace gr {
       : block("convolutional_deinterleaver",
           io_signature::make(1, 1, sizeof (unsigned char)),
           io_signature::make(1, 1, sizeof (unsigned char) * I * blocks)),
-      d_blocks(blocks), d_I(I), d_M(M), d_index(0), d_offset(0)
+      d_blocks(blocks), d_I(I), d_M(M)
     {
       set_relative_rate(1.0 / I * d_blocks);
       set_output_multiple(2);
@@ -99,69 +99,29 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        int count = 0;
+        int to_out = noutput_items;
 
-        // Output only (noutput_items - 1) items in order to 
-        // have room for an initial offset
-        int to_out = noutput_items - 1;
+        PRINTF("INTERLEAVER: noutput_items: %i\n", noutput_items);
 
-        PRINTF("INTERLEAVER: d_offset: %i, d_index: %i, noutput_items: %i\n", d_offset, d_index, noutput_items);
-
-        for (int i = 0; i < (noutput_items - 1); i++)
+        for (int count = 0, i = 0; i < to_out; i++)
         {
-          int sync = d_NSYNC;
-          int mux_pkt = 0;
-
-          while (mux_pkt < d_MUX_PKT)
+          for (int mux_pkt = 0; mux_pkt < d_MUX_PKT; mux_pkt++)
           {
-            if (in[d_index + count] != sync)
-            {
-              PRINTF("INTERLEAVER: error: Missing sync: %x on input[%i] %x!\n", sync, d_index + count, in[d_index + count]);
-
-              // Go to the next input element
-              d_index++;
-              // Reset output counter
-              count = 0;
-              // Restart the search for NSYNC on the next index
-              sync = d_NSYNC;
-              // Reset MUX packet to 0
-              mux_pkt = 0;
-
-              if (d_index == d_blocks * d_I)
-              {
-                // No valid frame found. Output 0 items.
-                d_index = 0;
-                to_out = 0;
-                break;
-              }
-
-              continue;
-            }
-            else
-              PRINTF("INTERLEAVER: sync found: %x on input[%i] %x, d_index: %i, mux_pkt: %i\n", \
-                  sync, d_index + count, in[d_index + count], d_index, mux_pkt);
-
             // This is actually the interleaver
             for (int k = 0; k < (d_M * d_I); k++)
             {
-              d_shift[k % d_I]->push_back(in[d_index + count]);
+              d_shift[k % d_I]->push_back(in[count]);
               out[count++] = d_shift[k % d_I]->front();
               d_shift[k % d_I]->pop_front();
             }
-
-            sync = d_SYNC;
-
-            mux_pkt++;
           }
         }
-
-        d_offset += to_out * d_blocks * d_I;
 
         PRINTF("INTERLEAVER: to_out: %i\n", to_out);
 
         // Tell runtime system how many input items we consumed on
         // each input stream.
-        consume_each(d_I * d_blocks * (noutput_items - 1));
+        consume_each(d_I * d_blocks * to_out);
 
         // Tell runtime system how many output items we produced.
         return (to_out);

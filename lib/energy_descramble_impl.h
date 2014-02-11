@@ -44,10 +44,6 @@ namespace gr {
       // Register for PRBS
       int d_reg;
 
-      int d_index;
-      // Offset into input stream (for debug)
-      int d_offset;
-
       void init_prbs(); 
       int clock_prbs(int clocks);
 

@@ -78,13 +78,12 @@ namespace gr {
     energy_descramble_impl::energy_descramble_impl(int nblocks)
       : block("energy_descramble",
           io_signature::make(1, 1, sizeof (unsigned char) * d_nblocks * d_bsize),
-          io_signature::make(1, 1, sizeof (unsigned char))),
-      d_index (0)
+          io_signature::make(1, 1, sizeof (unsigned char)))
     {
       set_relative_rate((double) (d_nblocks * d_bsize)); 
       set_output_multiple(2 * d_nblocks * d_bsize);
 
-      PRINTF("d_nblocks: %i, d_bsize: %i\n", d_nblocks, d_bsize);
+      PRINTF("ENERGY: d_nblocks: %i, d_bsize: %i\n", d_nblocks, d_bsize);
     }
 
     /*
@@ -109,72 +108,28 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        int count = 0;
-        int to_consume = 0;
-        int to_out = 0;
+        int to_consume = noutput_items / (d_nblocks * d_bsize);
+        int to_out = noutput_items;
 
-        PRINTF("ENERGY: d_offset: %i, d_index: %i, noutput_items: %i\n", d_offset, d_index, noutput_items);
+        PRINTF("ENERGY: noutput_items: %i\n", noutput_items);
 
-        // Calculate the input items to consume
-        // in order to produce noutput_items
-        // It is important to set_output_multiple() first
-        int isize = (noutput_items / (d_nblocks * d_bsize)) - 1;
-
-        // Output only (noutput_items - 1) items in order to 
-        // have room for an initial offset
-        to_out = isize * d_nblocks * d_bsize;
-        to_consume = isize;
-
-        for (int i = 0; i < isize; i++)
+        for (int count = 0, i = 0; i < to_consume; i++)
         {
-          int sync = d_NSYNC;
-          int mux_pkt = 0;
-
           init_prbs();
 
-          while (mux_pkt < d_MUX_PKT)
+          for (int mux_pkt = 0; mux_pkt < d_MUX_PKT; mux_pkt++)
           {
-            if (in[d_index + count] != sync)
-            {
-              PRINTF("ENERGY: error: Missing sync: %x on input[%i] %x!\n", sync, d_index + count, in[d_index + count]);
-
-              // Go to the next input element
-              d_index++;
-              // Reset output counter
-              count = 0;
-              // Restart the search for NSYNC on the next index
-              sync = d_NSYNC;
-              // Reset MUX packet to 0
-              mux_pkt = 0;
-
-              if (d_index == d_nblocks * d_bsize)
-              {
-                d_index = 0;
-                break;
-              }
-
-              continue;
-            }
-            else
-              PRINTF("ENERGY: sync found: %x on input[%i] %x, mux_pkt: %i\n", sync, d_index + count, in[d_index + count], mux_pkt);
-
             out[count++] = d_SYNC;
             // PRBS clocking starts right after NSYNC
 
             for (int k = 1; k < d_bsize; k++)
-              out[count++] = in[d_index + count] ^ clock_prbs(d_nblocks);
+              out[count++] = in[count] ^ clock_prbs(d_nblocks);
 
             // For subsequent blocks PRBS is clocked also on SYNC
             // but its output is not used
-            sync = d_SYNC;
             clock_prbs(d_nblocks);
-
-            mux_pkt++;
           }
         }
-
-        // For debug purposes
-        d_offset += to_consume * d_nblocks * d_bsize;
 
         PRINTF("ENERGY: to_consume: %i, to_out: %i\n", to_consume, to_out);
 

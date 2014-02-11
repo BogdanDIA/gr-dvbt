@@ -83,6 +83,9 @@ namespace gr {
       // Buffer to keep the input bits
       unsigned char * d_inbits;
 
+      // This is used to get rid of traceback on the first frame
+      int d_init;
+
     public:
       viterbi_decoder_impl(dvbt_constellation_t constellation, \
                   dvbt_hierarchy_t hierarchy, dvbt_code_rate_t coderate, int bsize, int S0, int SK);

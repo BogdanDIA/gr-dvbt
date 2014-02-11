@@ -166,6 +166,8 @@ namespace gr {
       d_viterbi_chunks_init(state0);
 
       d_viterbi_chunks_init_sse2(metric0, path0);
+
+      d_init = 0;
     }
 
     /*
@@ -195,7 +197,8 @@ namespace gr {
     {
         int nstreams = input_items.size();
         int nblocks = 8 * noutput_items / (d_bsize * d_k);
-
+        int out_count = 0;
+        
         gettimeofday(&tvs, &tzs);
 
         for (int m=0;m<nstreams;m++)
@@ -232,7 +235,7 @@ namespace gr {
             /*
              * Decode a block.
              */
-            for (int out_count = 0, in_count = 0; in_count < d_nbits; in_count++)
+            for (int in_count = 0; in_count < d_nbits; in_count++)
             {
               if ((in_count % 4) == 0) //0 or 3
               {
@@ -240,11 +243,39 @@ namespace gr {
                 //d_viterbi_butterfly2(&d_inbits[in_count & 0xfffffffc], mettab, state0, state1);
 
                 if ((in_count > 0) && (in_count % 16) == 8) // 8 or 11
-                  d_viterbi_get_output_sse2(metric0, path0, d_ntraceback, &out[n*d_nout + out_count++]);
-                  //d_viterbi_get_output(state0, &out[n*d_nout + out_count++]);
+                {
+                  unsigned char c;
+
+                  d_viterbi_get_output_sse2(metric0, path0, d_ntraceback, &c);
+                  //d_viterbi_get_output(state0, &c);
+
+                  if (d_init == 0)
+                  {
+                    if (out_count >= d_ntraceback)
+                    {
+                      out[out_count - d_ntraceback] = c;
+                      //printf("out_init[%i]: %x\n", out_count - d_ntraceback, out[out_count - d_ntraceback]);
+                    }
+                  }
+                  else
+                  {
+                      out[out_count] = c;
+                      //printf("out[%i]: %x\n", out_count, out[out_count]);
+                  }
+
+                  out_count++;
+                }
               }
             }
           }
+        }
+
+        int to_out = noutput_items;
+        
+        if (d_init == 0)
+        {
+          to_out = to_out - d_ntraceback;
+          d_init = 1;
         }
 
         gettimeofday(&tve, &tze);
@@ -256,7 +287,7 @@ namespace gr {
         consume_each (nblocks * d_nsymbols);
 
         // Tell runtime system how many output items we produced.
-        return noutput_items;
+        return (to_out);
     }
 
   } /* namespace dvbt */

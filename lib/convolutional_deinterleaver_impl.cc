@@ -57,7 +57,7 @@ namespace gr {
           io_signature::make(1, 1, sizeof (unsigned char) * I * blocks)),
       d_blocks(blocks), d_I(I), d_M(M)
     {
-      set_relative_rate(1.0 / I * d_blocks);
+      set_relative_rate(1.0 / d_I * d_blocks);
       set_output_multiple(2);
       //The positions are shift registers (FIFOs)
       //of lenght i*M
@@ -101,12 +101,36 @@ namespace gr {
 
         int to_out = noutput_items;
 
-        PRINTF("INTERLEAVER: noutput_items: %i\n", noutput_items);
+        /*
+         * Look for a tag that signals superframe_start and consume all input items
+         * that are in input buffer so far.
+         * This will actually reset the convolutional deinterleaver
+         */
+        std::vector<tag_t> tags;
+        const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+        this->get_tags_in_range(tags, 0, nread, nread + (noutput_items * d_I * d_blocks), pmt::string_to_symbol("superframe_start"));
+
+        if (tags.size())
+        {
+          printf("convolutional_superframe_start: %lu\n", tags[0].offset - nread);
+
+          if (tags[0].offset - nread)
+          {
+            consume_each(tags[0].offset - nread);
+            return (0);
+          }
+        }
+
+        /*
+         * At this moment the first item in input buffer should be NSYNC or SYNC
+         */
+        PRINTF("DEINTERLEAVER: noutput_items: %i\n", noutput_items);
 
         for (int count = 0, i = 0; i < to_out; i++)
         {
           for (int mux_pkt = 0; mux_pkt < d_MUX_PKT; mux_pkt++)
           {
+            PRINTF("DEINTERLEAVER: in[%i]: %x\n", count, in[count]);
             // This is actually the interleaver
             for (int k = 0; k < (d_M * d_I); k++)
             {
@@ -117,7 +141,7 @@ namespace gr {
           }
         }
 
-        PRINTF("INTERLEAVER: to_out: %i\n", to_out);
+        PRINTF("DEINTERLEAVER: to_out: %i\n", to_out);
 
         // Tell runtime system how many input items we consumed on
         // each input stream.

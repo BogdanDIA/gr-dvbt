@@ -41,7 +41,7 @@ namespace gr {
       int d_ninput;
       int d_noutput;
 
-      int d_skip;
+      int d_init;
 
       int is_sync_start(int nitems);
 

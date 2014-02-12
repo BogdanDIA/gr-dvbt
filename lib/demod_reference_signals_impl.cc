@@ -64,10 +64,10 @@ namespace gr {
           config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
             guard_interval, transmission_mode, include_cell_id, cell_id),
           d_ninput(ninput), d_noutput(noutput),
-          d_pg(config)
+          d_pg(config),
+          d_init(0)
     {
       //
-      d_skip = 1;
     }
 
     /*
@@ -103,18 +103,23 @@ namespace gr {
 
       /*
        * Wait for a sync_start tag from upstream that signals when to start.
-       * Skip OFDM symbols to start always with quad symbol (0, 4, 8, etc)
+       * Allways consume until to a superframe start.
        */
       if (is_sync_start(noutput_items))
-        d_skip = 1;
+        d_init = 0;
 
-      if (d_skip)
+      if (d_init == 0)
       {
         // This is super-frame start
         if (((symbol_index % 68) == 0) && ((frame_index % 4) == 3))
         {
-          d_skip = 0;
+          d_init = 1;
           printf("symbol_index: %i, frame_index: %i\n", symbol_index, frame_index);
+
+          const uint64_t offset = this->nitems_written(0);
+          pmt::pmt_t key = pmt::string_to_symbol("superframe_start");
+          pmt::pmt_t value = pmt::from_long(0xaa);
+          this->add_item_tag(0, offset, key, value);
         }
         else
         {

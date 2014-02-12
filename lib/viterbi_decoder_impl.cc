@@ -82,7 +82,8 @@ namespace gr {
       config(constellation, hierarchy, coderate, coderate),
       d_bsize(bsize),
       d_S0(S0),
-      d_SK(SK)
+      d_SK(SK),
+      d_init(0)
     {
       //Determine k - input of encoder
       d_k = config.d_cr_k;
@@ -166,8 +167,6 @@ namespace gr {
       d_viterbi_chunks_init(state0);
 
       d_viterbi_chunks_init_sse2(metric0, path0);
-
-      d_init = 0;
     }
 
     /*
@@ -206,6 +205,30 @@ namespace gr {
           const unsigned char *in = (const unsigned char *) input_items[m];
           unsigned char *out = (unsigned char *) output_items[m];
 
+          /*
+           * Look for a tag that signals superframe_start and consume all input items
+           * that are in input buffer so far.
+           * This will actually reset the viterbi decoder.
+           */
+          std::vector<tag_t> tags;
+          const uint64_t nread = this->nitems_read(0); //number of items read on port 0
+          this->get_tags_in_range(tags, 0, nread, nread + (nblocks * d_nsymbols), pmt::string_to_symbol("superframe_start"));
+
+          if (tags.size())
+          {
+            d_init = 0;
+            d_viterbi_chunks_init_sse2(metric0, path0);
+
+            printf("VITERBI: superframe_start: %li\n", tags[0].offset - nread);
+
+            if (tags[0].offset - nread)
+            {
+              consume_each(tags[0].offset - nread);
+              return (0);
+            }
+          }
+
+          // This is actually the Viterbi decoder
           for (int n = 0; n < nblocks; n++)
           {
             /*
@@ -274,6 +297,16 @@ namespace gr {
         
         if (d_init == 0)
         {
+          /*
+           * Send superframe_start to signal this situation
+           * downstream
+           */
+          const uint64_t offset = this->nitems_written(0);
+          pmt::pmt_t key = pmt::string_to_symbol("superframe_start");
+          pmt::pmt_t value = pmt::from_long(1);
+          this->add_item_tag(0, offset, key, value);
+
+          // Take in consideration the traceback length
           to_out = to_out - d_ntraceback;
           d_init = 1;
         }

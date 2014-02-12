@@ -260,7 +260,7 @@ d_viterbi_chunks_init(struct viterbi_state* state) {
 void
 d_viterbi_chunks_init_sse2(__m128i *mm0, __m128i *pp0) {
   // Initialize starting metrics to prefer 0 state
-  int i;
+  int i, j;
 
   for (i = 0; i < 4; i++)
   {
@@ -273,6 +273,13 @@ d_viterbi_chunks_init_sse2(__m128i *mm0, __m128i *pp0) {
   {
     Branchtab27_sse2[0].c[i] = (polys[0] < 0) ^ d_Partab[(2*i) & abs(polys[0])] ? 1 : 0;
     Branchtab27_sse2[1].c[i] = (polys[1] < 0) ^ d_Partab[(2*i) & abs(polys[1])] ? 1 : 0;
+  }
+
+  for (i = 0; i < 64; i++)
+  {
+    mmresult[i] = 0;
+    for (j = 0; j < TRACEBACK_MAX; j++)
+      ppresult[j][i] = 0;
   }
 }
 

@@ -112,8 +112,6 @@ namespace gr {
 
         if (tags.size())
         {
-          printf("convolutional_superframe_start: %lu\n", tags[0].offset - nread);
-
           if (tags[0].offset - nread)
           {
             consume_each(tags[0].offset - nread);

@@ -65,9 +65,14 @@ namespace gr {
             guard_interval, transmission_mode, include_cell_id, cell_id),
           d_ninput(ninput), d_noutput(noutput),
           d_pg(config),
-          d_init(0)
+          d_init(0),
+          d_fi_start(0)
     {
-      //
+      // TODO - investigate why this is happening
+      if ((config.d_constellation == QAM64) && (config.d_transmission_mode == T8k))
+        d_fi_start = 2;
+      else
+        d_fi_start = 3;
     }
 
     /*
@@ -111,7 +116,7 @@ namespace gr {
       if (d_init == 0)
       {
         // This is super-frame start
-        if (((symbol_index % 68) == 0) && ((frame_index % 4) == 3))
+        if (((symbol_index % 68) == 0) && ((frame_index % 4) == d_fi_start))
         {
           d_init = 1;
           printf("symbol_index: %i, frame_index: %i\n", symbol_index, frame_index);

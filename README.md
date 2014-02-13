@@ -29,7 +29,13 @@ The encoder/decoder currently works with gnuradio 3.7.2.x and 3.6 (if taken from
 
 The dvb-t module requires SSE2 SIMD instructions available in the processor. If the SSE2 is not available then illegal instruction will be seen at runtime.  
 
-Two new grc files are added to demo encoding/decoding for 2k, QAM64 and rate 7/8: dvbt_tx_demo_2k_QAM64_rate78.grc and dvbt_rx_demo_2k_QAM64_rate78.grc.  
+Demo grc files for encoding/decoding:  
+- for 2k: QAM16 and rate 1/2: dvbt_tx_demo.grc and dvbt_rx_demo.grc.  
+- for 2k: QAM64 and rate 7/8: dvbt_tx_demo_2k_QAM64_rate78.grc and dvbt_rx_demo_2k_QAM64_rate78.grc.  
+- for 8k, QAM16 and rate 1/2: dvbt_tx_demo_8k.grc and dvbt_rx_demo_8k.grc.  
+- for 8k, QAM64 and rate 7/8: dvbt_tx_demo_8k_QAM64_rate78.grc and dvbt_rx_demo_8k_QAM64_rate78.grc.  
+- for 8k, QPSK and rate 7/8: dvbt_tx_demo_8k_QPSK_rate78.grc and dvbt_rx_demo_8k_QPSK_rate78.grc.  
+
 
 **Build and run**  
 git clone https://github.com/BogdanDIA/gr-dvbt.git  

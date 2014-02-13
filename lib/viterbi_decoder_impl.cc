@@ -219,6 +219,8 @@ namespace gr {
             d_init = 0;
             d_viterbi_chunks_init_sse2(metric0, path0);
 
+            //printf("viterbi: superframe_start: %i\n", tags[0].offset - nread);
+
             if (tags[0].offset - nread)
             {
               consume_each(tags[0].offset - nread);

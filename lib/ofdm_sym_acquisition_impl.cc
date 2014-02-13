@@ -550,6 +550,10 @@ namespace gr {
               d_freq_correction_count = 0;
 
               printf("restart aquisition\n");
+
+              // Restart wit a half number so that we'll not endup with the same situation
+              // This will prevent peak_detect to not detect anything
+              d_to_consume = d_to_consume / 2;
             }
           }
         }

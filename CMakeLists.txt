@@ -85,8 +85,10 @@ set(GRC_BLOCKS_DIR      ${GR_PKG_DATA_DIR}/grc/blocks)
 ########################################################################
 #find_package(GnuradioRuntime)
 
-set(GR_REQUIRED_COMPONENTS RUNTIME FFT TRELLIS)
+set(GR_REQUIRED_COMPONENTS RUNTIME FFT TRELLIS VOLK)
 find_package(Gnuradio "3.7.2.1" REQUIRED)
+
+find_package(volk REQUIRED)
 
 find_package(CppUnit)
 

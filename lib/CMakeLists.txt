@@ -50,7 +50,7 @@ add_library(gnuradio-dvbt SHARED
     d_viterbi.c
     d_metrics.c
     d_tab.c)
-  target_link_libraries(gnuradio-dvbt ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${GNURADIO_VOLK_LIBRARIES})
+  target_link_libraries(gnuradio-dvbt ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${VOLK_LIBRARIES})
 set_target_properties(gnuradio-dvbt PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt_EXPORTS")
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")

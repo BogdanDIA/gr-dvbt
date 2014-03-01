@@ -87,6 +87,7 @@ set(GR_REQUIRED_COMPONENTS RUNTIME VOLK)
 
 find_package(Gnuradio "3.7.2.1" REQUIRED)
 find_package(CppUnit)
+find_package(Volk REQUIRED)
 
 if(NOT GNURADIO_RUNTIME_FOUND)
     message(FATAL_ERROR "GnuRadio Core required to compile dvbt")
@@ -94,6 +95,10 @@ endif()
 
 if(NOT CPPUNIT_FOUND)
     message(FATAL_ERROR "CppUnit required to compile dvbt")
+endif()
+
+if(NOT VOLK_FOUND)
+    message(FATAL_ERROR "Volk required to compile dvbt")
 endif()
 
 ########################################################################

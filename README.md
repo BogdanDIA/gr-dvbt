@@ -43,5 +43,9 @@ cd gr-dvbt
 mkdir build  
 cd build  
 cmake ../  
-make && sudo make install  
+make && sudo make install
+
+if gr-dvbt is installed for the first time:
+
+sudo ldconfig
 

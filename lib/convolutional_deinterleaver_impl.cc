@@ -65,7 +65,7 @@ namespace gr {
         d_shift.push_back(new std::deque<unsigned char>(d_M * i, 0));
 
       // There are 8 mux packets
-      assert(d_blocks / d_m == d_MUX_PKT);
+      assert(d_blocks / d_M == d_MUX_PKT);
     }
 
     /*

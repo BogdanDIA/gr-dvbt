@@ -26,7 +26,7 @@
 #include "energy_descramble_impl.h"
 #include <stdio.h>
 
-//#define DEBUG 1
+#define DEBUG 1
 
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)
@@ -152,7 +152,10 @@ namespace gr {
               // PRBS clocking starts right after NSYNC
 
               for (int k = 1; k < d_bsize; k++)
-                out[count++] = in[d_index + count] ^ clock_prbs(d_nblocks);
+              {
+                out[count] = in[d_index + count] ^ clock_prbs(d_nblocks);
+                count++;
+              }
 
               // For subsequent blocks PRBS is clocked also on SYNC
               // but its output is not used

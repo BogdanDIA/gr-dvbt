@@ -53,10 +53,10 @@ add_library(gnuradio-dvbt SHARED
   target_link_libraries(gnuradio-dvbt ${Boost_LIBRARIES} ${GNURADIO_RUNTIME_LIBRARIES} ${VOLK_LIBRARIES})
 set_target_properties(gnuradio-dvbt PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt_EXPORTS")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
+#set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
 #set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -ftree-vectorizer-verbose=2 -mavx")
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -msse2")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -funroll-loops -msse2")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -funroll-loops -msse2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -funroll-loops -msse2")
 
 ########################################################################
 # Install built library files

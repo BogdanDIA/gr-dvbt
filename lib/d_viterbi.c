@@ -326,7 +326,6 @@ d_viterbi_butterfly8(unsigned char *symbols, int mettab[2][256], struct viterbi_
 void
 d_viterbi_butterfly2(unsigned char *symbols, int mettab[2][256], struct viterbi_state *state0, struct viterbi_state *state1)
 {
-  int i, j;
   int mets[4];
 
   struct viterbi_state *state, *next;
@@ -461,7 +460,7 @@ d_viterbi_butterfly2(unsigned char *symbols, int mettab[2][256], struct viterbi_
 void
 d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __m128i *pp0, __m128i *pp1)
 {
-  int i, j;
+  int i;
 
   __m128i *metric0, *metric1;
   __m128i *path0, *path1;
@@ -478,7 +477,6 @@ d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __
   __m128i shift0, shift1;
   __m128i tmp0, tmp1;
   __m128i sym0v, sym1v;
-  __m128i min;
 
   sym0v = _mm_set1_epi8(symbols[0]);
   sym1v = _mm_set1_epi8(symbols[1]);
@@ -579,7 +577,7 @@ d_viterbi_butterfly2_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __
 void
 d_viterbi_butterfly_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __m128i *pp0, __m128i *pp1)
 {
-  int i, j;
+  int i;
 
   __m128i *metric0, *metric1;
   __m128i *path0, *path1;
@@ -600,7 +598,6 @@ d_viterbi_butterfly_sse2(unsigned char *symbols, __m128i *mm0, __m128i *mm1, __m
   __m128i shift0, shift1;
   __m128i tmp0, tmp1;
   __m128i sym0v, sym1v;
-  __m128i min;
 
   sym0v = _mm_set1_epi8(symbols[0]);
   sym1v = _mm_set1_epi8(symbols[1]);
@@ -661,7 +658,7 @@ d_viterbi_get_output(struct viterbi_state *state, unsigned char *outbuf) {
   //  if((bitcnt % 8) == 5 && bitcnt > 32) {
 
   //  Find current best path
-  unsigned int i, j, beststate = 0;
+  unsigned int i, beststate = 0;
   int bestmetric;
 
   bestmetric = state[0].metric;
@@ -682,7 +679,7 @@ d_viterbi_get_output(struct viterbi_state *state, unsigned char *outbuf) {
 unsigned char
 d_viterbi_get_output_sse2(__m128i *mm0, __m128i *pp0, int ntraceback, unsigned char *outbuf) {
   //  Find current best path
-  int i, j;
+  int i;
   int bestmetric, minmetric;
   int beststate = 0;
   int pos = 0;

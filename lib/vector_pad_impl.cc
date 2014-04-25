@@ -72,8 +72,6 @@ namespace gr {
 
       int icnt = 0;
       int ocnt = 0;
-      int blocks = 0;
-      
       
       for (int i = 0; i < noutput_items; i++)
       {

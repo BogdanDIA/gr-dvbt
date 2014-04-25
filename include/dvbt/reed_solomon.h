@@ -46,22 +46,22 @@ namespace gr {
      * \param blocks number of blocks to process at once\n
      */
     private:
-      int d_lambda;
-      int d_gfpoly;
       int d_p;
       int d_m;
+      int d_gfpoly;
       int d_n;
       int d_k;
       int d_t;
+      int d_s;
+      int d_blocks;
       unsigned char *d_gf_exp;
       unsigned char *d_gf_log;
       unsigned char *d_l;
       unsigned char *d_g;
 
-      int d_s;
-      int d_blocks;
       unsigned char *d_syn;
       int d_index;
+      int d_lambda;
 
       int gf_add(int a, int b);
       int gf_mul(int a, int b);

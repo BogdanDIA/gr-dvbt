@@ -103,7 +103,6 @@ namespace gr {
     const int * d_cpilot_carriers;
     float * d_known_phase_diff;
     float * d_cpilot_phase_diff;
-    int d_freq_offset_max;
     int d_freq_offset;
     float d_carrier_freq_correction;
     float d_sampling_freq_correction;
@@ -138,15 +137,17 @@ namespace gr {
     int d_spilot_index;
     int d_cpilot_index;
     int d_tpilot_index;
-    int d_payload_index;
-    int d_chanestim_index;
     int d_symbol_index;
-    int d_prev_mod_symbol_index;
-    int d_mod_symbol_index;
     int d_symbol_index_known;
-    int d_equalizer_ready;
     int d_frame_index;
     int d_superframe_index;
+    int d_freq_offset_max;
+    int d_trigger_index;
+    int d_payload_index;
+    int d_chanestim_index;
+    int d_prev_mod_symbol_index;
+    int d_mod_symbol_index;
+    int d_equalizer_ready;
 
     // PRPS generator data buffer
     char * d_wk;
@@ -209,8 +210,6 @@ namespace gr {
     void set_payload_carrier(int k);
     void advance_payload();
     void process_payload_data(const gr_complex *in, gr_complex *out);
-
-    int d_trigger_index;
 
   public:
 

@@ -31,8 +31,10 @@
 #include <sys/time.h>
 
 // For timing debug
+#ifdef DEMAP_DEBUG
 static struct timeval tvs, tve;
 static struct timezone tzs, tze;
+#endif
 
 #define USE_VOLK 1
 #define USE_POSIX_MEMALIGN 1

@@ -1268,10 +1268,10 @@ namespace gr {
           io_signature::make(1, 1, itemsize * noutput)),
           config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
               guard_interval, transmission_mode, include_cell_id, cell_id),
-          d_ninput(ninput), d_noutput(noutput),
     d_pg(config)
     {
-      //
+      d_ninput = ninput;
+      d_noutput = noutput;
     }
 
     /*

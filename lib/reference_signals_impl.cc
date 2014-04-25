@@ -498,7 +498,8 @@ namespace gr {
         size = d_spilot_carriers_size + 1;
 
       // TODO - fix this - what value should we use?
-      d_spilot_index = (++d_spilot_index) % size;
+      ++d_spilot_index;
+      d_spilot_index = d_spilot_index % size;
     }
 
     int
@@ -633,8 +634,8 @@ namespace gr {
         d_channel_gain[startk + j] = current;
 
         //printf("currentgain[%i]: re: %f, img: %f\n", j, current.real(), current.imag());
-        //printf("d_symbol_index: %i, set_d_channel_gain[%i]: re: %f, img: %f\n", \
-          d_symbol_index, startk + j, d_channel_gain[startk + j].real(), d_channel_gain[startk + j].imag());
+        //printf("d_symbol_index: %i, set_d_channel_gain[%i]: re: %f, img: %f\n",
+        //  d_symbol_index, startk + j, d_channel_gain[startk + j].real(), d_channel_gain[startk + j].imag());
       }
 
       startk = k;
@@ -706,7 +707,8 @@ namespace gr {
     void
     pilot_gen::advance_cpilot()
     {
-      d_cpilot_index = (++d_cpilot_index) % d_cpilot_carriers_size;
+      ++d_cpilot_index;
+      d_cpilot_index = d_cpilot_index % d_cpilot_carriers_size;
     }
 
     void
@@ -842,7 +844,8 @@ namespace gr {
     void
     pilot_gen::advance_tpilot()
     {
-      d_tpilot_index = (++d_tpilot_index) % (d_tps_carriers_size);
+      ++d_tpilot_index;
+      d_tpilot_index = d_tpilot_index % d_tps_carriers_size;
     }
 
     /*

@@ -309,7 +309,6 @@ namespace gr {
 
       int r = no_eras;
       int el = no_eras;
-      unsigned char d_discr;
 
       memcpy(b, sigma, 2 * d_t + 1);
 

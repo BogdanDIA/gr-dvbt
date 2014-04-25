@@ -73,7 +73,7 @@ namespace gr {
      */
     convolutional_deinterleaver_impl::~convolutional_deinterleaver_impl()
     {
-      for (int i = 0; i < d_shift.size(); i++)
+      for (unsigned int i = 0; i < d_shift.size(); i++)
       {
         delete d_shift.back();
         d_shift.pop_back();

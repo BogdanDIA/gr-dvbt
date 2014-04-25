@@ -27,8 +27,10 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+#ifdef RS_DEBUG
 static struct timeval tvs, tve;
 static struct timezone tzs, tze;
+#endif
 
 namespace gr {
   namespace dvbt {
@@ -102,8 +104,8 @@ namespace gr {
 
       //gettimeofday(&tve, &tze);
 
-      //printf("reed_solomon: blocks: %i, us: %f\n", d_blocks * noutput_items, \
-          (float) (tve.tv_usec - tvs.tv_usec) / (float) (d_blocks * noutput_items));
+      //printf("reed_solomon: blocks: %i, us: %f\n", d_blocks * noutput_items,
+        //(float) (tve.tv_usec - tvs.tv_usec) / (float) (d_blocks * noutput_items));
 
       // Tell runtime system how many input items we consumed on
       // each input stream.

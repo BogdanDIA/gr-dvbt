@@ -26,7 +26,7 @@
 #include "energy_descramble_impl.h"
 #include <stdio.h>
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #ifdef DEBUG
 #define PRINTF(a...) printf(a)

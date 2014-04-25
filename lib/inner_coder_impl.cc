@@ -36,20 +36,6 @@ namespace gr {
       //insert input bit
       d_reg |= ((in & 0x1) << 7);
 
-      int val = d_reg;
-
-      int bit7 = (val >> 7) & 1;
-      int bit6 = (val >> 6) & 1;
-      int bit5 = (val >> 5) & 1;
-      int bit4 = (val >> 4) & 1;
-      int bit3 = (val >> 3) & 1;
-      int bit2 = (val >> 2) & 1;
-
-      int state = (bit2 << 5) | (bit3 << 4) | (bit4 << 3) | (bit5 << 2) | (bit6 << 1) | bit7;
-      //printf("d_reg: %x, state: %x\n", d_reg, state);
-
-
-
       d_reg  = d_reg >> 1;
 
       // TODO - do this with polynoms and bitcnt

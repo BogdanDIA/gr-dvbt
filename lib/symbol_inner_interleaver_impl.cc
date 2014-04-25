@@ -39,7 +39,6 @@ namespace gr {
       const int Nmax = d_payload_length;
       const int Nr = int(ceil(log2(d_fft_length)));
       int q = 0;
-      int hq = 0;
 
       for (int i = 0; i < Mmax; i++)
       {
@@ -191,7 +190,8 @@ namespace gr {
                 out[blocks + H(q)] = in[blocks + q];
             }
 
-            d_symbol_index = (++d_symbol_index) % d_symbols_per_frame;
+            ++d_symbol_index;
+            d_symbol_index = d_symbol_index % d_symbols_per_frame;
           }
           else
           {

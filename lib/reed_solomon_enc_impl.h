@@ -41,15 +41,15 @@ namespace gr {
     class reed_solomon_enc_impl : public reed_solomon_enc
     {
     private:
-      int d_lambda;
-      int d_gfpoly;
       int d_p;
       int d_m;
+      int d_gfpoly;
       int d_n;
       int d_k;
       int d_t;
       int d_s;
       int d_blocks;
+      int d_lambda;
 
       unsigned char * d_in;
 

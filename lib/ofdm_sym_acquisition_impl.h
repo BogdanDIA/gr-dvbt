@@ -36,7 +36,6 @@ namespace gr {
       float d_rho;
 
       int d_index;
-      int d_count;
 
       int d_search_max;
 
@@ -54,6 +53,8 @@ namespace gr {
       float d_avg;
       float d_phase;
       double d_phaseinc;
+      int d_cp_found;
+      int d_count;
       double d_nextphaseinc;
       int d_nextpos;
 
@@ -62,10 +63,9 @@ namespace gr {
 
       int d_initial_aquisition;
 
-      int d_freq_correction_timeout;
       int d_freq_correction_count;
+      int d_freq_correction_timeout;
 
-      int d_cp_found;
       int d_cp_start;
       gr_complex * d_derot;
       int d_to_consume;

@@ -264,7 +264,7 @@ namespace gr {
       int peak_length, peak, peak_max;
       // Find peaks of lambda
       // We have found an end of symbol at peak_pos[0] + CP + FFT
-      if (peak_length = peak_detect_process(&d_lambda[0], (lookup_start - lookup_stop), &peak_pos[0], &peak_max))
+      if ((peak_length = peak_detect_process(&d_lambda[0], (lookup_start - lookup_stop), &peak_pos[0], &peak_max)))
       {
         peak = peak_pos[peak_max] + lookup_stop;
 #if 0
@@ -362,6 +362,7 @@ namespace gr {
     int
     ofdm_sym_acquisition_impl::cp_sync(const gr_complex * in, int * cp_pos, gr_complex * derot, int * to_consume, int * to_out)
     {
+      return (0);
     }
 
 

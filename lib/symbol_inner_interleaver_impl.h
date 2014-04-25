@@ -39,13 +39,12 @@ namespace gr {
     private:
       const dvbt_config config;
 
-      int d_nsize;
-
       int d_symbols_per_frame;
       dvbt_transmission_mode_t d_transmission_mode;
+      int d_nsize;
+      int d_direction;
       int d_fft_length;
       int d_payload_length;
-      int d_direction;
 
       int * d_h;
       const char * d_bit_perm;

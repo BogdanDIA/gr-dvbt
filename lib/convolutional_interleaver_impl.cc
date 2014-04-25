@@ -55,7 +55,7 @@ namespace gr {
      */
     convolutional_interleaver_impl::~convolutional_interleaver_impl()
     {
-      for (int i = 0; i < d_shift.size(); i++)
+      for (unsigned int i = 0; i < d_shift.size(); i++)
       {
         delete d_shift.back();
         d_shift.pop_back();
@@ -70,10 +70,10 @@ namespace gr {
         const unsigned char *in = (const unsigned char *) input_items[0];
         unsigned char *out = (unsigned char *) output_items[0];
 
-        for (int i = 0; i < (noutput_items / d_I); i++)
+        for (unsigned int i = 0; i < (noutput_items / d_I); i++)
         {
           //Process one block of I symbols
-          for (int j = 0; j < d_shift.size(); j++)
+          for (unsigned int j = 0; j < d_shift.size(); j++)
           {
             d_shift[j]->push_front(in[(d_I * i) + j]);
             out[(d_I * i) + j] = d_shift[j]->back();

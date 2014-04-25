@@ -99,16 +99,6 @@ namespace gr {
       int d_frame_index;
       int d_superframe_index;
 
-      //Transmission type parameters
-      dvbt_transmission_mode_t d_transmission_mode;
-      int d_Kmin;
-      int d_Kmax;
-      int d_fft_length;
-      int d_payload_length;
-      int d_zeros_on_left;
-      int d_zeros_on_right;
-      int d_cp_length;
-
       //Constelaltion parameters
       dvbt_constellation_t d_constellation;
       int d_constellation_size;
@@ -116,20 +106,37 @@ namespace gr {
       int d_m;
       float d_norm;
 
-      //Inner Coding + puncturer parameters
-      dvbt_code_rate_t d_code_rate_HP;
-      dvbt_code_rate_t d_code_rate_LP;
-      int d_cr_k;
-      int d_cr_n;
-      int d_cr_p;
-
       //Hierarchy information
       dvbt_hierarchy_t d_hierarchy;
       int d_alpha;
 
+      //Inner Coding parameters
+      dvbt_code_rate_t d_code_rate_HP;
+      dvbt_code_rate_t d_code_rate_LP;
+
+      // Guard interval length
       dvbt_guard_interval_t d_guard_interval;
+
+      //Transmission type parameters
+      dvbt_transmission_mode_t d_transmission_mode;
+
+      //Include cell id + cell id parameters
       int d_include_cell_id;
       int d_cell_id;
+
+      // Puncturer parameters
+      int d_cr_k;
+      int d_cr_n;
+      int d_cr_p;
+
+      //Other DVB-T parameters
+      int d_Kmin;
+      int d_Kmax;
+      int d_fft_length;
+      int d_payload_length;
+      int d_zeros_on_left;
+      int d_zeros_on_right;
+      int d_cp_length;
 
       void set_frame_number(int fn);
       int get_frame_mumber();

@@ -1,6 +1,7 @@
 /*
  * Copyright 1995 Phil Karn, KA9Q
  * Copyright 2008 Free Software Foundation, Inc.
+ * 2014 Added SSE2 implementation Bogdan Diaconescu
  *
  * This file is part of GNU Radio
  *
@@ -71,7 +72,7 @@ static union branchtab27 { unsigned char c[32]; __m128i v[2];} Branchtab27_sse2[
 // Metrics for each state
 static unsigned char mmresult[64] __attribute__((aligned(16))) = {0};
 // Paths for each state
-static unsigned char ppresult[TRACEBACK_MAX][64] __attribute__((aligned(16))) = {0};
+static unsigned char ppresult[TRACEBACK_MAX][64] __attribute__((aligned(16))) = {{0,0}};
 // Position in circular buffer where the current decoded byte is stored
 static int store_pos = 0;
 

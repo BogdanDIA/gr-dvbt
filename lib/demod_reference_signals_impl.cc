@@ -63,11 +63,13 @@ namespace gr {
           io_signature::make(1, 1, itemsize * noutput)),
           config(constellation, hierarchy, code_rate_HP, code_rate_LP, \
             guard_interval, transmission_mode, include_cell_id, cell_id),
-          d_ninput(ninput), d_noutput(noutput),
           d_pg(config),
           d_init(0),
           d_fi_start(0)
     {
+      d_ninput = ninput;
+      d_noutput = noutput;
+
       // TODO - investigate why this is happening
       if ((config.d_constellation == QAM64) && (config.d_transmission_mode == T8k))
         d_fi_start = 2;

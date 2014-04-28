@@ -123,7 +123,7 @@ namespace gr {
       d_direction = direction;
 
       // Verify if transmission mode matches with size of block
-      assert(d_payload_length != d_nsize);
+      assert(d_payload_length == d_nsize);
 
       // Allocate memory for h vector
       d_h = new int[d_fft_length];

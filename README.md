@@ -1,4 +1,4 @@
-###PROJECT: DVB-T implementation using gnuradio
+### PROJECT: DVB-T implementation using gnuradio
 **This is a opensource implementation of DVB-T encoder/decoder according to ETSI 300 744**  
 Works with gnuradio 3.7 and more details can be seen here:  
 http://yo3iiu.ro/blog/?p=1191  
@@ -6,7 +6,7 @@ http://yo3iiu.ro/blog/?p=1220
 http://yo3iiu.ro/blog/?p=1244  
 
 
-###HowTo:
+### HowTo:
 **Run TX**   
 The dvbt TX implementation now supports 2k/8k mode, QPSK, QAM16, QAM64 constelaltions and rates 1/2, 2/3, 3/4, 5/6, 7/8.  
 The simplest way to run DVB-T encoding is to use the gnuradio-companion flowgraphs apps/dvbt_tx_demo.grc. It will start with a MPEG-2 TS file and will eventually generate the 10Msps baseband samples.  

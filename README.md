@@ -1,6 +1,6 @@
 ### PROJECT: DVB-T implementation using gnuradio
 
-Late note: As of 2015, I donated the gr-dvbt project to gnuradio. It is now integrated in the mainiline of gnuradio.  
+**Late note: As of 2015, I donated the gr-dvbt project to gnuradio. It is now integrated in the mainiline of gnuradio.**  
 
 **This is a opensource implementation of DVB-T encoder/decoder according to ETSI 300 744**  
 Works with gnuradio 3.7 and more details can be seen here:  
